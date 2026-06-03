@@ -1,16 +1,7 @@
 import { prisma } from '../src/lib/db/prisma'
 
 async function main() {
-  const quijos = await prisma.tenant.upsert({
-    where: { slug: 'quijos' },
-    update: {},
-    create: {
-      name: 'Cantón Quijos',
-      slug: 'quijos',
-    },
-  })
-  
-  console.log({ quijos })
+  console.log('Seeding is not required at this time.');
 }
 
 main()
