@@ -62,9 +62,9 @@ export async function generateActionPlan() {
     Tu respuesta debe ser estrictamente Markdown bien formateado, muy profesional y orientada a la acción ejecutiva del Alcalde.
     `;
 
-    // 4. Llamada a Gemini con Google Search Grounding activado
+    // 4. Llamada a Gemini
     const { text } = await generateText({
-      model: google('gemini-2.5-flash', { useSearchGrounding: true }),
+      model: google('gemini-2.5-flash'),
       prompt: prompt,
       temperature: 0.7,
     });
@@ -116,7 +116,7 @@ export async function analyzeSingleReport(reportId: string) {
     `;
 
     const { text } = await generateText({
-      model: google('gemini-2.5-flash', { useSearchGrounding: true }),
+      model: google('gemini-2.5-flash'),
       prompt: prompt,
       temperature: 0.7,
     });
