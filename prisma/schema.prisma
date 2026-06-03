@@ -94,3 +94,11 @@ enum ReportStatus {
   RESOLVED
   REJECTED
 }
+
+// Configuración Global de la Plataforma
+model SystemSettings {
+  id             String   @id @default("global")
+  platformName   String   @default("Plataforma Ciudadana")
+  aiPromptMaster String   @db.LongText
+  updatedAt      DateTime @updatedAt
+}

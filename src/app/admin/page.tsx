@@ -22,12 +22,12 @@ export default async function AdminDashboard() {
               <Link href="/" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors border-r border-gray-700 pr-4 mr-2" title="Volver al Portal Público">
                 <Globe size={18} /> Portal
               </Link>
-              <button disabled className="flex items-center gap-2 text-gray-400 dark:text-gray-500 cursor-not-allowed transition-colors" title="Módulo en desarrollo">
+              <Link href="/admin/settings" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                 <Settings size={18} /> Configuración
-              </button>
-              <button disabled className="flex items-center gap-2 text-gray-400 dark:text-gray-500 cursor-not-allowed transition-colors" title="Módulo en desarrollo">
+              </Link>
+              <Link href="/admin/users" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                 <Users size={18} /> Usuarios
-              </button>
+              </Link>
               <form action={logoutAction}>
                 <button type="submit" className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors ml-4 border-l border-gray-700 pl-4">
                   <LogOut size={18} /> Salir

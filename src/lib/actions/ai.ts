@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { getSettings } from "@/lib/actions/settings";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -42,13 +43,14 @@ export async function generateActionPlan() {
       };
     }
 
+    const settings = await getSettings();
+
     // 2. Preparar el resumen estadístico para la IA
     const summaryData = JSON.stringify(reports);
 
     // 3. Prompt para la IA
     const prompt = `
-    Actúa como un Consultor Experto en Smart Cities y Políticas Públicas para el Gobierno Autónomo Descentralizado local en Ecuador.
-    Contexto Actual: Año 2026. Basa tus recomendaciones de presupuesto y normativas en la realidad y leyes actualizadas vigentes para el 2026.
+    ${settings.aiPromptMaster}
     
     A continuación tienes un listado en JSON de los reportes y quejas ciudadanas recientes:
     ${summaryData}
@@ -95,10 +97,12 @@ export async function analyzeSingleReport(reportId: string) {
       return { success: false, error: 'Reporte no encontrado.', content: null };
     }
 
+    const settings = await getSettings();
+
     const prompt = `
-    Actúa como un Experto en Administración Pública, Ley Orgánica de Contratación Pública y COOTAD (Ecuador).
-    
-    Contexto Actual: Estamos en el año 2026. Ha habido cambios recientes (aprox. abril 2026) en el COOTAD respecto a competencias de GADs y montos obligatorios de inversión pública, así como actualizaciones en la Ínfima Cuantía.
+    ${settings.aiPromptMaster}
+
+    Adicionalmente, actúa como un Experto en Administración Pública, Ley Orgánica de Contratación Pública y COOTAD (Ecuador).
     POR FAVOR, USA TU CAPACIDAD DE BÚSQUEDA (Google Search) para buscar y confirmar las leyes vigentes en Ecuador para 2026 antes de responder. No uses datos desactualizados de 2024.
 
     Tienes la siguiente petición o problema ciudadano:
