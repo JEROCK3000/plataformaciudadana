@@ -1,7 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
 import { notFound } from 'next/navigation';
-import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, Shield } from 'lucide-react';
+import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, Shield, Globe } from 'lucide-react';
 import Link from 'next/link';
 import SingleReportAI from '@/components/ui/SingleReportAI';
 import ReactMarkdown from 'react-markdown';
@@ -37,12 +37,19 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-12">
       <header className="bg-gray-900 dark:bg-black text-white shadow-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 py-4">
-            <Link href="/admin" className="p-2 hover:bg-gray-800 rounded-full transition-colors">
-              <ArrowLeft size={20} />
-            </Link>
-            <Shield size={24} className="text-emerald-400" />
-            <h1 className="text-xl font-bold">Gestión de Reporte</h1>
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-4">
+              <Link href="/admin" className="p-2 hover:bg-gray-800 rounded-full transition-colors" title="Volver al panel">
+                <ArrowLeft size={20} />
+              </Link>
+              <Shield size={24} className="text-emerald-400" />
+              <h1 className="text-xl font-bold">Gestión de Reporte</h1>
+            </div>
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors" title="Volver al Portal Público">
+                <Globe size={18} /> Portal
+              </Link>
+            </div>
           </div>
         </div>
       </header>

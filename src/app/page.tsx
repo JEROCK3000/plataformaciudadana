@@ -23,7 +23,7 @@ export default async function PublicPortal() {
               </div>
               <div>
                 <h1 className="text-xl font-bold leading-tight">Plataforma Ciudadana</h1>
-                <p className="text-xs text-emerald-200 font-medium tracking-wide uppercase">Participación Smart City</p>
+                <p className="text-xs text-emerald-200 font-medium tracking-wide uppercase">Participación Eficiente y Activa</p>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { Shield, Settings, Users, LogOut } from 'lucide-react';
+import { Shield, Settings, Users, LogOut, Globe } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '@/lib/actions/auth';
 
@@ -19,6 +19,9 @@ export default async function AdminDashboard() {
               <h1 className="text-xl font-bold">Panel de Administración</h1>
             </div>
             <div className="flex items-center gap-4 text-sm font-medium">
+              <Link href="/" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors border-r border-gray-700 pr-4 mr-2" title="Volver al Portal Público">
+                <Globe size={18} /> Portal
+              </Link>
               <button disabled className="flex items-center gap-2 text-gray-400 dark:text-gray-500 cursor-not-allowed transition-colors" title="Módulo en desarrollo">
                 <Settings size={18} /> Configuración
               </button>

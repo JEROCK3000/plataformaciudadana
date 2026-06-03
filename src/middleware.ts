@@ -8,13 +8,17 @@ export function middleware(request: NextRequest) {
     if (!adminToken) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
-    // Para simplificar, en Next.js Edge Middleware no podemos usar jsonwebtoken fácilmente (usa Node APIs).
-    // Con la existencia del token asumimos autenticación. Las validaciones finas se pueden hacer en Server Actions o Layouts.
+  }
+
+  if (request.nextUrl.pathname.startsWith('/login')) {
+    if (adminToken) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
   }
   
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/login'],
 };
