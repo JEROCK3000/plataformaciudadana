@@ -2,6 +2,7 @@ import React from 'react';
 import { prisma } from '@/lib/db/prisma';
 import { Shield, Settings, Users, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { logoutAction } from '@/lib/actions/auth';
 
 export default async function AdminDashboard() {
   const reports = await prisma.report.findMany({
@@ -18,15 +19,17 @@ export default async function AdminDashboard() {
               <h1 className="text-xl font-bold">Panel de Administración</h1>
             </div>
             <div className="flex items-center gap-4 text-sm font-medium">
-              <button className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+              <button disabled className="flex items-center gap-2 text-gray-400 dark:text-gray-500 cursor-not-allowed transition-colors" title="Módulo en desarrollo">
                 <Settings size={18} /> Configuración
               </button>
-              <button className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
+              <button disabled className="flex items-center gap-2 text-gray-400 dark:text-gray-500 cursor-not-allowed transition-colors" title="Módulo en desarrollo">
                 <Users size={18} /> Usuarios
               </button>
-              <button className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors ml-4 border-l border-gray-700 pl-4">
-                <LogOut size={18} /> Salir
-              </button>
+              <form action={logoutAction}>
+                <button type="submit" className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors ml-4 border-l border-gray-700 pl-4">
+                  <LogOut size={18} /> Salir
+                </button>
+              </form>
             </div>
           </div>
         </div>
