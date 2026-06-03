@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Usuarios Administradores de la Plataforma
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(MODERATOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Reportes Ciudadanos
+model Report {
+  id               String   @id @default(uuid())
+  title            String
+  category         Category
+  urgency          Urgency
+  parish           String
+  neighborhood     String
+  description      String   @db.Text
+  
+  // Evidencia (Galería de fotos)
+  photos           Json? 
+  
+  // Datos Opcionales del Ciudadano
+  citizenName      String?
+  citizenContact   String?
+  privacyAccepted  Boolean  @default(false)
+
+  // Estado y Apoyo
+  status           ReportStatus @default(RECEIVED)
+  votes            Int          @default(0)
+
+  // Análisis IA persistido
+  aiAnalysis       String?  @db.LongText
+
+  // Relaciones
+  comments         Comment[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Comment {
+  id               String   @id @default(uuid())
+  text             String   @db.Text
+  citizenName      String?
+  reportId         String
+  report           Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  status           CommentStatus @default(APPROVED)
+  
+  createdAt        DateTime @default(now())
+}
+
+enum CommentStatus {
+  APPROVED
+  REJECTED
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+}
+
+enum Category {
+  INFRASTRUCTURE
+  SECURITY
+  WATER
+  SERVICES
+  ENVIRONMENT
+  EDUCATION
+  OTHER
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ReportStatus {
+  RECEIVED
+  IN_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
