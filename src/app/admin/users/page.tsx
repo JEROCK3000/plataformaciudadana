@@ -27,7 +27,7 @@ export default async function UsersPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
             <Plus size={20} className="text-emerald-500" /> Crear Nuevo Administrador
           </h2>
-          <form action={createUser} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <form action={async (formData) => { "use server"; await createUser(formData); }} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
               <input type="text" name="name" required className="block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white" />
@@ -71,7 +71,7 @@ export default async function UsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     {user.email !== 'admin@solinteec.com' && (
-                      <form action={deleteUser.bind(null, user.id)}>
+                      <form action={async () => { "use server"; await deleteUser(user.id); }}>
                         <button type="submit" className="text-red-500 hover:text-red-700 transition-colors" title="Eliminar usuario">
                           <Trash2 size={18} />
                         </button>
