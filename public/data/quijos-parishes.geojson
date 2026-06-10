@@ -1,0 +1,137 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "Papallacta",
+      "properties": {
+        "name": "Papallacta",
+        "code": "150204",
+        "lat": -0.366,
+        "lon": -78.141
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-78.42, -0.18],
+          [-78.03, -0.20],
+          [-78.00, -0.36],
+          [-78.01, -0.52],
+          [-78.03, -0.62],
+          [-78.42, -0.62],
+          [-78.42, -0.18]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "Cuyuja",
+      "properties": {
+        "name": "Cuyuja",
+        "code": "150203",
+        "lat": -0.455,
+        "lon": -77.988
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-78.03, -0.20],
+          [-77.92, -0.22],
+          [-77.90, -0.38],
+          [-77.91, -0.62],
+          [-78.03, -0.62],
+          [-78.01, -0.52],
+          [-78.00, -0.36],
+          [-78.03, -0.20]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "Baeza",
+      "properties": {
+        "name": "Baeza",
+        "code": "150201",
+        "lat": -0.455,
+        "lon": -77.883
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-77.92, -0.22],
+          [-77.72, -0.20],
+          [-77.70, -0.38],
+          [-77.71, -0.62],
+          [-77.91, -0.62],
+          [-77.90, -0.38],
+          [-77.92, -0.22]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "San Francisco de Borja",
+      "properties": {
+        "name": "San Francisco de Borja",
+        "code": "150205",
+        "lat": -0.400,
+        "lon": -77.720
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-77.72, -0.20],
+          [-77.28, -0.18],
+          [-77.27, -0.42],
+          [-77.29, -0.62],
+          [-77.71, -0.62],
+          [-77.70, -0.38],
+          [-77.72, -0.20]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "Cosanga",
+      "properties": {
+        "name": "Cosanga",
+        "code": "150202",
+        "lat": -0.720,
+        "lon": -77.820
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-78.42, -0.62],
+          [-78.03, -0.62],
+          [-77.91, -0.62],
+          [-77.71, -0.62],
+          [-77.71, -0.98],
+          [-78.42, -0.98],
+          [-78.42, -0.62]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "Sumaco",
+      "properties": {
+        "name": "Sumaco",
+        "code": "150206",
+        "lat": -0.780,
+        "lon": -77.530
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-77.71, -0.62],
+          [-77.29, -0.62],
+          [-77.27, -0.78],
+          [-77.30, -0.98],
+          [-77.71, -0.98],
+          [-77.71, -0.62]
+        ]]
+      }
+    }
+  ]
+}
