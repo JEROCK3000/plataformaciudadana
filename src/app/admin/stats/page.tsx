@@ -121,10 +121,18 @@ export default async function StatsPage() {
               <ArrowLeft size={20} />
             </Link>
             <BarChart3 size={24} className="text-emerald-400" />
-            <div>
+            <div className="flex-1">
               <h1 className="text-xl font-bold">KPIs y Estadísticas</h1>
               <p className="text-xs text-gray-400">Distribución de reportes ciudadanos por parroquia</p>
             </div>
+            <a
+              href="/mapa-prototipo.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-sm font-bold shadow transition-colors"
+            >
+              <Map size={16} /> Ver Mapa Prototipo
+            </a>
           </div>
         </div>
       </header>

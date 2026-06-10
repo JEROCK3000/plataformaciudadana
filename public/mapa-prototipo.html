@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Reportes del Cantón Quijos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            height: 100vh;
+        }
+
+        #main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #map-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #map-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .parroquia {
+            transition: fill 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            stroke-width: 1px;
+            stroke: #333;
+        }
+
+        .parroquia:hover {
+            fill: #ffd700;
+            transform: scale(1.02);
+            stroke: #000;
+            stroke-width: 2px;
+        }
+
+        .parroquia.active {
+            fill: #ff8c00;
+            stroke: #000;
+            stroke-width: 2px;
+        }
+
+        .parroquia[data-reports="1"] { fill-opacity: 0.8; }
+        .parroquia[data-reports="2"] { fill-opacity: 0.9; }
+        .parroquia[data-reports="3"] { fill: #d32f2f; fill-opacity: 1; }
+        .parroquia[data-reports="0"] { fill-opacity: 0.6; }
+
+        #report-panel {
+            width: 350px;
+            background-color: #fff;
+            border-left: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            box-shadow: -4px 0 6px rgba(0,0,0,0.1);
+        }
+
+        #report-panel.visible {
+            display: flex;
+        }
+
+        #panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #close-panel {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d32f2f;
+        }
+
+        h2, h3 { margin-top: 0; }
+
+        form { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover { background-color: #0056b3; }
+
+        #report-list {
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .report-item {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .report-item h4 { margin-top: 0; margin-bottom: 5px; }
+        .report-item .date { font-size: 0.8rem; color: #777; }
+        .report-item .desc { margin-top: 5px; }
+
+        #back-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            background: #1f2937;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            z-index: 999;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #back-btn:hover { background: #374151; }
+    </style>
+</head>
+<body>
+    <a href="/admin/stats" id="back-btn">&#8592; Volver a Estadísticas</a>
+
+    <div id="main-container">
+        <h1 id="map-title">Sistema de Reportes del Cantón Quijos</h1>
+        <div id="map-wrapper">
+            <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                <title>Mapa Interactivo de Reportes de Cantón Quijos</title>
+                <rect width="800" height="600" fill="white"/>
+                <path d="M 50,20 L 750,20 L 750,580 L 50,580 Z" stroke="black" fill="none" stroke-width="1"/>
+
+                <path id="papallacta" class="parroquia" d="M 120.4,120.3 L 135.2,130.6 L 150.1,140.9 L 165,151.1 L 180,161.4 L 195.1,171.7 L 210.1,181.9 L 225.1,192.1 L 240.2,202.4 L 255.2,212.7 L 270.3,222.9 L 285.3,233.1 L 300.3,243.3 L 315.4,253.5 L 330.4,263.8 L 345.3,274 L 360.2,284.1 L 375,294.3 L 389.8,304.5 L 404.6,314.7 L 419.4,324.9 L 434.1,335.1 L 448.9,345.3 L 463.6,355.5 L 478.3,365.6 L 493,375.8 L 507.7,386 L 522.3,396.1 L 537,406.3 L 551.6,416.5 L 566.2,426.6 L 580.8,436.8 L 595.3,446.9 L 609.9,457.1 L 624.4,467.2 L 638.9,477.4 L 653.4,487.5 L 667.9,497.6 L 682.4,507.8 L 696.8,517.9 L 711.2,528 L 725.6,538.1 L 740,548.3 L 754.3,558.4 C 754.3,558.4 756.9,561.1 756.9,561.1 Z" fill="#FFF44F"/>
+                <path id="cuyuja" class="parroquia" d="M 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 L 130.1,114 L 139.7,107.7 L 149.3,101.4 L 158.9,95 L 168.4,88.6 L 177.9,82.2 L 187.3,75.8 L 196.7,69.4 L 206,62.9 L 215.3,56.5 L 224.5,50 L 233.6,43.5 L 242.7,37 L 251.7,30.4 L 260.6,23.8 L 269.4,17.2 L 278.2,10.6 L 286.9,4 L 295.5,-2.7 L 303.9,-9.4 L 312.3,-16.1 L 320.6,-22.8 L 328.7,-29.6 Z" fill="#F47B62"/>
+                <path id="baeza" class="parroquia" d="M 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#008000"/>
+                <path id="sanfranciscodeborja" class="parroquia" d="M 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#F47B62"/>
+                <path id="cosanga" class="parroquia" d="M 404.6,314.7 L 389.8,304.5 L 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#FFA07A"/>
+                <path id="sumaco" class="parroquia" d="M 434.1,335.1 L 419.4,324.9 L 404.6,314.7 L 389.8,304.5 L 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#FF69B4"/>
+
+                <text x="171.6" y="102.5" font-size="12" text-anchor="middle">PAPALLACTA</text>
+                <text x="330" y="222.5" font-size="12" text-anchor="middle">CUYUJA</text>
+                <text x="511.4" y="278.4" font-size="12" text-anchor="middle">SAN FRANCISCO</text>
+                <text x="511.4" y="291.4" font-size="12" text-anchor="middle">DE BORJA</text>
+                <text x="518" y="280.4" font-size="12" text-anchor="middle">BAEZA</text>
+                <text x="630.9" y="323.3" font-size="12" text-anchor="middle">SUMACO</text>
+                <text x="546.6" y="399.7" font-size="12" text-anchor="middle">COSANGA</text>
+
+                <g id="simbologia" transform="translate(620,20)">
+                    <rect width="180" height="165" fill="white" stroke="black" stroke-width="1"/>
+                    <text x="90" y="20" font-size="14" font-weight="bold" text-anchor="middle">SIMBOLOGÍA</text>
+                    <g transform="translate(10,35)">
+                        <rect x="0" y="0"  width="20" height="10" fill="#FFF44F" stroke="black"/><text x="25" y="9"  font-size="10">PAPALLACTA</text>
+                        <rect x="0" y="15" width="20" height="10" fill="#F47B62" stroke="black"/><text x="25" y="24" font-size="10">CUYUJA</text>
+                        <rect x="0" y="30" width="20" height="10" fill="#008000" stroke="black"/><text x="25" y="39" font-size="10">BAEZA</text>
+                        <rect x="0" y="45" width="20" height="10" fill="#F47B62" stroke="black"/><text x="25" y="54" font-size="10">BORJA</text>
+                        <rect x="0" y="60" width="20" height="10" fill="#FF69B4" stroke="black"/><text x="25" y="69" font-size="10">SUMACO</text>
+                        <rect x="0" y="75" width="20" height="10" fill="#FFA07A" stroke="black"/><text x="25" y="84" font-size="10">COSANGA</text>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <div id="report-panel">
+        <div id="panel-header">
+            <h3>Reportes en <span id="parroquia-name"></span></h3>
+            <button id="close-panel" title="Cerrar">&times;</button>
+        </div>
+        <form id="new-report-form">
+            <label for="report-title">Título del Reporte:</label>
+            <input type="text" id="report-title" name="title" required>
+            <label for="report-desc">Descripción:</label>
+            <textarea id="report-desc" name="desc" rows="4" required></textarea>
+            <button type="submit">Guardar Reporte</button>
+        </form>
+        <h3>Reportes Existentes</h3>
+        <div id="report-list"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'cantonQuijosReports';
+        let reportsData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        const parishPaths = document.querySelectorAll('.parroquia');
+        const reportPanel = document.getElementById('report-panel');
+        const parishNameSpan = document.getElementById('parroquia-name');
+        const closePanelBtn = document.getElementById('close-panel');
+        const newReportForm = document.getElementById('new-report-form');
+        const reportTitleInput = document.getElementById('report-title');
+        const reportDescInput = document.getElementById('report-desc');
+        const reportListDiv = document.getElementById('report-list');
+        let currentActiveParishId = null;
+
+        function updateMapStatus() {
+            parishPaths.forEach(path => {
+                const reports = reportsData[path.id] || [];
+                path.setAttribute('data-reports', reports.length);
+            });
+        }
+        updateMapStatus();
+
+        parishPaths.forEach(path => {
+            path.addEventListener('click', function() {
+                currentActiveParishId = this.id;
+                const nameMap = {
+                    papallacta: 'Papallacta',
+                    cuyuja: 'Cuyuja',
+                    baeza: 'Baeza',
+                    sanfranciscodeborja: 'San Francisco de Borja',
+                    cosanga: 'Cosanga',
+                    sumaco: 'Sumaco'
+                };
+                parishPaths.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                reportPanel.classList.add('visible');
+                parishNameSpan.innerText = nameMap[this.id] || this.id;
+                renderReports(currentActiveParishId);
+            });
+        });
+
+        closePanelBtn.addEventListener('click', function() {
+            reportPanel.classList.remove('visible');
+            parishPaths.forEach(p => p.classList.remove('active'));
+            newReportForm.reset();
+        });
+
+        newReportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!currentActiveParishId) return;
+            const newReport = {
+                title: reportTitleInput.value,
+                desc: reportDescInput.value,
+                date: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            };
+            if (!reportsData[currentActiveParishId]) reportsData[currentActiveParishId] = [];
+            reportsData[currentActiveParishId].unshift(newReport);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(reportsData));
+            renderReports(currentActiveParishId);
+            updateMapStatus();
+            this.reset();
+        });
+
+        function renderReports(parishId) {
+            reportListDiv.innerHTML = '';
+            const reports = reportsData[parishId] || [];
+            if (reports.length === 0) {
+                reportListDiv.innerHTML = '<p>No hay reportes para esta parroquia aún.</p>';
+                return;
+            }
+            reports.forEach(report => {
+                const item = document.createElement('div');
+                item.classList.add('report-item');
+                item.innerHTML = `<h4>${report.title}</h4><span class="date">${report.date}</span><p class="desc">${report.desc}</p>`;
+                reportListDiv.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
