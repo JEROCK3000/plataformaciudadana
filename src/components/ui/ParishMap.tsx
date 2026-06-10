@@ -91,8 +91,8 @@ export default function ParishMap({ data }: Props) {
         </div>
       ) : (
         <MapContainer
-          center={[-0.48, -77.86]}
-          zoom={10}
+          center={[-0.56, -77.90]}
+          zoom={9}
           scrollWheelZoom={false}
           className="w-full h-full z-0"
           style={{ background: isDark ? '#111827' : '#f9fafb' }}
