@@ -91,12 +91,12 @@ export default function QuijosMap({ data }: Props) {
   return (
     <div className="relative w-full select-none">
       <svg
-        viewBox="0 0 1000 600"
+        viewBox="0 0 1150 620"
         className="w-full h-auto"
         preserveAspectRatio="xMidYMid meet"
         style={{ background: 'white', borderRadius: '0.5rem' }}
       >
-        <rect width="1000" height="600" fill="white" />
+        <rect width="1150" height="620" fill="white" />
 
         {/* Vías referenciales */}
         <path d="M 0 250 Q 150 200, 470 280 Q 600 250, 800 150" fill="none" stroke="#bbb" strokeWidth="1"/>
@@ -127,19 +127,20 @@ export default function QuijosMap({ data }: Props) {
         <g transform="translate(760,330)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
         <g transform="translate(500,470)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
 
-        {/* Etiquetas externas */}
-        <text x="50"  y="80"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">CANTON QUITO</text>
-        <text x="400" y="80"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">CANTON EL CHACO</text>
-        <text x="750" y="140" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">A LAGO AGRIO</text>
-        <text x="870" y="420" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">CANTON LORETO</text>
-        <text x="50"  y="500" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">CANTON ARCHIDONA</text>
-        <text x="430" y="590" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#333" pointerEvents="none">CANTON ARCHIDONA</text>
+        {/* Etiquetas externas — fuera del área de parroquias */}
+        <text x="50"  y="75"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON QUITO</text>
+        <text x="390" y="55"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON EL CHACO</text>
+        <text x="680" y="115" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">A LAGO AGRIO</text>
+        <text x="1060" y="350" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON</text>
+        <text x="1060" y="364" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">LORETO</text>
+        <text x="50"  y="510" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON ARCHIDONA</text>
+        <text x="420" y="612" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON ARCHIDONA</text>
 
-        {/* Título */}
-        <text x="700" y="48" fontFamily="Arial" fontSize="22" fontWeight="bold" textAnchor="middle" pointerEvents="none">CANTON QUIJOS</text>
+        {/* Título — centrado en zona libre superior derecha */}
+        <text x="840" y="48" fontFamily="Arial" fontSize="22" fontWeight="bold" textAnchor="middle" pointerEvents="none">CANTON QUIJOS</text>
 
-        {/* Rosa de los vientos */}
-        <g transform="translate(580,100)" pointerEvents="none">
+        {/* Rosa de los vientos — debajo del título, sin solapar parroquias */}
+        <g transform="translate(760,105)" pointerEvents="none">
           <circle r="20" fill="none" stroke="black" strokeWidth="1"/>
           <circle r="14" fill="none" stroke="black" strokeWidth="0.5"/>
           <path d="M0,-25 L5,-12 L0,-15 L-5,-12 Z" fill="black"/>
@@ -147,22 +148,22 @@ export default function QuijosMap({ data }: Props) {
           <path d="M0,-20 L0,20 M-20,0 L20,0" stroke="black" strokeWidth="1"/>
         </g>
 
-        {/* Simbología */}
-        <g transform="translate(820,20)" pointerEvents="none">
-          <rect width="160" height="180" fill="white" stroke="black" strokeWidth="1.5"/>
-          <text x="80" y="20" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle">SIMBOLOGIA</text>
-          <line x1="10" y1="28" x2="150" y2="28" stroke="black" strokeWidth="1"/>
+        {/* Simbología — columna derecha, sin solapar el mapa */}
+        <g transform="translate(960,20)" pointerEvents="none">
+          <rect width="170" height="185" fill="white" stroke="black" strokeWidth="1.5"/>
+          <text x="85" y="20" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle">SIMBOLOGIA</text>
+          <line x1="10" y1="28" x2="160" y2="28" stroke="black" strokeWidth="1"/>
           <g transform="translate(10,45)" fontFamily="Arial" fontSize="10">
             <text y="5">Cabecera Cantonal</text>
-            <g transform="translate(130,2)"><circle r="5" fill="white" stroke="black" strokeWidth="1"/><circle r="1" fill="black"/></g>
+            <g transform="translate(140,2)"><circle r="5" fill="white" stroke="black" strokeWidth="1"/><circle r="1" fill="black"/></g>
             <text y="25">Parroquias</text>
-            <g transform="translate(130,22)"><circle r="4" fill="white" stroke="black" strokeWidth="1"/><circle r="1.5" fill="black"/></g>
-            <text y="50">PAPALLACTA</text><rect x="120" y="42" width="20" height="10" fill="#FFF983" stroke="black" strokeWidth="0.5"/>
-            <text y="70">CUYUJA</text>    <rect x="120" y="62" width="20" height="10" fill="#FA9B8F" stroke="black" strokeWidth="0.5"/>
-            <text y="90">BAEZA</text>     <rect x="120" y="82" width="20" height="10" fill="#00933C" stroke="black" strokeWidth="0.5"/>
-            <text y="110">BORJA</text>    <rect x="120" y="102" width="20" height="10" fill="#FBB040" stroke="black" strokeWidth="0.5"/>
-            <text y="130">SUMACO</text>   <rect x="120" y="122" width="20" height="10" fill="#F07DBC" stroke="black" strokeWidth="0.5"/>
-            <text y="150">COSANGA</text>  <rect x="120" y="142" width="20" height="10" fill="#F18E65" stroke="black" strokeWidth="0.5"/>
+            <g transform="translate(140,22)"><circle r="4" fill="white" stroke="black" strokeWidth="1"/><circle r="1.5" fill="black"/></g>
+            <text y="50">PAPALLACTA</text><rect x="130" y="42" width="20" height="10" fill="#FFF983" stroke="black" strokeWidth="0.5"/>
+            <text y="70">CUYUJA</text>    <rect x="130" y="62" width="20" height="10" fill="#FA9B8F" stroke="black" strokeWidth="0.5"/>
+            <text y="90">BAEZA</text>     <rect x="130" y="82" width="20" height="10" fill="#00933C" stroke="black" strokeWidth="0.5"/>
+            <text y="110">BORJA</text>    <rect x="130" y="102" width="20" height="10" fill="#FBB040" stroke="black" strokeWidth="0.5"/>
+            <text y="130">SUMACO</text>   <rect x="130" y="122" width="20" height="10" fill="#F07DBC" stroke="black" strokeWidth="0.5"/>
+            <text y="150">COSANGA</text>  <rect x="130" y="142" width="20" height="10" fill="#F18E65" stroke="black" strokeWidth="0.5"/>
           </g>
         </g>
       </svg>
