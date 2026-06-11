@@ -26,7 +26,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             stroke: #333;
-            stroke-width: 1;
+            stroke-width: 1.2;
             stroke-linejoin: round;
             stroke-linecap: round;
         }
@@ -113,90 +113,92 @@
             <div id="map-container" class="w-full h-full flex items-center justify-center">
                 <svg viewBox="0 0 1000 600" class="w-full h-full max-h-full" preserveAspectRatio="xMidYMid meet">
 
+                    <!-- Fondo Blanco -->
                     <rect width="1000" height="600" fill="white" />
 
-                    <path d="M 0 350 Q 150 240 480 310" fill="none" stroke="black" stroke-width="1.5"/>
-                    <path d="M 480 310 Q 530 220 700 150" fill="none" stroke="black" stroke-width="1.5"/>
-                    <path d="M 480 310 Q 760 300 960 320" fill="none" stroke="black" stroke-width="1.5"/>
-                    <path d="M 480 310 Q 500 480 450 580" fill="none" stroke="black" stroke-width="1.5"/>
+                    <!-- Vías Principales (Líneas referenciales finas en el fondo) -->
+                    <path d="M 0 250 Q 150 200, 470 280 Q 600 250, 800 150" fill="none" stroke="#666" stroke-width="1"/>
+                    <path d="M 470 280 Q 400 400, 450 600" fill="none" stroke="#666" stroke-width="1"/>
 
-                    <!-- Papallacta (Amarillo Claro) -->
+                    <!-- Papallacta (Amarillo) -->
                     <path id="papallacta" class="parroquia" fill="#FFF983"
-                          d="M 180 420 L 160 435 L 140 445 L 110 452 L 80 445 L 60 425 L 45 390 L 40 340 L 45 290 L 60 250 L 85 200 L 115 140 L 145 95 L 180 65 L 220 48 L 260 55 L 290 80 L 290 130 L 275 180 L 255 240 L 230 300 L 200 360 L 180 420 Z" />
+                          d="M 285 50 L 270 30 L 250 20 L 220 15 L 180 25 L 150 40 L 130 60 L 110 80 L 90 110 L 70 140 L 60 160 L 70 190 L 55 220 L 50 260 L 65 300 L 90 330 L 120 350 L 160 370 L 190 380 L 210 375 L 220 350 L 230 320 L 235 280 L 245 240 L 260 200 L 275 160 L 285 120 L 280 80 L 285 50 Z" />
 
                     <!-- Cuyuja (Salmón) -->
                     <path id="cuyuja" class="parroquia" fill="#FA9B8F"
-                          d="M 290 80 L 310 95 L 340 120 L 370 145 L 405 160 L 420 180 L 410 200 L 395 230 L 380 260 L 370 290 L 360 330 L 350 360 L 290 410 L 230 440 L 180 420 L 200 360 L 230 300 L 255 240 L 275 180 L 290 130 Z" />
+                          d="M 285 50 L 300 70 L 320 90 L 350 120 L 380 145 L 410 165 L 440 185 L 415 220 L 395 250 L 380 285 L 365 315 L 350 345 L 330 365 L 300 380 L 270 390 L 240 385 L 210 375 L 220 350 L 230 320 L 235 280 L 245 240 L 260 200 L 275 160 L 285 120 L 280 80 L 285 50 Z" />
 
-                    <!-- Baeza (Verde Oscuro) -->
+                    <!-- Baeza (Verde) -->
                     <path id="baeza" class="parroquia" fill="#00933C"
-                          d="M 380 260 L 430 250 L 490 245 L 550 255 L 610 270 L 595 300 L 590 335 L 600 370 L 540 385 L 480 395 L 410 380 L 350 360 L 360 330 L 370 290 Z" />
+                          d="M 440 185 L 455 180 L 475 185 L 495 190 L 515 200 L 535 210 L 545 230 L 550 260 L 560 290 L 570 320 L 580 350 L 540 365 L 500 375 L 460 375 L 420 370 L 380 360 L 350 345 L 365 315 L 380 285 L 395 250 L 415 220 L 440 185 Z" />
 
                     <!-- San Francisco de Borja (Naranja) -->
                     <path id="borja" class="parroquia" fill="#FBB040"
-                          d="M 420 180 L 440 165 L 470 175 L 510 170 L 540 185 L 580 180 L 620 170 L 660 175 L 690 200 L 710 230 L 680 245 L 640 260 L 610 270 L 550 255 L 490 245 L 430 250 L 380 260 L 395 230 L 410 200 Z" />
+                          d="M 535 210 L 555 205 L 575 200 L 595 195 L 620 205 L 645 220 L 640 245 L 645 275 L 655 305 L 665 335 L 640 345 L 610 355 L 580 350 L 570 320 L 560 290 L 550 260 L 545 230 L 535 210 Z" />
 
                     <!-- Sumaco (Rosa) -->
                     <path id="sumaco" class="parroquia" fill="#F07DBC"
-                          d="M 710 230 L 740 215 L 780 235 L 820 245 L 870 260 L 910 280 L 945 305 L 955 325 L 920 345 L 870 350 L 810 355 L 760 360 L 720 360 L 680 375 L 640 385 L 600 370 L 590 335 L 595 300 L 610 270 L 640 260 L 680 245 Z" />
+                          d="M 645 220 L 670 215 L 700 215 L 740 210 L 780 225 L 820 240 L 860 260 L 900 275 L 940 290 L 970 310 L 980 330 L 960 345 L 930 355 L 890 365 L 850 380 L 815 385 L 790 370 L 760 355 L 730 350 L 700 345 L 665 335 L 655 305 L 645 275 L 640 245 L 645 220 Z" />
 
                     <!-- Cosanga (Terracota) -->
                     <path id="cosanga" class="parroquia" fill="#F18E65"
-                          d="M 720 360 L 745 390 L 755 425 L 730 465 L 690 495 L 640 525 L 580 555 L 510 570 L 440 565 L 370 540 L 300 505 L 240 480 L 200 450 L 180 420 L 230 440 L 290 410 L 350 360 L 410 380 L 480 395 L 540 385 L 600 370 L 640 385 L 680 375 Z" />
+                          d="M 210 375 L 240 385 L 270 390 L 300 380 L 330 365 L 350 345 L 380 360 L 420 370 L 460 375 L 500 375 L 540 365 L 580 350 L 610 355 L 640 345 L 665 335 L 700 345 L 730 350 L 760 355 L 790 370 L 815 385 L 790 420 L 760 460 L 720 490 L 680 510 L 640 520 L 590 535 L 540 555 L 490 565 L 440 560 L 390 540 L 340 510 L 290 480 L 250 450 L 220 410 L 210 375 Z" />
 
-                    <!-- Textos parroquias -->
-                    <text x="150" y="220" class="svg-text">PAPALLACTA</text>
-                    <text x="310" y="220" class="svg-text">CUYUJA</text>
-                    <text x="480" y="290" class="svg-text" fill="white">BAEZA</text>
-                    <text x="530" y="200" class="svg-text">SAN FRANCISCO</text>
-                    <text x="530" y="215" class="svg-text">DE BORJA</text>
-                    <text x="760" y="280" class="svg-text">SUMACO</text>
-                    <text x="500" y="460" class="svg-text">COSANGA</text>
+                    <!-- TEXTOS PARROQUIAS -->
+                    <text x="160" y="200" class="svg-text">PAPALLACTA</text>
+                    <text x="320" y="220" class="svg-text">CUYUJA</text>
+                    <text x="470" y="290" class="svg-text" fill="white">BAEZA</text>
+                    <text x="590" y="265" class="svg-text">SAN FRANCISCO</text>
+                    <text x="590" y="280" class="svg-text">DE BORJA</text>
+                    <text x="760" y="310" class="svg-text">SUMACO</text>
+                    <text x="500" y="450" class="svg-text">COSANGA</text>
 
-                    <!-- Marcadores -->
-                    <g transform="translate(150, 240)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
-                    <g transform="translate(310, 240)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
-                    <g transform="translate(480, 310)"><circle cx="0" cy="0" r="9" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="5" fill="none" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
-                    <g transform="translate(530, 235)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
-                    <g transform="translate(760, 300)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
-                    <g transform="translate(500, 480)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <!-- MARCADORES -->
+                    <g transform="translate(160, 220)"><circle cx="0" cy="0" r="6" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="black"/></g>
+                    <g transform="translate(320, 240)"><circle cx="0" cy="0" r="6" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="black"/></g>
+                    <!-- Baeza (Cabecera Cantonal: Doble anillo) -->
+                    <g transform="translate(470, 310)"><circle cx="0" cy="0" r="8" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="4" fill="none" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="2" fill="black"/></g>
+                    <g transform="translate(590, 300)"><circle cx="0" cy="0" r="6" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="black"/></g>
+                    <g transform="translate(760, 330)"><circle cx="0" cy="0" r="6" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="black"/></g>
+                    <g transform="translate(500, 470)"><circle cx="0" cy="0" r="6" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="black"/></g>
 
-                    <!-- Etiquetas externas -->
-                    <text x="30"  y="100" class="svg-label-small font-bold">CANTON QUITO</text>
-                    <text x="400" y="100" class="svg-label-small font-bold">CANTON EL CHACO</text>
-                    <text x="710" y="140" class="svg-label-small font-bold">A LAGO AGRIO</text>
-                    <text x="880" y="400" class="svg-label-small font-bold">CANTON LORETO</text>
-                    <text x="40"  y="500" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
-                    <text x="420" y="595" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
+                    <!-- ETIQUETAS EXTERNAS -->
+                    <text x="50"  y="80"  class="svg-label-small font-bold">CANTON QUITO</text>
+                    <text x="400" y="80"  class="svg-label-small font-bold">CANTON EL CHACO</text>
+                    <text x="750" y="140" class="svg-label-small font-bold">A LAGO AGRIO</text>
+                    <text x="880" y="420" class="svg-label-small font-bold">CANTON LORETO</text>
+                    <text x="50"  y="500" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
+                    <text x="450" y="580" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
 
-                    <!-- Título -->
-                    <text x="700" y="60" class="svg-main-title">CANTON QUIJOS</text>
+                    <!-- TITULO PRINCIPAL -->
+                    <text x="700" y="50" class="svg-main-title">CANTON QUIJOS</text>
 
-                    <!-- Rosa de los vientos -->
-                    <g transform="translate(600, 100)">
-                        <circle cx="0" cy="0" r="25" fill="none" stroke="black" stroke-width="1"/>
-                        <circle cx="0" cy="0" r="18" fill="none" stroke="black" stroke-width="0.5"/>
-                        <path d="M0,-30 L5,-15 L0,-18 L-5,-15 Z" fill="black"/>
-                        <text x="0" y="-35" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">N</text>
-                        <path d="M0,-25 L0,25 M-25,0 L25,0" stroke="black" stroke-width="1"/>
+                    <!-- ROSA DE LOS VIENTOS -->
+                    <g transform="translate(580, 100)">
+                        <circle cx="0" cy="0" r="20" fill="none" stroke="black" stroke-width="1"/>
+                        <circle cx="0" cy="0" r="14" fill="none" stroke="black" stroke-width="0.5"/>
+                        <path d="M0,-25 L5,-12 L0,-15 L-5,-12 Z" fill="black"/>
+                        <text x="0" y="-30" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">N</text>
+                        <path d="M0,-20 L3,-3 L20,0 L3,3 L0,20 L-3,3 L-20,0 L-3,-3 Z" fill="none" stroke="black" stroke-width="1"/>
+                        <path d="M0,-20 L0,20 M-20,0 L20,0" stroke="black" stroke-width="1"/>
                     </g>
 
-                    <!-- Simbología -->
-                    <g transform="translate(820, 30)">
-                        <rect x="0" y="0" width="150" height="170" fill="white" stroke="black" stroke-width="1.5"/>
-                        <text x="75" y="20" class="simbologia-title">SIMBOLOGIA</text>
-                        <line x1="10" y1="28" x2="140" y2="28" stroke="black" stroke-width="1"/>
+                    <!-- SIMBOLOGIA -->
+                    <g transform="translate(820, 20)">
+                        <rect x="0" y="0" width="160" height="180" fill="white" stroke="black" stroke-width="1.5"/>
+                        <text x="80" y="20" class="simbologia-title">SIMBOLOGIA</text>
+                        <line x1="10" y1="28" x2="150" y2="28" stroke="black" stroke-width="1"/>
                         <g transform="translate(10, 45)">
                             <text x="0" y="5"   class="simbologia-text">Cabecera Cantonal</text>
-                            <g transform="translate(120, 2)"><circle cx="0" cy="0" r="5" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="3" fill="none" stroke="black" stroke-width="0.5"/><circle cx="0" cy="0" r="1.5" fill="black"/></g>
+                            <g transform="translate(130, 2)"><circle cx="0" cy="0" r="5" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="2.5" fill="none" stroke="black" stroke-width="0.5"/><circle cx="0" cy="0" r="1" fill="black"/></g>
                             <text x="0" y="25"  class="simbologia-text">Parroquias</text>
-                            <g transform="translate(120, 22)"><circle cx="0" cy="0" r="4" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="1.5" fill="black"/></g>
-                            <text x="0" y="50"  class="simbologia-text">PAPALLACTA</text><rect x="110" y="42"  width="20" height="10" fill="#FFF983" stroke="black" stroke-width="0.5"/>
-                            <text x="0" y="70"  class="simbologia-text">CUYUJA</text>   <rect x="110" y="62"  width="20" height="10" fill="#FA9B8F" stroke="black" stroke-width="0.5"/>
-                            <text x="0" y="90"  class="simbologia-text">BAEZA</text>    <rect x="110" y="82"  width="20" height="10" fill="#00933C" stroke="black" stroke-width="0.5"/>
-                            <text x="0" y="110" class="simbologia-text">BORJA</text>    <rect x="110" y="102" width="20" height="10" fill="#FBB040" stroke="black" stroke-width="0.5"/>
-                            <text x="0" y="130" class="simbologia-text">SUMACO</text>   <rect x="110" y="122" width="20" height="10" fill="#F07DBC" stroke="black" stroke-width="0.5"/>
-                            <text x="0" y="150" class="simbologia-text">COSANGA</text>  <rect x="110" y="142" width="20" height="10" fill="#F18E65" stroke="black" stroke-width="0.5"/>
+                            <g transform="translate(130, 22)"><circle cx="0" cy="0" r="4" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="1.5" fill="black"/></g>
+                            <text x="0" y="50"  class="simbologia-text">PAPALLACTA</text><rect x="120" y="42"  width="20" height="10" fill="#FFF983" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="70"  class="simbologia-text">CUYUJA</text>    <rect x="120" y="62"  width="20" height="10" fill="#FA9B8F" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="90"  class="simbologia-text">BAEZA</text>     <rect x="120" y="82"  width="20" height="10" fill="#00933C" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="110" class="simbologia-text">BORJA</text>     <rect x="120" y="102" width="20" height="10" fill="#FBB040" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="130" class="simbologia-text">SUMACO</text>    <rect x="120" y="122" width="20" height="10" fill="#F07DBC" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="150" class="simbologia-text">COSANGA</text>   <rect x="120" y="142" width="20" height="10" fill="#F18E65" stroke="black" stroke-width="0.5"/>
                         </g>
                     </g>
                 </svg>
