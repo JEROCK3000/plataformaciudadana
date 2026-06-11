@@ -14,7 +14,6 @@ type Props = {
   data: ParishReportCount[];
 };
 
-// SVG id → nombre en BD
 const ID_TO_NAME: Record<string, string> = {
   papallacta: 'Papallacta',
   cuyuja:     'Cuyuja',
@@ -24,15 +23,25 @@ const ID_TO_NAME: Record<string, string> = {
   cosanga:    'Cosanga',
 };
 
-function getColor(count: number, max: number): string {
-  if (max === 0 || count === 0) return '#e5e7eb';
-  const r = count / max;
-  if (r >= 0.8) return '#065f46';
-  if (r >= 0.6) return '#047857';
-  if (r >= 0.4) return '#059669';
-  if (r >= 0.2) return '#34d399';
-  return '#a7f3d0';
-}
+// Colores originales de la simbología
+const PARISH_COLORS: Record<string, string> = {
+  papallacta: '#FFF983',
+  cuyuja:     '#FA9B8F',
+  baeza:      '#00933C',
+  borja:      '#FBB040',
+  sumaco:     '#F07DBC',
+  cosanga:    '#F18E65',
+};
+
+// Centros visuales para el punto titilante de cada parroquia
+const PULSE_CENTERS: Record<string, [number, number]> = {
+  papallacta: [155, 310],
+  cuyuja:     [335, 315],
+  baeza:      [475, 310],
+  borja:      [605, 310],
+  sumaco:     [810, 315],
+  cosanga:    [510, 478],
+};
 
 type Tooltip = {
   x: number;
@@ -45,12 +54,10 @@ export default function QuijosMap({ data }: Props) {
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const [active, setActive] = useState<string | null>(null);
 
-  const max = Math.max(...data.map(d => d.total), 1);
   const dataMap = Object.fromEntries(data.map(d => [d.parish, d]));
 
   const handleMouseMove = (e: React.MouseEvent<SVGPathElement>, id: string) => {
-    const rect = (e.currentTarget.closest('svg') as SVGSVGElement)
-      .getBoundingClientRect();
+    const rect = (e.currentTarget.closest('svg') as SVGSVGElement).getBoundingClientRect();
     setTooltip({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top - 12,
@@ -60,31 +67,53 @@ export default function QuijosMap({ data }: Props) {
   };
 
   const parishPath = (id: string, d: string) => {
-    const name = ID_TO_NAME[id] ?? id;
-    const stat = dataMap[name];
-    const fill = getColor(stat?.total ?? 0, max);
     const isActive = active === id;
+    const fill = PARISH_COLORS[id] ?? '#e5e7eb';
     return (
       <path
         key={id}
         id={id}
         d={d}
         fill={fill}
-        stroke={isActive ? '#000' : '#333'}
+        stroke={isActive ? '#111' : '#333'}
         strokeWidth={isActive ? 2.5 : 1.2}
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          filter: isActive
-            ? 'brightness(1.15) drop-shadow(0 0 8px rgba(0,0,0,0.4))'
-            : undefined,
+          filter: isActive ? 'brightness(1.18) drop-shadow(0 0 8px rgba(0,0,0,0.35))' : undefined,
         }}
         onMouseMove={e => handleMouseMove(e, id)}
         onMouseLeave={() => { setTooltip(null); setActive(null); }}
         onMouseEnter={() => setActive(id)}
       />
+    );
+  };
+
+  // Punto titilante para parroquias con reportes
+  const pulsingDot = (id: string) => {
+    const name = ID_TO_NAME[id];
+    const stat = dataMap[name];
+    if (!stat || stat.total === 0) return null;
+    const [cx, cy] = PULSE_CENTERS[id];
+    return (
+      <g key={`pulse-${id}`} transform={`translate(${cx},${cy})`} pointerEvents="none">
+        {/* Primera onda expansiva */}
+        <circle r="6" fill="#dc2626" opacity="0">
+          <animate attributeName="r"       values="6;26"   dur="2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.75;0" dur="2s" repeatCount="indefinite" />
+        </circle>
+        {/* Segunda onda (desfasada) */}
+        <circle r="6" fill="#dc2626" opacity="0">
+          <animate attributeName="r"       values="6;26"   dur="2s" begin="0.7s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.5;0"  dur="2s" begin="0.7s" repeatCount="indefinite" />
+        </circle>
+        {/* Punto sólido interior */}
+        <circle r="6" fill="#dc2626" />
+        <circle r="3" fill="white" />
+        <circle r="1.5" fill="#dc2626" />
+      </g>
     );
   };
 
@@ -102,7 +131,7 @@ export default function QuijosMap({ data }: Props) {
         <path d="M 0 250 Q 150 200, 470 280 Q 600 250, 800 150" fill="none" stroke="#bbb" strokeWidth="1"/>
         <path d="M 470 280 Q 400 400, 450 600" fill="none" stroke="#bbb" strokeWidth="1"/>
 
-        {/* Parroquias */}
+        {/* ── PARROQUIAS con colores de la simbología ── */}
         {parishPath('papallacta', 'M 285 50 L 270 30 L 250 20 L 220 15 L 180 25 L 150 40 L 130 60 L 110 80 L 90 110 L 70 140 L 60 160 L 70 190 L 55 220 L 50 260 L 65 300 L 90 330 L 120 350 L 160 370 L 190 380 L 210 375 L 220 350 L 230 320 L 235 280 L 245 240 L 260 200 L 275 160 L 285 120 L 280 80 L 285 50 Z')}
         {parishPath('cuyuja',     'M 285 50 L 300 70 L 320 90 L 350 120 L 380 145 L 410 165 L 440 185 L 415 220 L 395 250 L 380 285 L 365 315 L 350 345 L 330 365 L 300 380 L 270 390 L 240 385 L 210 375 L 220 350 L 230 320 L 235 280 L 245 240 L 260 200 L 275 160 L 285 120 L 280 80 L 285 50 Z')}
         {parishPath('baeza',      'M 440 185 L 455 180 L 475 185 L 495 190 L 515 200 L 535 210 L 545 230 L 550 260 L 560 290 L 570 320 L 580 350 L 540 365 L 500 375 L 460 375 L 420 370 L 380 360 L 350 345 L 365 315 L 380 285 L 395 250 L 415 220 L 440 185 Z')}
@@ -110,42 +139,39 @@ export default function QuijosMap({ data }: Props) {
         {parishPath('sumaco',     'M 645 220 L 670 215 L 700 215 L 740 210 L 780 225 L 820 240 L 860 260 L 900 275 L 940 290 L 970 310 L 980 330 L 960 345 L 930 355 L 890 365 L 850 380 L 815 385 L 790 370 L 760 355 L 730 350 L 700 345 L 665 335 L 655 305 L 645 275 L 640 245 L 645 220 Z')}
         {parishPath('cosanga',    'M 210 375 L 240 385 L 270 390 L 300 380 L 330 365 L 350 345 L 380 360 L 420 370 L 460 375 L 500 375 L 540 365 L 580 350 L 610 355 L 640 345 L 665 335 L 700 345 L 730 350 L 760 355 L 790 370 L 815 385 L 790 420 L 760 460 L 720 490 L 680 510 L 640 520 L 590 535 L 540 555 L 490 565 L 440 560 L 390 540 L 340 510 L 290 480 L 250 450 L 220 410 L 210 375 Z')}
 
+        {/* ── PUNTOS TITILANTES — encima de parroquias, debajo de etiquetas ── */}
+        {Object.keys(ID_TO_NAME).map(id => pulsingDot(id))}
+
         {/* Etiquetas parroquias */}
         <text x="160" y="200" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">PAPALLACTA</text>
         <text x="320" y="220" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">CUYUJA</text>
-        <text x="470" y="290" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" fill="white" pointerEvents="none">BAEZA</text>
-        <text x="608" y="268" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">SAN FRANCISCO</text>
-        <text x="608" y="281" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">DE BORJA</text>
-        <text x="760" y="310" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">SUMACO</text>
-        <text x="500" y="450" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">COSANGA</text>
+        <text x="470" y="270" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" fill="white" pointerEvents="none">BAEZA</text>
+        <text x="608" y="248" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">SAN FRANCISCO</text>
+        <text x="608" y="261" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">DE BORJA</text>
+        <text x="760" y="290" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">SUMACO</text>
+        <text x="500" y="440" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">COSANGA</text>
 
-        {/* Marcadores */}
+        {/* Marcadores de cabecera */}
         <g transform="translate(160,220)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
         <g transform="translate(320,240)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
-        <g transform="translate(470,310)" pointerEvents="none"><circle r="8" fill="white" stroke="black" strokeWidth="1.5"/><circle r="4" fill="none" stroke="black" strokeWidth="1"/><circle r="2" fill="black"/></g>
-        <g transform="translate(590,300)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
-        <g transform="translate(760,330)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
-        <g transform="translate(500,470)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
+        <g transform="translate(470,285)" pointerEvents="none"><circle r="8" fill="white" stroke="black" strokeWidth="1.5"/><circle r="4" fill="none" stroke="black" strokeWidth="1"/><circle r="2" fill="black"/></g>
+        <g transform="translate(590,278)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
+        <g transform="translate(760,305)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
+        <g transform="translate(500,458)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
 
         {/* Etiquetas externas */}
-        {/* CANTON QUITO: esquina superior izquierda, encima del mapa */}
         <text x="12"  y="22"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON QUITO</text>
-        {/* CANTON EL CHACO: borde norte, zona central */}
         <text x="390" y="42"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON EL CHACO</text>
-        {/* A LAGO AGRIO: debajo de la brújula, a su derecha */}
         <text x="800" y="165" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">A LAGO AGRIO</text>
-        {/* CANTON LORETO: columna derecha, fuera del mapa */}
         <text x="1060" y="350" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON</text>
         <text x="1060" y="364" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">LORETO</text>
-        {/* CANTON ARCHIDONA izquierda: debajo de la parroquia */}
         <text x="12"  y="530" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON ARCHIDONA</text>
-        {/* CANTON ARCHIDONA sur: centro inferior */}
         <text x="430" y="612" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON ARCHIDONA</text>
 
         {/* Título */}
         <text x="850" y="42" fontFamily="Arial" fontSize="22" fontWeight="bold" textAnchor="middle" pointerEvents="none">CANTON QUIJOS</text>
 
-        {/* Rosa de los vientos: zona libre entre mapa y simbología */}
+        {/* Rosa de los vientos */}
         <g transform="translate(770,105)" pointerEvents="none">
           <circle r="20" fill="none" stroke="black" strokeWidth="1"/>
           <circle r="14" fill="none" stroke="black" strokeWidth="0.5"/>
@@ -154,7 +180,7 @@ export default function QuijosMap({ data }: Props) {
           <path d="M0,-20 L0,20 M-20,0 L20,0" stroke="black" strokeWidth="1"/>
         </g>
 
-        {/* Simbología: columna derecha con altura corregida para incluir COSANGA */}
+        {/* Simbología */}
         <g transform="translate(960,20)" pointerEvents="none">
           <rect width="170" height="215" fill="white" stroke="black" strokeWidth="1.5"/>
           <text x="85" y="20" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle">SIMBOLOGIA</text>
@@ -178,14 +204,16 @@ export default function QuijosMap({ data }: Props) {
       {tooltip && (
         <div
           className="absolute z-50 pointer-events-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg px-3 py-2 text-sm"
-          style={{ left: tooltip.x + 12, top: tooltip.y - 60 }}
+          style={{ left: tooltip.x + 14, top: tooltip.y - 70 }}
         >
           <p className="font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-1 mb-1">
             {tooltip.parish}
           </p>
           {tooltip.stat ? (
             <>
-              <p className="text-2xl font-extrabold text-emerald-600">{tooltip.stat.total} <span className="text-xs font-normal text-gray-500">reportes</span></p>
+              <p className="text-2xl font-extrabold text-emerald-600">
+                {tooltip.stat.total} <span className="text-xs font-normal text-gray-500">reportes</span>
+              </p>
               <div className="mt-1 space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
                 <div>🟢 Resueltos: <strong>{tooltip.stat.resolved}</strong></div>
                 <div>🔵 En proceso: <strong>{tooltip.stat.inProgress}</strong></div>
@@ -198,22 +226,20 @@ export default function QuijosMap({ data }: Props) {
         </div>
       )}
 
-      {/* Leyenda de intensidad */}
-      <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 shadow text-xs space-y-1">
-        <p className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Reportes</p>
-        {[
-          { color: '#065f46', label: 'Muy alto' },
-          { color: '#047857', label: 'Alto' },
-          { color: '#059669', label: 'Medio' },
-          { color: '#34d399', label: 'Bajo' },
-          { color: '#a7f3d0', label: 'Muy bajo' },
-          { color: '#e5e7eb', label: 'Sin datos' },
-        ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: color }} />
-            <span className="text-gray-600 dark:text-gray-400">{label}</span>
-          </div>
-        ))}
+      {/* Leyenda */}
+      <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 shadow text-xs space-y-1.5">
+        <p className="font-semibold text-gray-600 dark:text-gray-300">Actividad</p>
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600" />
+          </span>
+          <span className="text-gray-600 dark:text-gray-400">Con reportes</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+          <span className="text-gray-600 dark:text-gray-400">Sin reportes</span>
+        </div>
       </div>
     </div>
   );
