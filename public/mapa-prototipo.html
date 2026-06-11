@@ -3,305 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Reportes del Cantón Quijos</title>
+    <title>Sistema de Reportes - Cantón Quijos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
         }
 
-        #main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        #map-title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #map-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        #map-container {
             position: relative;
-        }
-
-        svg {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+            background-color: white;
+            overflow: hidden;
         }
 
         .parroquia {
-            transition: fill 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
-            stroke-width: 1px;
             stroke: #333;
+            stroke-width: 1;
+            stroke-linejoin: round;
+            stroke-linecap: round;
         }
 
         .parroquia:hover {
-            fill: #ffd700;
-            transform: scale(1.02);
-            stroke: #000;
-            stroke-width: 2px;
+            filter: brightness(1.1) drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+            transform: scale(1.01);
+            transform-origin: center;
+            z-index: 10;
+            stroke-width: 2;
         }
 
         .parroquia.active {
-            fill: #ff8c00;
             stroke: #000;
-            stroke-width: 2px;
+            stroke-width: 2.5;
+            filter: brightness(1.15) drop-shadow(0 0 8px rgba(0,0,0,0.4));
+            z-index: 20;
         }
 
-        .parroquia[data-reports="1"] { fill-opacity: 0.8; }
-        .parroquia[data-reports="2"] { fill-opacity: 0.9; }
-        .parroquia[data-reports="3"] { fill: #d32f2f; fill-opacity: 1; }
-        .parroquia[data-reports="0"] { fill-opacity: 0.6; }
-
-        #report-panel {
-            width: 350px;
-            background-color: #fff;
-            border-left: 1px solid #ccc;
-            padding: 20px;
-            display: none;
-            flex-direction: column;
-            box-shadow: -4px 0 6px rgba(0,0,0,0.1);
+        #side-panel {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
         }
 
-        #report-panel.visible {
-            display: flex;
+        #side-panel.open {
+            transform: translateX(0);
         }
 
-        #panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        #close-panel {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #d32f2f;
-        }
-
-        h2, h3 { margin-top: 0; }
-
-        form { margin-bottom: 20px; }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
+        .svg-text {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
             font-weight: bold;
+            fill: #000;
+            pointer-events: none;
+            text-anchor: middle;
         }
 
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+        .svg-label-small {
+             font-family: Arial, sans-serif;
+             font-size: 11px;
+             fill: #333;
+             pointer-events: none;
         }
 
-        button[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
+        .svg-main-title {
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            fill: #000;
+            pointer-events: none;
+            text-anchor: middle;
         }
 
-        button[type="submit"]:hover { background-color: #0056b3; }
-
-        #report-list {
-            flex: 1;
-            overflow-y: auto;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+        .simbologia-text {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            fill: #000;
         }
-
-        .report-item {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
+        .simbologia-title {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            fill: #000;
+            text-anchor: middle;
         }
-
-        .report-item h4 { margin-top: 0; margin-bottom: 5px; }
-        .report-item .date { font-size: 0.8rem; color: #777; }
-        .report-item .desc { margin-top: 5px; }
-
-        #back-btn {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            background: #1f2937;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            z-index: 999;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #back-btn:hover { background: #374151; }
     </style>
 </head>
-<body>
-    <a href="/admin/stats" id="back-btn">&#8592; Volver a Estadísticas</a>
+<body class="h-screen flex flex-col overflow-hidden text-slate-800">
 
-    <div id="main-container">
-        <h1 id="map-title">Sistema de Reportes del Cantón Quijos</h1>
-        <div id="map-wrapper">
-            <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
-                <title>Mapa Interactivo de Reportes de Cantón Quijos</title>
-                <rect width="800" height="600" fill="white"/>
-                <path d="M 50,20 L 750,20 L 750,580 L 50,580 Z" stroke="black" fill="none" stroke-width="1"/>
+    <header class="bg-white shadow-sm p-4 z-10 relative flex items-center justify-between">
+        <a href="/admin/stats" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors">
+            &#8592; Volver
+        </a>
+        <div class="text-center flex-1">
+            <h1 class="text-2xl font-bold text-slate-800">Mapa Interactivo - Cantón Quijos</h1>
+            <p class="text-slate-500 text-sm">Haz clic en una parroquia para gestionar reportes</p>
+        </div>
+        <div class="w-24"></div>
+    </header>
 
-                <path id="papallacta" class="parroquia" d="M 120.4,120.3 L 135.2,130.6 L 150.1,140.9 L 165,151.1 L 180,161.4 L 195.1,171.7 L 210.1,181.9 L 225.1,192.1 L 240.2,202.4 L 255.2,212.7 L 270.3,222.9 L 285.3,233.1 L 300.3,243.3 L 315.4,253.5 L 330.4,263.8 L 345.3,274 L 360.2,284.1 L 375,294.3 L 389.8,304.5 L 404.6,314.7 L 419.4,324.9 L 434.1,335.1 L 448.9,345.3 L 463.6,355.5 L 478.3,365.6 L 493,375.8 L 507.7,386 L 522.3,396.1 L 537,406.3 L 551.6,416.5 L 566.2,426.6 L 580.8,436.8 L 595.3,446.9 L 609.9,457.1 L 624.4,467.2 L 638.9,477.4 L 653.4,487.5 L 667.9,497.6 L 682.4,507.8 L 696.8,517.9 L 711.2,528 L 725.6,538.1 L 740,548.3 L 754.3,558.4 C 754.3,558.4 756.9,561.1 756.9,561.1 Z" fill="#FFF44F"/>
-                <path id="cuyuja" class="parroquia" d="M 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 L 130.1,114 L 139.7,107.7 L 149.3,101.4 L 158.9,95 L 168.4,88.6 L 177.9,82.2 L 187.3,75.8 L 196.7,69.4 L 206,62.9 L 215.3,56.5 L 224.5,50 L 233.6,43.5 L 242.7,37 L 251.7,30.4 L 260.6,23.8 L 269.4,17.2 L 278.2,10.6 L 286.9,4 L 295.5,-2.7 L 303.9,-9.4 L 312.3,-16.1 L 320.6,-22.8 L 328.7,-29.6 Z" fill="#F47B62"/>
-                <path id="baeza" class="parroquia" d="M 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#008000"/>
-                <path id="sanfranciscodeborja" class="parroquia" d="M 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#F47B62"/>
-                <path id="cosanga" class="parroquia" d="M 404.6,314.7 L 389.8,304.5 L 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#FFA07A"/>
-                <path id="sumaco" class="parroquia" d="M 434.1,335.1 L 419.4,324.9 L 404.6,314.7 L 389.8,304.5 L 375,294.3 L 360.2,284.1 L 345.3,274 L 330.4,263.8 L 315.4,253.5 L 300.3,243.3 L 285.3,233.1 L 270.3,222.9 L 255.2,212.7 L 240.2,202.4 L 225.1,192.1 L 210.1,181.9 L 195.1,171.7 L 180,161.4 L 165,151.1 L 150.1,140.9 L 135.2,130.6 L 120.4,120.3 Z" fill="#FF69B4"/>
+    <div class="flex-1 flex overflow-hidden relative w-full">
 
-                <text x="171.6" y="102.5" font-size="12" text-anchor="middle">PAPALLACTA</text>
-                <text x="330" y="222.5" font-size="12" text-anchor="middle">CUYUJA</text>
-                <text x="511.4" y="278.4" font-size="12" text-anchor="middle">SAN FRANCISCO</text>
-                <text x="511.4" y="291.4" font-size="12" text-anchor="middle">DE BORJA</text>
-                <text x="518" y="280.4" font-size="12" text-anchor="middle">BAEZA</text>
-                <text x="630.9" y="323.3" font-size="12" text-anchor="middle">SUMACO</text>
-                <text x="546.6" y="399.7" font-size="12" text-anchor="middle">COSANGA</text>
+        <main class="flex-1 p-4 flex items-center justify-center overflow-auto bg-slate-100">
+            <div id="map-container" class="w-full h-full flex items-center justify-center">
+                <svg viewBox="0 0 1000 600" class="w-full h-full max-h-full" preserveAspectRatio="xMidYMid meet">
 
-                <g id="simbologia" transform="translate(620,20)">
-                    <rect width="180" height="165" fill="white" stroke="black" stroke-width="1"/>
-                    <text x="90" y="20" font-size="14" font-weight="bold" text-anchor="middle">SIMBOLOGÍA</text>
-                    <g transform="translate(10,35)">
-                        <rect x="0" y="0"  width="20" height="10" fill="#FFF44F" stroke="black"/><text x="25" y="9"  font-size="10">PAPALLACTA</text>
-                        <rect x="0" y="15" width="20" height="10" fill="#F47B62" stroke="black"/><text x="25" y="24" font-size="10">CUYUJA</text>
-                        <rect x="0" y="30" width="20" height="10" fill="#008000" stroke="black"/><text x="25" y="39" font-size="10">BAEZA</text>
-                        <rect x="0" y="45" width="20" height="10" fill="#F47B62" stroke="black"/><text x="25" y="54" font-size="10">BORJA</text>
-                        <rect x="0" y="60" width="20" height="10" fill="#FF69B4" stroke="black"/><text x="25" y="69" font-size="10">SUMACO</text>
-                        <rect x="0" y="75" width="20" height="10" fill="#FFA07A" stroke="black"/><text x="25" y="84" font-size="10">COSANGA</text>
+                    <rect width="1000" height="600" fill="white" />
+
+                    <path d="M 0 350 Q 150 240 480 310" fill="none" stroke="black" stroke-width="1.5"/>
+                    <path d="M 480 310 Q 530 220 700 150" fill="none" stroke="black" stroke-width="1.5"/>
+                    <path d="M 480 310 Q 760 300 960 320" fill="none" stroke="black" stroke-width="1.5"/>
+                    <path d="M 480 310 Q 500 480 450 580" fill="none" stroke="black" stroke-width="1.5"/>
+
+                    <!-- Papallacta (Amarillo Claro) -->
+                    <path id="papallacta" class="parroquia" fill="#FFF983"
+                          d="M 180 420 L 160 435 L 140 445 L 110 452 L 80 445 L 60 425 L 45 390 L 40 340 L 45 290 L 60 250 L 85 200 L 115 140 L 145 95 L 180 65 L 220 48 L 260 55 L 290 80 L 290 130 L 275 180 L 255 240 L 230 300 L 200 360 L 180 420 Z" />
+
+                    <!-- Cuyuja (Salmón) -->
+                    <path id="cuyuja" class="parroquia" fill="#FA9B8F"
+                          d="M 290 80 L 310 95 L 340 120 L 370 145 L 405 160 L 420 180 L 410 200 L 395 230 L 380 260 L 370 290 L 360 330 L 350 360 L 290 410 L 230 440 L 180 420 L 200 360 L 230 300 L 255 240 L 275 180 L 290 130 Z" />
+
+                    <!-- Baeza (Verde Oscuro) -->
+                    <path id="baeza" class="parroquia" fill="#00933C"
+                          d="M 380 260 L 430 250 L 490 245 L 550 255 L 610 270 L 595 300 L 590 335 L 600 370 L 540 385 L 480 395 L 410 380 L 350 360 L 360 330 L 370 290 Z" />
+
+                    <!-- San Francisco de Borja (Naranja) -->
+                    <path id="borja" class="parroquia" fill="#FBB040"
+                          d="M 420 180 L 440 165 L 470 175 L 510 170 L 540 185 L 580 180 L 620 170 L 660 175 L 690 200 L 710 230 L 680 245 L 640 260 L 610 270 L 550 255 L 490 245 L 430 250 L 380 260 L 395 230 L 410 200 Z" />
+
+                    <!-- Sumaco (Rosa) -->
+                    <path id="sumaco" class="parroquia" fill="#F07DBC"
+                          d="M 710 230 L 740 215 L 780 235 L 820 245 L 870 260 L 910 280 L 945 305 L 955 325 L 920 345 L 870 350 L 810 355 L 760 360 L 720 360 L 680 375 L 640 385 L 600 370 L 590 335 L 595 300 L 610 270 L 640 260 L 680 245 Z" />
+
+                    <!-- Cosanga (Terracota) -->
+                    <path id="cosanga" class="parroquia" fill="#F18E65"
+                          d="M 720 360 L 745 390 L 755 425 L 730 465 L 690 495 L 640 525 L 580 555 L 510 570 L 440 565 L 370 540 L 300 505 L 240 480 L 200 450 L 180 420 L 230 440 L 290 410 L 350 360 L 410 380 L 480 395 L 540 385 L 600 370 L 640 385 L 680 375 Z" />
+
+                    <!-- Textos parroquias -->
+                    <text x="150" y="220" class="svg-text">PAPALLACTA</text>
+                    <text x="310" y="220" class="svg-text">CUYUJA</text>
+                    <text x="480" y="290" class="svg-text" fill="white">BAEZA</text>
+                    <text x="530" y="200" class="svg-text">SAN FRANCISCO</text>
+                    <text x="530" y="215" class="svg-text">DE BORJA</text>
+                    <text x="760" y="280" class="svg-text">SUMACO</text>
+                    <text x="500" y="460" class="svg-text">COSANGA</text>
+
+                    <!-- Marcadores -->
+                    <g transform="translate(150, 240)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <g transform="translate(310, 240)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <g transform="translate(480, 310)"><circle cx="0" cy="0" r="9" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="5" fill="none" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <g transform="translate(530, 235)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <g transform="translate(760, 300)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+                    <g transform="translate(500, 480)"><circle cx="0" cy="0" r="7" fill="white" stroke="black" stroke-width="1.5"/><circle cx="0" cy="0" r="2.5" fill="black"/></g>
+
+                    <!-- Etiquetas externas -->
+                    <text x="30"  y="100" class="svg-label-small font-bold">CANTON QUITO</text>
+                    <text x="400" y="100" class="svg-label-small font-bold">CANTON EL CHACO</text>
+                    <text x="710" y="140" class="svg-label-small font-bold">A LAGO AGRIO</text>
+                    <text x="880" y="400" class="svg-label-small font-bold">CANTON LORETO</text>
+                    <text x="40"  y="500" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
+                    <text x="420" y="595" class="svg-label-small font-bold">CANTON ARCHIDONA</text>
+
+                    <!-- Título -->
+                    <text x="700" y="60" class="svg-main-title">CANTON QUIJOS</text>
+
+                    <!-- Rosa de los vientos -->
+                    <g transform="translate(600, 100)">
+                        <circle cx="0" cy="0" r="25" fill="none" stroke="black" stroke-width="1"/>
+                        <circle cx="0" cy="0" r="18" fill="none" stroke="black" stroke-width="0.5"/>
+                        <path d="M0,-30 L5,-15 L0,-18 L-5,-15 Z" fill="black"/>
+                        <text x="0" y="-35" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">N</text>
+                        <path d="M0,-25 L0,25 M-25,0 L25,0" stroke="black" stroke-width="1"/>
                     </g>
-                </g>
-            </svg>
-        </div>
-    </div>
 
-    <div id="report-panel">
-        <div id="panel-header">
-            <h3>Reportes en <span id="parroquia-name"></span></h3>
-            <button id="close-panel" title="Cerrar">&times;</button>
-        </div>
-        <form id="new-report-form">
-            <label for="report-title">Título del Reporte:</label>
-            <input type="text" id="report-title" name="title" required>
-            <label for="report-desc">Descripción:</label>
-            <textarea id="report-desc" name="desc" rows="4" required></textarea>
-            <button type="submit">Guardar Reporte</button>
-        </form>
-        <h3>Reportes Existentes</h3>
-        <div id="report-list"></div>
+                    <!-- Simbología -->
+                    <g transform="translate(820, 30)">
+                        <rect x="0" y="0" width="150" height="170" fill="white" stroke="black" stroke-width="1.5"/>
+                        <text x="75" y="20" class="simbologia-title">SIMBOLOGIA</text>
+                        <line x1="10" y1="28" x2="140" y2="28" stroke="black" stroke-width="1"/>
+                        <g transform="translate(10, 45)">
+                            <text x="0" y="5"   class="simbologia-text">Cabecera Cantonal</text>
+                            <g transform="translate(120, 2)"><circle cx="0" cy="0" r="5" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="3" fill="none" stroke="black" stroke-width="0.5"/><circle cx="0" cy="0" r="1.5" fill="black"/></g>
+                            <text x="0" y="25"  class="simbologia-text">Parroquias</text>
+                            <g transform="translate(120, 22)"><circle cx="0" cy="0" r="4" fill="white" stroke="black" stroke-width="1"/><circle cx="0" cy="0" r="1.5" fill="black"/></g>
+                            <text x="0" y="50"  class="simbologia-text">PAPALLACTA</text><rect x="110" y="42"  width="20" height="10" fill="#FFF983" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="70"  class="simbologia-text">CUYUJA</text>   <rect x="110" y="62"  width="20" height="10" fill="#FA9B8F" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="90"  class="simbologia-text">BAEZA</text>    <rect x="110" y="82"  width="20" height="10" fill="#00933C" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="110" class="simbologia-text">BORJA</text>    <rect x="110" y="102" width="20" height="10" fill="#FBB040" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="130" class="simbologia-text">SUMACO</text>   <rect x="110" y="122" width="20" height="10" fill="#F07DBC" stroke="black" stroke-width="0.5"/>
+                            <text x="0" y="150" class="simbologia-text">COSANGA</text>  <rect x="110" y="142" width="20" height="10" fill="#F18E65" stroke="black" stroke-width="0.5"/>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </main>
+
+        <!-- Panel Lateral -->
+        <aside id="side-panel" class="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col z-20 border-l border-slate-200">
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+                <h2 class="text-xl font-semibold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span id="parish-title">Parroquia</span>
+                </h2>
+                <button id="close-panel-btn" class="text-white hover:text-blue-200 transition-colors p-1 rounded-full hover:bg-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-5">
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                    <h3 class="text-lg font-medium text-slate-800 mb-3 border-b pb-2">Registrar Nuevo Reporte</h3>
+                    <form id="report-form" class="space-y-4">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-slate-700 mb-1">Título del Incidente</label>
+                            <input type="text" id="title" required placeholder="Ej: Vía cerrada por deslave"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow">
+                        </div>
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Descripción Detallada</label>
+                            <textarea id="description" required rows="3" placeholder="Describe la situación aquí..."
+                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow resize-none"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors shadow-sm flex justify-center items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                            </svg>
+                            Guardar Reporte
+                        </button>
+                    </form>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-3 border-b pb-2">
+                        <h3 class="text-lg font-medium text-slate-800">Historial de Reportes</h3>
+                        <span id="report-count" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="reports-container" class="space-y-3">
+                        <p class="text-slate-500 text-sm text-center py-4 italic">No hay reportes registrados para esta zona.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script>
-        const STORAGE_KEY = 'cantonQuijosReports';
-        let reportsData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        const parishPaths = document.querySelectorAll('.parroquia');
-        const reportPanel = document.getElementById('report-panel');
-        const parishNameSpan = document.getElementById('parroquia-name');
-        const closePanelBtn = document.getElementById('close-panel');
-        const newReportForm = document.getElementById('new-report-form');
-        const reportTitleInput = document.getElementById('report-title');
-        const reportDescInput = document.getElementById('report-desc');
-        const reportListDiv = document.getElementById('report-list');
-        let currentActiveParishId = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            const mapPaths = document.querySelectorAll('.parroquia');
+            const sidePanel = document.getElementById('side-panel');
+            const closePanelBtn = document.getElementById('close-panel-btn');
+            const parishTitle = document.getElementById('parish-title');
+            const reportForm = document.getElementById('report-form');
+            const titleInput = document.getElementById('title');
+            const descInput = document.getElementById('description');
+            const reportsContainer = document.getElementById('reports-container');
+            const reportCountBadge = document.getElementById('report-count');
 
-        function updateMapStatus() {
-            parishPaths.forEach(path => {
-                const reports = reportsData[path.id] || [];
-                path.setAttribute('data-reports', reports.length);
-            });
-        }
-        updateMapStatus();
+            let currentParishId = null;
+            const STORAGE_KEY = 'quijos_interactive_reports';
+            let reportsData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-        parishPaths.forEach(path => {
-            path.addEventListener('click', function() {
-                currentActiveParishId = this.id;
-                const nameMap = {
-                    papallacta: 'Papallacta',
-                    cuyuja: 'Cuyuja',
-                    baeza: 'Baeza',
-                    sanfranciscodeborja: 'San Francisco de Borja',
-                    cosanga: 'Cosanga',
-                    sumaco: 'Sumaco'
-                };
-                parishPaths.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                reportPanel.classList.add('visible');
-                parishNameSpan.innerText = nameMap[this.id] || this.id;
-                renderReports(currentActiveParishId);
-            });
-        });
-
-        closePanelBtn.addEventListener('click', function() {
-            reportPanel.classList.remove('visible');
-            parishPaths.forEach(p => p.classList.remove('active'));
-            newReportForm.reset();
-        });
-
-        newReportForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!currentActiveParishId) return;
-            const newReport = {
-                title: reportTitleInput.value,
-                desc: reportDescInput.value,
-                date: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            const parishNames = {
+                'papallacta': 'Papallacta',
+                'cuyuja': 'Cuyuja',
+                'baeza': 'Baeza (Cabecera)',
+                'borja': 'San Francisco de Borja',
+                'sumaco': 'Sumaco',
+                'cosanga': 'Cosanga'
             };
-            if (!reportsData[currentActiveParishId]) reportsData[currentActiveParishId] = [];
-            reportsData[currentActiveParishId].unshift(newReport);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(reportsData));
-            renderReports(currentActiveParishId);
-            updateMapStatus();
-            this.reset();
-        });
 
-        function renderReports(parishId) {
-            reportListDiv.innerHTML = '';
-            const reports = reportsData[parishId] || [];
-            if (reports.length === 0) {
-                reportListDiv.innerHTML = '<p>No hay reportes para esta parroquia aún.</p>';
-                return;
-            }
-            reports.forEach(report => {
-                const item = document.createElement('div');
-                item.classList.add('report-item');
-                item.innerHTML = `<h4>${report.title}</h4><span class="date">${report.date}</span><p class="desc">${report.desc}</p>`;
-                reportListDiv.appendChild(item);
+            mapPaths.forEach(path => {
+                path.addEventListener('click', function() {
+                    mapPaths.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    currentParishId = this.id;
+                    parishTitle.textContent = parishNames[this.id] || this.id.toUpperCase();
+                    renderReportsList();
+                    sidePanel.classList.add('open');
+                });
             });
-        }
+
+            closePanelBtn.addEventListener('click', () => {
+                sidePanel.classList.remove('open');
+                mapPaths.forEach(p => p.classList.remove('active'));
+                currentParishId = null;
+            });
+
+            reportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentParishId) return;
+
+                const newReport = {
+                    id: Date.now().toString(),
+                    title: titleInput.value.trim(),
+                    description: descInput.value.trim(),
+                    date: new Date().toLocaleString('es-EC', {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute:'2-digit'
+                    })
+                };
+
+                if (!reportsData[currentParishId]) reportsData[currentParishId] = [];
+                reportsData[currentParishId].unshift(newReport);
+                saveData();
+                reportForm.reset();
+                renderReportsList();
+
+                const btn = reportForm.querySelector('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '&#10003; ¡Guardado!';
+                btn.classList.replace('bg-blue-600', 'bg-green-600');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-green-600', 'bg-blue-600');
+                }, 2000);
+            });
+
+            function renderReportsList() {
+                if (!currentParishId) return;
+                const reports = reportsData[currentParishId] || [];
+                reportCountBadge.textContent = reports.length;
+
+                if (reports.length === 0) {
+                    reportsContainer.innerHTML = `
+                        <div class="text-center p-6 bg-slate-50 rounded-lg border border-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-slate-500 text-sm">No hay reportes registrados.</p>
+                            <p class="text-slate-400 text-xs mt-1">Usa el formulario arriba para agregar uno.</p>
+                        </div>`;
+                    return;
+                }
+
+                reportsContainer.innerHTML = reports.map((report, index) => `
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow relative group">
+                        <h4 class="font-bold text-slate-800 pr-6">${report.title}</h4>
+                        <p class="text-xs text-slate-500 mb-2 flex items-center gap-1 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            ${report.date}
+                        </p>
+                        <p class="text-sm text-slate-700 bg-slate-50 p-2 rounded">${report.description}</p>
+                        <button onclick="deleteReport('${currentParishId}', ${index})"
+                            class="absolute top-3 right-3 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Eliminar reporte">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>`).join('');
+            }
+
+            window.deleteReport = function(parishId, reportIndex) {
+                if (confirm('¿Eliminar este reporte?')) {
+                    reportsData[parishId].splice(reportIndex, 1);
+                    saveData();
+                    renderReportsList();
+                }
+            };
+
+            function saveData() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reportsData));
+            }
+        });
     </script>
 </body>
 </html>
