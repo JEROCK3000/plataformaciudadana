@@ -114,8 +114,8 @@ export default function QuijosMap({ data }: Props) {
         <text x="160" y="200" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">PAPALLACTA</text>
         <text x="320" y="220" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">CUYUJA</text>
         <text x="470" y="290" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" fill="white" pointerEvents="none">BAEZA</text>
-        <text x="590" y="268" fontFamily="Arial" fontSize="12" fontWeight="bold" textAnchor="middle" pointerEvents="none">SAN FRANCISCO</text>
-        <text x="590" y="283" fontFamily="Arial" fontSize="12" fontWeight="bold" textAnchor="middle" pointerEvents="none">DE BORJA</text>
+        <text x="608" y="268" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">SAN FRANCISCO</text>
+        <text x="608" y="281" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle" pointerEvents="none">DE BORJA</text>
         <text x="760" y="310" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">SUMACO</text>
         <text x="500" y="450" fontFamily="Arial" fontSize="13" fontWeight="bold" textAnchor="middle" pointerEvents="none">COSANGA</text>
 
@@ -127,20 +127,26 @@ export default function QuijosMap({ data }: Props) {
         <g transform="translate(760,330)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
         <g transform="translate(500,470)" pointerEvents="none"><circle r="6" fill="white" stroke="black" strokeWidth="1.5"/><circle r="2" fill="black"/></g>
 
-        {/* Etiquetas externas — fuera del área de parroquias */}
-        <text x="50"  y="75"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON QUITO</text>
-        <text x="390" y="55"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON EL CHACO</text>
-        <text x="680" y="115" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">A LAGO AGRIO</text>
+        {/* Etiquetas externas */}
+        {/* CANTON QUITO: esquina superior izquierda, encima del mapa */}
+        <text x="12"  y="22"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON QUITO</text>
+        {/* CANTON EL CHACO: borde norte, zona central */}
+        <text x="390" y="42"  fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON EL CHACO</text>
+        {/* A LAGO AGRIO: debajo de la brújula, a su derecha */}
+        <text x="800" y="165" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">A LAGO AGRIO</text>
+        {/* CANTON LORETO: columna derecha, fuera del mapa */}
         <text x="1060" y="350" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON</text>
         <text x="1060" y="364" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">LORETO</text>
-        <text x="50"  y="510" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON ARCHIDONA</text>
-        <text x="420" y="612" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON ARCHIDONA</text>
+        {/* CANTON ARCHIDONA izquierda: debajo de la parroquia */}
+        <text x="12"  y="530" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" pointerEvents="none">CANTON ARCHIDONA</text>
+        {/* CANTON ARCHIDONA sur: centro inferior */}
+        <text x="430" y="612" fontFamily="Arial" fontSize="11" fontWeight="bold" fill="#444" textAnchor="middle" pointerEvents="none">CANTON ARCHIDONA</text>
 
-        {/* Título — centrado en zona libre superior derecha */}
-        <text x="840" y="48" fontFamily="Arial" fontSize="22" fontWeight="bold" textAnchor="middle" pointerEvents="none">CANTON QUIJOS</text>
+        {/* Título */}
+        <text x="850" y="42" fontFamily="Arial" fontSize="22" fontWeight="bold" textAnchor="middle" pointerEvents="none">CANTON QUIJOS</text>
 
-        {/* Rosa de los vientos — debajo del título, sin solapar parroquias */}
-        <g transform="translate(760,105)" pointerEvents="none">
+        {/* Rosa de los vientos: zona libre entre mapa y simbología */}
+        <g transform="translate(770,105)" pointerEvents="none">
           <circle r="20" fill="none" stroke="black" strokeWidth="1"/>
           <circle r="14" fill="none" stroke="black" strokeWidth="0.5"/>
           <path d="M0,-25 L5,-12 L0,-15 L-5,-12 Z" fill="black"/>
@@ -148,9 +154,9 @@ export default function QuijosMap({ data }: Props) {
           <path d="M0,-20 L0,20 M-20,0 L20,0" stroke="black" strokeWidth="1"/>
         </g>
 
-        {/* Simbología — columna derecha, sin solapar el mapa */}
+        {/* Simbología: columna derecha con altura corregida para incluir COSANGA */}
         <g transform="translate(960,20)" pointerEvents="none">
-          <rect width="170" height="185" fill="white" stroke="black" strokeWidth="1.5"/>
+          <rect width="170" height="215" fill="white" stroke="black" strokeWidth="1.5"/>
           <text x="85" y="20" fontFamily="Arial" fontSize="11" fontWeight="bold" textAnchor="middle">SIMBOLOGIA</text>
           <line x1="10" y1="28" x2="160" y2="28" stroke="black" strokeWidth="1"/>
           <g transform="translate(10,45)" fontFamily="Arial" fontSize="10">
@@ -163,7 +169,7 @@ export default function QuijosMap({ data }: Props) {
             <text y="90">BAEZA</text>     <rect x="130" y="82" width="20" height="10" fill="#00933C" stroke="black" strokeWidth="0.5"/>
             <text y="110">BORJA</text>    <rect x="130" y="102" width="20" height="10" fill="#FBB040" stroke="black" strokeWidth="0.5"/>
             <text y="130">SUMACO</text>   <rect x="130" y="122" width="20" height="10" fill="#F07DBC" stroke="black" strokeWidth="0.5"/>
-            <text y="150">COSANGA</text>  <rect x="130" y="142" width="20" height="10" fill="#F18E65" stroke="black" strokeWidth="0.5"/>
+            <text y="155">COSANGA</text>  <rect x="130" y="147" width="20" height="10" fill="#F18E65" stroke="black" strokeWidth="0.5"/>
           </g>
         </g>
       </svg>
@@ -193,7 +199,7 @@ export default function QuijosMap({ data }: Props) {
       )}
 
       {/* Leyenda de intensidad */}
-      <div className="absolute bottom-3 left-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 shadow text-xs space-y-1">
+      <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 shadow text-xs space-y-1">
         <p className="font-semibold text-gray-600 dark:text-gray-300 mb-1">Reportes</p>
         {[
           { color: '#065f46', label: 'Muy alto' },
