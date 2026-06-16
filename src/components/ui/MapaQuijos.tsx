@@ -149,6 +149,31 @@ export default function MapaQuijos({ data, imageSrc = '/mapa_quijos.png' }: Prop
           );
         })}
 
+        {/* Puntos titilantes en parroquias con reportes */}
+        {REGIONS.map((r) => {
+          const total = dataMap[r.nombre]?.total ?? 0;
+          if (total === 0) return null;
+          const [cx, cy] = r.centroide;
+          return (
+            <g key={`pulse-${r.id}`} transform={`translate(${cx},${cy - 55})`} pointerEvents="none">
+              {/* Primera onda */}
+              <circle r="10" fill="#dc2626" opacity="0">
+                <animate attributeName="r"       values="10;42"  dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0"  dur="2s" repeatCount="indefinite" />
+              </circle>
+              {/* Segunda onda desfasada */}
+              <circle r="10" fill="#dc2626" opacity="0">
+                <animate attributeName="r"       values="10;42"  dur="2s" begin="0.7s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.55;0" dur="2s" begin="0.7s" repeatCount="indefinite" />
+              </circle>
+              {/* Punto sólido */}
+              <circle r="10" fill="#dc2626" />
+              <circle r="5"  fill="white" />
+              <circle r="2.5" fill="#dc2626" />
+            </g>
+          );
+        })}
+
         {/* Conteo en el centroide de cada parroquia con reportes */}
         {REGIONS.map((r) => {
           const total = dataMap[r.nombre]?.total ?? 0;
