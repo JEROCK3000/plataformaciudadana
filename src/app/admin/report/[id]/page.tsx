@@ -5,6 +5,24 @@ import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, Shield, Globe } from
 import Link from 'next/link';
 import SingleReportAI from '@/components/ui/SingleReportAI';
 import ReactMarkdown from 'react-markdown';
+import { updateReportStatus } from '@/lib/actions/reports';
+import { ReportStatus } from '@prisma/client';
+
+const STATUS_LABELS: Record<string, string> = {
+  RECEIVED:    'Recibido',
+  IN_REVIEW:   'En revisión',
+  IN_PROGRESS: 'En proceso',
+  RESOLVED:    'Resuelto',
+  REJECTED:    'Rechazado',
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  RECEIVED:    'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  IN_REVIEW:   'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  IN_PROGRESS: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  RESOLVED:    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  REJECTED:    'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+};
 
 export default async function AdminSingleReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -56,6 +74,34 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
+        {/* Cambio de Estado */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Estado actual del reporte</p>
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${STATUS_STYLES[report.status] ?? 'bg-gray-100 text-gray-700'}`}>
+              {STATUS_LABELS[report.status] ?? report.status}
+            </span>
+          </div>
+          <form action={async (formData: FormData) => {
+            'use server';
+            const newStatus = formData.get('status') as ReportStatus;
+            if (newStatus) await updateReportStatus(report.id, newStatus);
+          }} className="flex items-center gap-3">
+            <select
+              name="status"
+              defaultValue={report.status}
+              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              {(Object.entries(STATUS_LABELS) as [string, string][]).map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
+            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+              Actualizar
+            </button>
+          </form>
+        </div>
+
         {/* Cabecera del Reporte */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 md:p-8">
@@ -63,8 +109,8 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
                 {categoryLabels[report.category] || report.category}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                {report.status}
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[report.status] ?? 'bg-gray-100 text-gray-700'}`}>
+                {STATUS_LABELS[report.status] ?? report.status}
               </span>
             </div>
 

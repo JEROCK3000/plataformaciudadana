@@ -3,6 +3,25 @@
 import { prisma } from "@/lib/db/prisma";
 import { writeLog } from "@/lib/logs";
 import { Category, Urgency, ReportStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+
+export async function updateReportStatus(reportId: string, status: ReportStatus) {
+  try {
+    const report = await prisma.report.update({
+      where: { id: reportId },
+      data: { status },
+      select: { id: true, title: true, parish: true },
+    });
+    writeLog('AUDIT', 'SYSTEM', 'ADMIN', `Estado actualizado → ${status}: reporte ${report.id} (${report.title}) [${report.parish}]`);
+    revalidatePath('/admin');
+    revalidatePath('/admin/stats');
+    revalidatePath(`/admin/report/${reportId}`);
+    return { success: true };
+  } catch (error) {
+    writeLog('ERROR', 'SYSTEM', 'SYSTEM', `Error al actualizar estado: ${error}`);
+    return { success: false };
+  }
+}
 
 export async function createReport(data: {
   title: string;
