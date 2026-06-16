@@ -11,7 +11,7 @@ import {
   type CategoryStat,
   type UrgencyStat,
 } from '@/components/ui/StatsCharts';
-import QuijosMap from '@/components/ui/QuijosMap';
+import MapaQuijos from '@/components/ui/MapaQuijos';
 
 const PARISHES = ['Baeza', 'Cosanga', 'Cuyuja', 'Papallacta', 'San Francisco de Borja', 'Sumaco'];
 
@@ -159,7 +159,7 @@ export default async function StatsPage() {
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
             Pasa el cursor sobre cada parroquia para ver el detalle. El color indica la intensidad de reportes.
           </p>
-          <QuijosMap data={mapData} />
+          <MapaQuijos data={mapData} />
         </section>
 
         {/* Gráficas */}
