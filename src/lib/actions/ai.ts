@@ -115,8 +115,12 @@ export async function analyzeSingleReport(reportId: string) {
       HIGH: 'Alta',
     };
 
+    const fechaActual = new Date().toLocaleDateString('es-EC', { year: 'numeric', month: 'long', day: 'numeric' });
+
     const prompt = `
 ${settings.aiPromptMaster}
+
+FECHA ACTUAL DEL SISTEMA: ${fechaActual}. Estamos en el año 2026. NO uses datos de años anteriores como si fueran proyecciones futuras — son datos del pasado. Busca información actualizada a 2026.
 
 Eres un experto jurídico en Derecho Público ecuatoriano especializado en GADs municipales. Antes de responder, BUSCA EN GOOGLE las versiones vigentes del COOTAD y la LOSNCP para el año 2026, así como los montos actualizados del SERCOP.
 
@@ -158,16 +162,26 @@ Conflictos de competencia, requisitos previos, o riesgos legales relevantes. Si 
 Sé preciso, cita los artículos que encontraste y nunca inventes datos que no pudiste verificar.
 `;
 
-    const { text } = await generateText({
-      model: google('gemini-2.5-flash'),
-      prompt: prompt,
-      temperature: 0.4,
-      // Habilita Google Search Grounding: Gemini busca en tiempo real
-      // para obtener montos SERCOP, leyes y normativas actualizadas al 2026
-      providerOptions: {
-        google: { useSearchGrounding: true },
-      },
-    });
+    // Intenta con Google Search Grounding (datos en tiempo real).
+    // Si falla (no disponible en el plan/modelo), reintenta sin él.
+    let text: string;
+    try {
+      const result = await generateText({
+        model: google('gemini-2.5-flash'),
+        prompt: prompt,
+        temperature: 0.4,
+        providerOptions: { google: { useSearchGrounding: true } },
+      });
+      text = result.text;
+    } catch {
+      writeLog('WARN', 'AI', 'SYSTEM', 'Search grounding no disponible, reintentando sin él');
+      const result = await generateText({
+        model: google('gemini-2.5-flash'),
+        prompt: prompt,
+        temperature: 0.4,
+      });
+      text = result.text;
+    }
 
     await prisma.report.update({
       where: { id: reportId },
