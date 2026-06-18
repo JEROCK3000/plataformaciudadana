@@ -67,7 +67,7 @@ export async function generateActionPlan() {
 
     // 4. Llamada a Gemini
     const { text } = await generateText({
-      model: google('gemini-2.5-flash'),
+      model: google('gemini-3.5-flash'),
       prompt: prompt,
       temperature: 0.7,
     });
@@ -159,29 +159,25 @@ Basándote en los montos vigentes 2026 que encontraste en el SERCOP, indica la m
 ## 4. Advertencias y Riesgos
 Conflictos de competencia, requisitos previos, o riesgos legales relevantes. Si no pudiste confirmar algún dato legal mediante búsqueda, indícalo claramente.
 
-Sé preciso, cita los artículos que encontraste y nunca inventes datos que no pudiste verificar.
+REGLAS ESTRICTAS:
+- NUNCA uses valores de años anteriores como referencia. Solo datos que encontraste ahora.
+- Si no pudiste buscar o confirmar un monto del SERCOP, escribe exactamente: "⚠️ No pude verificar este valor en tiempo real. Consúltalo en www.sercop.gob.ec antes de ejecutar el proceso."
+- NUNCA escribas frases como "proyección", "estimación", "referencia 2024", "asumiendo que". O encontraste el dato real o indicas que no lo encontraste.
+- Cita el número de resolución del SERCOP si lo encontraste.
 `;
 
-    // Intenta con Google Search Grounding (datos en tiempo real).
-    // Si falla (no disponible en el plan/modelo), reintenta sin él.
-    let text: string;
-    try {
-      const result = await generateText({
-        model: google('gemini-2.5-flash'),
-        prompt: prompt,
-        temperature: 0.4,
-        providerOptions: { google: { useSearchGrounding: true } },
-      });
-      text = result.text;
-    } catch {
-      writeLog('WARN', 'AI', 'SYSTEM', 'Search grounding no disponible, reintentando sin él');
-      const result = await generateText({
-        model: google('gemini-2.5-flash'),
-        prompt: prompt,
-        temperature: 0.4,
-      });
-      text = result.text;
-    }
+    // Google Search Grounding activo: Gemini consulta fuentes reales en tiempo real.
+    // gemini-3.5-flash (mayo 2026) con Google Search Grounding en tiempo real.
+    const { text } = await generateText({
+      model: google('gemini-3.5-flash'),
+      prompt: prompt,
+      temperature: 0.3,
+      providerOptions: {
+        google: {
+          useSearchGrounding: true,
+        },
+      },
+    });
 
     await prisma.report.update({
       where: { id: reportId },
