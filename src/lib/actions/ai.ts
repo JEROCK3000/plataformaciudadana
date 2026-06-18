@@ -202,9 +202,7 @@ REGLAS ABSOLUTAS — INCUMPLIRLAS INVALIDA EL ANÁLISIS:
     writeLog('ERROR', 'AI', 'SYSTEM', `analyzeSingleReport error: ${msg}`);
     return {
       success: false,
-      error: process.env.NODE_ENV === 'development'
-        ? `Error IA: ${msg}`
-        : 'Hubo un error al generar el análisis.',
+      error: `Error al generar el análisis: ${msg}`,
       content: null,
     };
   }
