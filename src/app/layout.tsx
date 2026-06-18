@@ -42,7 +42,7 @@ export default function RootLayout({
         <footer className="bg-gray-900 text-gray-500 text-xs text-center py-3 mt-auto">
           Desarrollado por{' '}
           <span className="text-emerald-400 font-semibold">SOLINTEEC DEVS &amp; TECH</span>
-          {' '}— GAD Municipal Quijos &copy; {new Date().getFullYear()}
+          {' '}&copy; {new Date().getFullYear()}
         </footer>
       </body>
     </html>
