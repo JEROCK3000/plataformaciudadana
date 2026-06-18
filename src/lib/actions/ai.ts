@@ -99,42 +99,47 @@ export async function analyzeSingleReport(reportId: string) {
 
     const settings = await getSettings();
 
-    // Marco legal estático de referencia — actualizar si cambia la normativa
-    const marcoLegal = `
-MARCO LEGAL VIGENTE PARA GADs MUNICIPALES EN ECUADOR:
-- COOTAD: competencias municipales en vías, agua potable, saneamiento, residuos sólidos, espacios públicos y seguridad ciudadana.
-- LOSNCP y su Reglamento:
-  • Ínfima Cuantía: hasta el coeficiente 0,0000002 del PGE vigente (verificar monto exacto en www.sercop.gob.ec antes de ejecutar; referencia orientativa: entre $7.000-$10.000 USD).
-  • Catálogo Electrónico: bienes y servicios normalizados disponibles en el portal SERCOP.
-  • Menor Cuantía Obras: hasta el coeficiente 0,000002 del PGE.
-  • Administración Directa: cuando el GAD dispone de maquinaria, personal y materiales propios.
-NOTA: Los montos exactos deben verificarse en www.sercop.gob.ec. Este análisis es orientativo.
-`;
-
     const prompt = `
 ${settings.aiPromptMaster}
 
-Actúa como experto en Administración Pública y Contratación Pública para GADs municipales de Ecuador.
+Eres un experto jurídico en Derecho Público ecuatoriano especializado en GADs municipales. Antes de responder, BUSCA EN GOOGLE las versiones vigentes del COOTAD y la LOSNCP para el año 2026, así como los montos actualizados del SERCOP.
 
-${marcoLegal}
+CONTEXTO DEL GAD:
+- Tipo: GAD Municipal (Gobierno Autónomo Descentralizado Municipal)
+- Cantón: Quijos, Provincia de Napo, Ecuador
 
-Reporte ciudadano registrado en la Plataforma del Cantón Quijos:
+NORMATIVA CLAVE A CONSULTAR (busca la versión vigente 2026):
+1. COOTAD (Código Orgánico de Organización Territorial, Autonomía y Descentralización):
+   - Art. 55: Competencias exclusivas del GAD municipal (vías, agua, saneamiento, tránsito, planificación urbana, residuos, espacios públicos, actividades económicas, etc.)
+   - Art. 54: Funciones del GAD municipal
+   - Art. 57: Atribuciones del Concejo Municipal
+   - Busca si hubo reformas al COOTAD en 2025-2026 que afecten competencias municipales.
+
+2. LOSNCP (Ley Orgánica del Sistema Nacional de Contratación Pública) y su Reglamento:
+   - Montos actualizados de ínfima cuantía, menor cuantía, cotización y licitación para el año 2026 (búscalos en www.sercop.gob.ec o resoluciones del SERCOP vigentes).
+   - Modalidades: administración directa, catálogo electrónico, ínfima cuantía, menor cuantía, cotización, licitación.
+
+REPORTE CIUDADANO A ANALIZAR:
 - Título: ${report.title}
 - Categoría: ${report.category}
 - Urgencia: ${report.urgency}
 - Descripción: ${report.description}
 
-Responde en formato Markdown estructurado:
+RESPONDE EN FORMATO MARKDOWN con las siguientes secciones:
 
-1. **Competencia del GAD**: ¿El COOTAD faculta al GAD Municipal de Quijos para atender esto? ¿Es competencia exclusiva, concurrente o debe coordinarse con otra entidad?
+## 1. Competencia Municipal (COOTAD)
+Indica el artículo específico del COOTAD que faculta al GAD de Quijos para actuar. Especifica si es competencia exclusiva, concurrente o adicional. Si debe coordinarse con la prefectura, gobierno central u otra entidad, indícalo con el artículo que lo sustenta.
 
-2. **Mecanismo de Contratación**: Según la LOSNCP, ¿qué modalidad aplica (ínfima cuantía, catálogo electrónico, menor cuantía, administración directa)? Indica el rango orientativo de monto y recuerda verificar el valor exacto en el SERCOP.
+## 2. Mecanismo de Contratación (LOSNCP)
+Basándote en los montos vigentes 2026 que encontraste en el SERCOP, indica la modalidad más adecuada y por qué. Cita el monto exacto actualizado o indica dónde verificarlo si no lo encontraste.
 
-3. **3 Acciones Inmediatas**: Pasos concretos ejecutables en los próximos 15 días.
+## 3. Plan de Acción Inmediata (15 días)
+3 pasos concretos, ordenados cronológicamente, que el Alcalde o Director puede ejecutar de inmediato.
 
-4. **Riesgos o Advertencias**: Si hay competencias de otras entidades o riesgos legales, indícalos. Si no estás seguro de algún artículo o monto, dilo explícitamente en lugar de inventarlo.
+## 4. Advertencias y Riesgos
+Conflictos de competencia, requisitos previos, o riesgos legales relevantes. Si no pudiste confirmar algún dato legal mediante búsqueda, indícalo claramente.
 
-Sé directo, profesional y orientado a la acción. No inventes montos ni artículos.
+Sé preciso, cita los artículos que encontraste y nunca inventes datos que no pudiste verificar.
 `;
 
     const { text } = await generateText({
