@@ -149,10 +149,11 @@ export default function MapaQuijos({ data, imageSrc = '/mapa_quijos.png' }: Prop
           );
         })}
 
-        {/* Puntos titilantes en parroquias con reportes */}
+        {/* Puntos titilantes — solo parroquias con reportes ACTIVOS (pendientes o en proceso) */}
         {REGIONS.map((r) => {
-          const total = dataMap[r.nombre]?.total ?? 0;
-          if (total === 0) return null;
+          const stat = dataMap[r.nombre];
+          const active = (stat?.pending ?? 0) + (stat?.inProgress ?? 0);
+          if (active === 0) return null;
           const [cx, cy] = r.centroide;
           return (
             <g key={`pulse-${r.id}`} transform={`translate(${cx},${cy - 55})`} pointerEvents="none">

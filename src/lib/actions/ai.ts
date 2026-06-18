@@ -99,30 +99,53 @@ export async function analyzeSingleReport(reportId: string) {
 
     const settings = await getSettings();
 
+    // Marco legal estático de referencia — actualizar si cambia la normativa
+    const marcoLegal = `
+MARCO LEGAL VIGENTE PARA GADs MUNICIPALES EN ECUADOR:
+- COOTAD: competencias municipales en vías, agua potable, saneamiento, residuos sólidos, espacios públicos y seguridad ciudadana.
+- LOSNCP y su Reglamento:
+  • Ínfima Cuantía: hasta el coeficiente 0,0000002 del PGE vigente (verificar monto exacto en www.sercop.gob.ec antes de ejecutar; referencia orientativa: entre $7.000-$10.000 USD).
+  • Catálogo Electrónico: bienes y servicios normalizados disponibles en el portal SERCOP.
+  • Menor Cuantía Obras: hasta el coeficiente 0,000002 del PGE.
+  • Administración Directa: cuando el GAD dispone de maquinaria, personal y materiales propios.
+NOTA: Los montos exactos deben verificarse en www.sercop.gob.ec. Este análisis es orientativo.
+`;
+
     const prompt = `
-    ${settings.aiPromptMaster}
+${settings.aiPromptMaster}
 
-    Adicionalmente, actúa como un Experto en Administración Pública, Ley Orgánica de Contratación Pública y COOTAD (Ecuador).
-    POR FAVOR, USA TU CAPACIDAD DE BÚSQUEDA (Google Search) para buscar y confirmar las leyes vigentes en Ecuador para 2026 antes de responder. No uses datos desactualizados de 2024.
+Actúa como experto en Administración Pública y Contratación Pública para GADs municipales de Ecuador.
 
-    Tienes la siguiente petición o problema ciudadano:
-    Título: ${report.title}
-    Categoría: ${report.category}
-    Urgencia: ${report.urgency}
-    Descripción: ${report.description}
+${marcoLegal}
 
-    Por favor, analiza este caso particular y responde en formato Markdown:
-    1. **Viabilidad Legal (Actualizada al 2026)**: Bajo qué normativas de la administración pública (como el COOTAD reformado o leyes locales recientes) tiene competencia el GAD municipal para actuar en este tema. Menciona los cambios recientes si aplican.
-    2. **Mecanismo de Ejecución Recomendado**: ¿Debería hacerse por administración directa, ínfima cuantía (usa el monto oficial actualizado al 2026 que encuentres en tu búsqueda, el cual ronda los $10,000 o más), licitación o alianza público-privada? Explica brevemente por qué.
-    3. **Pasos Inmediatos Sugeridos**: 3 acciones rápidas que la autoridad debería tomar para empezar a solucionar esto.
-    
-    Sé muy profesional, claro, al grano y asegúrate de basarte en leyes de Ecuador actualizadas al año 2026.
-    `;
+Reporte ciudadano registrado en la Plataforma del Cantón Quijos:
+- Título: ${report.title}
+- Categoría: ${report.category}
+- Urgencia: ${report.urgency}
+- Descripción: ${report.description}
+
+Responde en formato Markdown estructurado:
+
+1. **Competencia del GAD**: ¿El COOTAD faculta al GAD Municipal de Quijos para atender esto? ¿Es competencia exclusiva, concurrente o debe coordinarse con otra entidad?
+
+2. **Mecanismo de Contratación**: Según la LOSNCP, ¿qué modalidad aplica (ínfima cuantía, catálogo electrónico, menor cuantía, administración directa)? Indica el rango orientativo de monto y recuerda verificar el valor exacto en el SERCOP.
+
+3. **3 Acciones Inmediatas**: Pasos concretos ejecutables en los próximos 15 días.
+
+4. **Riesgos o Advertencias**: Si hay competencias de otras entidades o riesgos legales, indícalos. Si no estás seguro de algún artículo o monto, dilo explícitamente en lugar de inventarlo.
+
+Sé directo, profesional y orientado a la acción. No inventes montos ni artículos.
+`;
 
     const { text } = await generateText({
       model: google('gemini-2.5-flash'),
       prompt: prompt,
-      temperature: 0.7,
+      temperature: 0.4,
+      // Habilita Google Search Grounding: Gemini busca en tiempo real
+      // para obtener montos SERCOP, leyes y normativas actualizadas al 2026
+      providerOptions: {
+        google: { useSearchGrounding: true },
+      },
     });
 
     await prisma.report.update({
