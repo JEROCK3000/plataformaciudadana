@@ -100,6 +100,21 @@ export async function analyzeSingleReport(reportId: string) {
 
     const settings = await getSettings();
 
+    const categoryLabels: Record<string, string> = {
+      INFRASTRUCTURE: 'Infraestructura',
+      SECURITY: 'Seguridad Ciudadana',
+      WATER: 'Agua y Saneamiento',
+      SERVICES: 'Servicios Públicos',
+      ENVIRONMENT: 'Medio Ambiente',
+      EDUCATION: 'Educación',
+      OTHER: 'Otros',
+    };
+    const urgencyLabels: Record<string, string> = {
+      LOW: 'Baja',
+      MEDIUM: 'Media',
+      HIGH: 'Alta',
+    };
+
     const prompt = `
 ${settings.aiPromptMaster}
 
@@ -122,8 +137,8 @@ NORMATIVA CLAVE A CONSULTAR (busca la versión vigente 2026):
 
 REPORTE CIUDADANO A ANALIZAR:
 - Título: ${report.title}
-- Categoría: ${report.category}
-- Urgencia: ${report.urgency}
+- Categoría: ${categoryLabels[report.category] ?? report.category}
+- Nivel de Urgencia: ${urgencyLabels[report.urgency] ?? report.urgency}
 - Descripción: ${report.description}
 
 RESPONDE EN FORMATO MARKDOWN con las siguientes secciones:

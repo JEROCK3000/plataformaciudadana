@@ -30,7 +30,21 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
     SERVICES: 'Servicios Públicos',
     ENVIRONMENT: 'Medio Ambiente',
     EDUCATION: 'Educación',
-    OTHER: 'Otros'
+    OTHER: 'Otros',
+  };
+
+  const statusLabels: Record<string, string> = {
+    RECEIVED:    'Recibido',
+    IN_REVIEW:   'En revisión',
+    IN_PROGRESS: 'En proceso',
+    RESOLVED:    'Resuelto',
+    REJECTED:    'Rechazado',
+  };
+
+  const urgencyLabels: Record<string, string> = {
+    HIGH:   'Urgencia Alta',
+    MEDIUM: 'Urgencia Media',
+    LOW:    'Urgencia Baja',
   };
 
   return (
@@ -55,14 +69,19 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
                 {categoryLabels[report.category] || report.category}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                {report.status}
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                report.status === 'RESOLVED'    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300' :
+                report.status === 'REJECTED'    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                report.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                report.status === 'IN_REVIEW'   ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300'}`}>
+                {statusLabels[report.status] ?? report.status}
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold 
-                ${report.urgency === 'HIGH' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 
-                  report.urgency === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 
-                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
-                Urgencia: {report.urgency}
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                report.urgency === 'HIGH'   ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                report.urgency === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
+                {urgencyLabels[report.urgency] ?? report.urgency}
               </span>
             </div>
 
