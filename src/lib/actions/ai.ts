@@ -120,24 +120,34 @@ export async function analyzeSingleReport(reportId: string) {
     const prompt = `
 ${settings.aiPromptMaster}
 
-FECHA ACTUAL DEL SISTEMA: ${fechaActual}. Estamos en el año 2026. NO uses datos de años anteriores como si fueran proyecciones futuras — son datos del pasado. Busca información actualizada a 2026.
+FECHA ACTUAL DEL SISTEMA: ${fechaActual}. Estamos en el año 2026.
 
-Eres un experto jurídico en Derecho Público ecuatoriano especializado en GADs municipales. Antes de responder, BUSCA EN GOOGLE las versiones vigentes del COOTAD y la LOSNCP para el año 2026, así como los montos actualizados del SERCOP.
+Eres un experto jurídico en Derecho Público ecuatoriano especializado en GADs municipales.
 
+═══ PASO 1 — BUSCA ANTES DE RESPONDER ═══
+Usa Google Search AHORA para obtener:
+
+A) El valor del PRESUPUESTO GENERAL DEL ESTADO (PGE) de Ecuador para el año 2026.
+   Busca: "Presupuesto General del Estado Ecuador 2026 aprobado"
+   Fuentes confiables: Ministerio de Finanzas (finanzas.gob.ec), Asamblea Nacional Ecuador.
+
+B) Los umbrales de contratación pública vigentes del SERCOP para 2026.
+   Busca: "SERCOP resolución umbrales contratación 2026 Ecuador ínfima cuantía"
+   Fuente: sercop.gob.ec
+
+C) Cómo se calculan los umbrales (fórmula legal de la LOSNCP):
+   - Ínfima Cuantía = 0,0000002 × PGE
+   - Menor Cuantía Bienes/Servicios = 0,000002 × PGE
+   - Menor Cuantía Obras = 0,00002 × PGE
+   - Cotización = 0,000015 × PGE
+   Una vez que encuentres el PGE 2026, aplica estas fórmulas para obtener los montos exactos vigentes.
+
+D) Reformas o actualizaciones al COOTAD en 2025-2026 que afecten competencias municipales.
+
+═══ PASO 2 — RESPONDE CON DATOS REALES ═══
 CONTEXTO DEL GAD:
 - Tipo: GAD Municipal (Gobierno Autónomo Descentralizado Municipal)
 - Cantón: Quijos, Provincia de Napo, Ecuador
-
-NORMATIVA CLAVE A CONSULTAR (busca la versión vigente 2026):
-1. COOTAD (Código Orgánico de Organización Territorial, Autonomía y Descentralización):
-   - Art. 55: Competencias exclusivas del GAD municipal (vías, agua, saneamiento, tránsito, planificación urbana, residuos, espacios públicos, actividades económicas, etc.)
-   - Art. 54: Funciones del GAD municipal
-   - Art. 57: Atribuciones del Concejo Municipal
-   - Busca si hubo reformas al COOTAD en 2025-2026 que afecten competencias municipales.
-
-2. LOSNCP (Ley Orgánica del Sistema Nacional de Contratación Pública) y su Reglamento:
-   - Montos actualizados de ínfima cuantía, menor cuantía, cotización y licitación para el año 2026 (búscalos en www.sercop.gob.ec o resoluciones del SERCOP vigentes).
-   - Modalidades: administración directa, catálogo electrónico, ínfima cuantía, menor cuantía, cotización, licitación.
 
 REPORTE CIUDADANO A ANALIZAR:
 - Título: ${report.title}
@@ -159,11 +169,11 @@ Basándote en los montos vigentes 2026 que encontraste en el SERCOP, indica la m
 ## 4. Advertencias y Riesgos
 Conflictos de competencia, requisitos previos, o riesgos legales relevantes. Si no pudiste confirmar algún dato legal mediante búsqueda, indícalo claramente.
 
-REGLAS ESTRICTAS:
-- NUNCA uses valores de años anteriores como referencia. Solo datos que encontraste ahora.
-- Si no pudiste buscar o confirmar un monto del SERCOP, escribe exactamente: "⚠️ No pude verificar este valor en tiempo real. Consúltalo en www.sercop.gob.ec antes de ejecutar el proceso."
-- NUNCA escribas frases como "proyección", "estimación", "referencia 2024", "asumiendo que". O encontraste el dato real o indicas que no lo encontraste.
-- Cita el número de resolución del SERCOP si lo encontraste.
+REGLAS ABSOLUTAS — INCUMPLIRLAS INVALIDA EL ANÁLISIS:
+1. NUNCA uses la palabra "simulado", "proyección", "estimación", "referencia 2024", "se estima", "asumiendo" o cualquier término que indique dato inventado.
+2. Los montos de contratación DEBEN calcularse con la fórmula legal usando el PGE 2026 real que encontraste. Si no encontraste el PGE, escríbelo así: "⚠️ No pude obtener el PGE 2026 en esta búsqueda. El monto exacto debe calcularse con la fórmula [coeficiente] × PGE 2026 disponible en finanzas.gob.ec"
+3. NUNCA menciones valores de años anteriores (2024, 2025) como referencia de montos de contratación.
+4. Si encontraste la resolución SERCOP, cita su número.
 `;
 
     // Google Search Grounding activo: Gemini consulta fuentes reales en tiempo real.
