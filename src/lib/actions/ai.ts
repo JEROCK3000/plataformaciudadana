@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getSettings } from "@/lib/actions/settings";
+import { writeLog } from "@/lib/logs";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -161,7 +162,15 @@ Sé preciso, cita los artículos que encontraste y nunca inventes datos que no p
     return { success: true, content: text };
 
   } catch (error) {
-    console.error("Error al generar IA individual:", error);
-    return { success: false, error: 'Hubo un error al generar el análisis.', content: null };
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Error al generar IA individual:", msg);
+    writeLog('ERROR', 'AI', 'SYSTEM', `analyzeSingleReport error: ${msg}`);
+    return {
+      success: false,
+      error: process.env.NODE_ENV === 'development'
+        ? `Error IA: ${msg}`
+        : 'Hubo un error al generar el análisis.',
+      content: null,
+    };
   }
 }
