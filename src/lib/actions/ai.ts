@@ -177,17 +177,30 @@ REGLAS ABSOLUTAS — INCUMPLIRLAS INVALIDA EL ANÁLISIS:
 `;
 
     // Google Search Grounding activo: Gemini consulta fuentes reales en tiempo real.
-    // gemini-3.5-flash (mayo 2026) con Google Search Grounding en tiempo real.
-    const { text } = await generateText({
-      model: google('gemini-3.5-flash'),
-      prompt: prompt,
-      temperature: 0.3,
-      providerOptions: {
-        google: {
-          useSearchGrounding: true,
-        },
-      },
-    });
+    // Intenta con gemini-3.5-flash (mayo 2026). Si está saturado, usa gemini-2.0-flash.
+    const MODELS = ['gemini-3.5-flash', 'gemini-2.0-flash'];
+    let text = '';
+    let lastError: unknown;
+
+    for (const modelId of MODELS) {
+      try {
+        const result = await generateText({
+          model: google(modelId),
+          prompt: prompt,
+          temperature: 0.3,
+          providerOptions: { google: { useSearchGrounding: true } },
+        });
+        text = result.text;
+        writeLog('INFO', 'AI', 'SYSTEM', `Análisis generado con modelo: ${modelId}`);
+        break;
+      } catch (err) {
+        lastError = err;
+        const msg = err instanceof Error ? err.message : String(err);
+        writeLog('WARN', 'AI', 'SYSTEM', `Modelo ${modelId} falló: ${msg}. Intentando siguiente...`);
+      }
+    }
+
+    if (!text) throw lastError;
 
     await prisma.report.update({
       where: { id: reportId },
