@@ -127,13 +127,18 @@ Eres un experto jurídico en Derecho Público ecuatoriano especializado en GADs 
 ═══ PASO 1 — BUSCA ANTES DE RESPONDER ═══
 Usa Google Search AHORA para obtener:
 
-A) El valor del PRESUPUESTO GENERAL DEL ESTADO (PGE) de Ecuador para el año 2026.
-   Busca: "Presupuesto General del Estado Ecuador 2026 aprobado"
-   Fuentes confiables: Ministerio de Finanzas (finanzas.gob.ec), Asamblea Nacional Ecuador.
+A) El valor exacto en dólares del PRESUPUESTO GENERAL DEL ESTADO (PGE) de Ecuador aprobado para el año 2026.
+   Busca AHORA: "Presupuesto General del Estado Ecuador 2026 monto total aprobado dólares"
+   También busca: "Ministerio de Finanzas Ecuador PGE 2026 proforma presupuestaria"
+   Fuentes: finanzas.gob.ec, asamblea.gob.ec, el-ciudadano.gob.ec
+   Una vez que tengas el PGE en dólares, calcula:
+   - Ínfima Cuantía = 0.0000002 × PGE (escribe el resultado en dólares, sin fórmulas LaTeX)
+   - Menor Cuantía Bienes = 0.000002 × PGE
+   - Menor Cuantía Obras = 0.00002 × PGE
 
-B) Los umbrales de contratación pública vigentes del SERCOP para 2026.
-   Busca: "SERCOP resolución umbrales contratación 2026 Ecuador ínfima cuantía"
-   Fuente: sercop.gob.ec
+B) Resolución vigente del SERCOP con umbrales 2026.
+   Busca: "SERCOP resolución umbrales montos contratación pública Ecuador 2026"
+   Fuente: sercop.gob.ec/normativa
 
 C) Cómo se calculan los umbrales (fórmula legal de la LOSNCP):
    - Ínfima Cuantía = 0,0000002 × PGE
@@ -171,9 +176,11 @@ Conflictos de competencia, requisitos previos, o riesgos legales relevantes. Si 
 
 REGLAS ABSOLUTAS — INCUMPLIRLAS INVALIDA EL ANÁLISIS:
 1. NUNCA uses la palabra "simulado", "proyección", "estimación", "referencia 2024", "se estima", "asumiendo" o cualquier término que indique dato inventado.
-2. Los montos de contratación DEBEN calcularse con la fórmula legal usando el PGE 2026 real que encontraste. Si no encontraste el PGE, escríbelo así: "⚠️ No pude obtener el PGE 2026 en esta búsqueda. El monto exacto debe calcularse con la fórmula [coeficiente] × PGE 2026 disponible en finanzas.gob.ec"
-3. NUNCA menciones valores de años anteriores (2024, 2025) como referencia de montos de contratación.
-4. Si encontraste la resolución SERCOP, cita su número.
+2. NUNCA uses notación LaTeX ni fórmulas matemáticas con símbolos como $, \times, \text{}. Escribe los valores en texto plano: por ejemplo "USD 15.234,00" o "0.0000002 x PGE 2026".
+3. Si encontraste el PGE 2026, escribe el monto calculado en dólares directamente: ejemplo "Ínfima Cuantía 2026: USD XX.XXX,XX".
+4. Si NO encontraste el PGE 2026, escribe UNA SOLA VEZ al final del análisis: "⚠️ Verificar monto exacto en finanzas.gob.ec o sercop.gob.ec". No repitas esta advertencia.
+5. NUNCA menciones valores de años anteriores (2024, 2025) como referencia de montos.
+6. Si encontraste la resolución SERCOP, cita su número.
 `;
 
     // Google Search Grounding activo: Gemini consulta fuentes reales en tiempo real.
