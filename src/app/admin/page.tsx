@@ -1,12 +1,22 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { Shield, Settings, Users, LogOut, Globe, BarChart3 } from 'lucide-react';
+import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '@/lib/actions/auth';
+import { requireTenantAdmin } from '@/lib/auth/session';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
+  const { session, tenantId } = await requireTenantAdmin();
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+  });
+
   const reports = await prisma.report.findMany({
-    orderBy: { createdAt: 'desc' }
+    where: { tenantId },
+    orderBy: { createdAt: 'desc' },
   });
 
   return (
@@ -16,11 +26,20 @@ export default async function AdminDashboard() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
               <Shield size={24} className="text-emerald-400" />
-              <h1 className="text-xl font-bold">Panel de Administración</h1>
+              <div>
+                <h1 className="text-xl font-bold leading-tight">Panel de Administración</h1>
+                <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                  <Building2 size={12} /> {tenant?.name || 'GAD Municipal'} (Cantón {tenant?.canton || ''})
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4 text-sm font-medium">
-              <Link href="/" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors border-r border-gray-700 pr-4 mr-2" title="Volver al Portal Público">
-                <Globe size={18} /> Portal
+              <Link 
+                href={tenant ? `/${tenant.slug}` : "/"} 
+                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors border-r border-gray-700 pr-4 mr-2" 
+                title="Volver al Portal Ciudadano de este cantón"
+              >
+                <Globe size={18} /> Portal Ciudadano
               </Link>
               <Link href="/admin/stats" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                 <BarChart3 size={18} /> Estadísticas
@@ -43,8 +62,11 @@ export default async function AdminDashboard() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Reportes Ciudadanos Recientes</h2>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Reportes de {tenant?.canton || 'este Cantón'}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Total de reportes recibidos en este municipio: {reports.length}</p>
+            </div>
             <a href="/admin/ai-analysis" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow transition-colors">
               Lluvia de Ideas IA ✨
             </a>
@@ -63,7 +85,9 @@ export default async function AdminDashboard() {
               <tbody>
                 {reports.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center">No hay reportes en el sistema</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No hay reportes registrados para este municipio aún.
+                    </td>
                   </tr>
                 ) : (
                   reports.map(report => (
@@ -71,7 +95,7 @@ export default async function AdminDashboard() {
                       <td className="px-6 py-4">{new Date(report.createdAt).toLocaleDateString('es-EC')}</td>
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-800 dark:text-gray-200">{report.title}</div>
-                        <div className="text-xs">{report.parish} - {report.neighborhood}</div>
+                        <div className="text-xs text-gray-500">{report.parish} - {report.neighborhood}</div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700">{report.urgency}</span>

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, Map } from 'lucide-react';
+import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, Map, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   ParishBarChart,
@@ -14,8 +14,7 @@ import {
   type UrgencyStat,
 } from '@/components/ui/StatsCharts';
 import MapaQuijos from '@/components/ui/MapaQuijos';
-
-const PARISHES = ['Baeza', 'Cosanga', 'Cuyuja', 'Papallacta', 'San Francisco de Borja', 'Sumaco'];
+import { requireTenantAdmin } from '@/lib/auth/session';
 
 const STATUS_LABELS: Record<string, string> = {
   RECEIVED: 'Recibidos',
@@ -48,12 +47,36 @@ const URGENCY_COLORS: Record<string, string> = {
 };
 
 export default async function StatsPage() {
+  const { session, tenantId } = await requireTenantAdmin();
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+  });
+
+  const parishes = (tenant?.parishes as string[]) || [];
+
   const [reports, byParishRaw, byCategoryRaw, byUrgencyRaw, byStatusRaw] = await Promise.all([
-    prisma.report.count(),
-    prisma.report.groupBy({ by: ['parish', 'status'], _count: { id: true } }),
-    prisma.report.groupBy({ by: ['category'], _count: { id: true } }),
-    prisma.report.groupBy({ by: ['urgency'], _count: { id: true } }),
-    prisma.report.groupBy({ by: ['status'], _count: { id: true } }),
+    prisma.report.count({ where: { tenantId } }),
+    prisma.report.groupBy({
+      by: ['parish', 'status'],
+      where: { tenantId },
+      _count: { id: true },
+    }),
+    prisma.report.groupBy({
+      by: ['category'],
+      where: { tenantId },
+      _count: { id: true },
+    }),
+    prisma.report.groupBy({
+      by: ['urgency'],
+      where: { tenantId },
+      _count: { id: true },
+    }),
+    prisma.report.groupBy({
+      by: ['status'],
+      where: { tenantId },
+      _count: { id: true },
+    }),
   ]);
 
   const statusTotals = Object.fromEntries(
@@ -65,8 +88,8 @@ export default async function StatsPage() {
   const resolved = statusTotals['RESOLVED'] ?? 0;
   const rejected = statusTotals['REJECTED'] ?? 0;
 
-  // Build per-parish stats
-  const parishStats: ParishStat[] = PARISHES.map(parish => {
+  // Build per-parish stats dinámicamente según las parroquias del tenant
+  const parishStats: ParishStat[] = parishes.map(parish => {
     const rows = byParishRaw.filter(r => r.parish === parish);
     const stat: ParishStat = {
       parish,
@@ -91,10 +114,10 @@ export default async function StatsPage() {
 
   // Per-parish top category
   const parishTopCategory = await Promise.all(
-    PARISHES.map(async parish => {
+    parishes.map(async parish => {
       const rows = await prisma.report.groupBy({
         by: ['category'],
-        where: { parish },
+        where: { parish, tenantId },
         _count: { id: true },
         orderBy: { _count: { id: 'desc' } },
         take: 1,
@@ -124,26 +147,30 @@ export default async function StatsPage() {
             </Link>
             <BarChart3 size={24} className="text-emerald-400" />
             <div className="flex-1">
-              <h1 className="text-xl font-bold">KPIs y Estadísticas</h1>
-              <p className="text-xs text-gray-400">Distribución de reportes ciudadanos por parroquia</p>
+              <h1 className="text-xl font-bold">KPIs y Estadísticas — {tenant?.canton || 'Cantón'}</h1>
+              <p className="text-xs text-gray-400">Distribución de reportes ciudadanos de {tenant?.name || 'GAD'}</p>
             </div>
-            <a
-              href="/mapa-prototipo.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-sm font-bold shadow transition-colors"
-            >
-              <Map size={16} /> Ver Mapa Prototipo
-            </a>
+            {tenant?.slug === 'quijos' && (
+              <a
+                href="/mapa-prototipo.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-sm font-bold shadow transition-colors"
+              >
+                <Map size={16} /> Ver Mapa Prototipo
+              </a>
+            )}
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {/* KPI Cards globales */}
+        {/* KPI Cards globales del Tenant */}
         <section>
-          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Resumen General</h2>
+          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+            Resumen General de {tenant?.canton}
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <KpiCard icon={<FileText size={20} />} label="Total Reportes" value={reports} color="bg-gray-800 text-white dark:bg-gray-700" />
             <KpiCard icon={<AlertCircle size={20} />} label="Pendientes" value={pending} color="bg-indigo-600 text-white" />
@@ -153,16 +180,36 @@ export default async function StatsPage() {
           </div>
         </section>
 
-        {/* Mapa del cantón Quijos */}
-        <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
-            <Map size={16} className="text-emerald-500" /> Mapa del Cantón Quijos — Reportes por Parroquia
-          </h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-            Pasa el cursor sobre cada parroquia para ver el detalle. El color indica la intensidad de reportes.
-          </p>
-          <MapaQuijos data={mapData} />
-        </section>
+        {/* Mapa del cantón o visualización territorial */}
+        {tenant?.slug === 'quijos' ? (
+          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
+              <Map size={16} className="text-emerald-500" /> Mapa del Cantón Quijos — Reportes por Parroquia
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              Pasa el cursor sobre cada parroquia para ver el detalle. El color indica la intensidad de reportes.
+            </p>
+            <MapaQuijos data={mapData} />
+          </section>
+        ) : (
+          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-2">
+              <Building2 size={18} className="text-emerald-500" /> Distribución Territorial de {tenant?.name}
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              Parroquias registradas en este municipio: {parishes.join(', ')}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {parishStats.map(s => (
+                <div key={s.parish} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400">{s.parish}</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{s.total}</div>
+                  <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">{s.RESOLVED} resueltos</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Gráficas */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -170,7 +217,7 @@ export default async function StatsPage() {
           {/* Barra: total por parroquia */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-4">
-              <MapPin size={16} className="text-emerald-500" /> Reportes por Parroquia
+              <MapPin size={16} className="text-emerald-500" /> Reportes por Parroquia ({tenant?.canton})
             </h3>
             <ParishBarChart data={parishStats} />
           </div>
@@ -204,7 +251,7 @@ export default async function StatsPage() {
         <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-              <MapPin size={16} className="text-emerald-500" /> Detalle por Parroquia
+              <MapPin size={16} className="text-emerald-500" /> Detalle de Parroquias en {tenant?.canton}
             </h3>
           </div>
           <div className="overflow-x-auto">
@@ -250,7 +297,7 @@ export default async function StatsPage() {
                         {topCat ? CATEGORY_LABELS[topCat] ?? topCat : <span className="text-gray-400">—</span>}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <TopUrgencyCell parish={stat.parish} urgencyLabels={URGENCY_LABELS} urgencyColors={URGENCY_COLORS} />
+                        <TopUrgencyCell parish={stat.parish} tenantId={tenantId} urgencyLabels={URGENCY_LABELS} urgencyColors={URGENCY_COLORS} />
                       </td>
                     </tr>
                   );
@@ -312,16 +359,18 @@ function StatBadge({ value, color }: { value: number; color: string }) {
 
 async function TopUrgencyCell({
   parish,
+  tenantId,
   urgencyLabels,
   urgencyColors,
 }: {
   parish: string;
+  tenantId: string;
   urgencyLabels: Record<string, string>;
   urgencyColors: Record<string, string>;
 }) {
   const rows = await prisma.report.groupBy({
     by: ['urgency'],
-    where: { parish },
+    where: { parish, tenantId },
     _count: { id: true },
     orderBy: { _count: { id: 'desc' } },
     take: 1,

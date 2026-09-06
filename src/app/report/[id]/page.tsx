@@ -12,6 +12,7 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
   const report = await prisma.report.findUnique({
     where: { id },
     include: {
+      tenant: true,
       comments: {
         where: { status: 'APPROVED' },
         orderBy: { createdAt: 'desc' }
@@ -51,11 +52,18 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-12">
       <header className="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 py-4">
-            <Link href="/" className="p-2 hover:bg-emerald-700 dark:hover:bg-emerald-900 rounded-full transition-colors">
-              <ArrowLeft size={20} />
-            </Link>
-            <h1 className="text-xl font-bold">Detalle del Reporte Ciudadano</h1>
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-4">
+              <Link href={report.tenant ? `/${report.tenant.slug}` : "/"} className="p-2 hover:bg-emerald-700 dark:hover:bg-emerald-900 rounded-full transition-colors" title={`Volver al portal de ${report.tenant?.canton || 'inicio'}`}>
+                <ArrowLeft size={20} />
+              </Link>
+              <div>
+                <h1 className="text-xl font-bold">Detalle del Reporte Ciudadano</h1>
+                {report.tenant && (
+                  <p className="text-xs text-emerald-200">{report.tenant.name}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </header>

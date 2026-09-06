@@ -28,10 +28,10 @@ export default function LoginPage() {
           <Shield size={48} />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Acceso Autoridades
+          Acceso Institucional
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Panel de Gestión GAD Quijos
+          Superadministración & Panel de Gestión Municipal
         </p>
       </div>
 

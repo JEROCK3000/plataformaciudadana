@@ -7,6 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Modelo de Organización / Municipio (Multitenant SaaS)
+model Tenant {
+  id             String    @id @default(uuid())
+  slug           String    @unique // ej: "quijos", "archidona", "tena"
+  name           String    // ej: "GAD Municipal del Cantón Quijos"
+  canton         String    // ej: "Quijos"
+  province       String    @default("Napo")
+  logoUrl        String?
+  isActive       Boolean   @default(true)
+  parishes       Json      // Array JSON con nombres de parroquias ["Baeza", "Cosanga", ...]
+  aiPromptMaster String?   @db.LongText
+  plan           String    @default("ENTERPRISE")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  users          User[]
+  reports        Report[]
+}
+
 // Usuarios Administradores de la Plataforma
 model User {
   id        String   @id @default(uuid())
@@ -14,13 +33,19 @@ model User {
   password  String
   name      String
   role      Role     @default(MODERATOR)
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
 }
 
 // Reportes Ciudadanos
 model Report {
   id               String   @id @default(uuid())
+  tenantId         String
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   title            String
   category         Category
   urgency          Urgency
@@ -48,6 +73,9 @@ model Report {
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status])
 }
 
 model Comment {
@@ -67,6 +95,7 @@ enum CommentStatus {
 }
 
 enum Role {
+  SUPERADMIN
   ADMIN
   MODERATOR
 }
@@ -98,7 +127,7 @@ enum ReportStatus {
 // Configuración Global de la Plataforma
 model SystemSettings {
   id             String   @id @default("global")
-  platformName   String   @default("Plataforma Ciudadana")
+  platformName   String   @default("Plataforma Ciudadana SaaS")
   aiPromptMaster String   @db.LongText
   updatedAt      DateTime @updatedAt
 }

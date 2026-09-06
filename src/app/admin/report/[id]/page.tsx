@@ -24,12 +24,18 @@ const STATUS_STYLES: Record<string, string> = {
   REJECTED:    'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 };
 
+import { requireTenantAdmin } from '@/lib/auth/session';
+
+export const dynamic = 'force-dynamic';
+
 export default async function AdminSingleReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const { session, tenantId } = await requireTenantAdmin();
 
   const report = await prisma.report.findUnique({
     where: { id },
     include: {
+      tenant: true,
       comments: {
         where: { status: 'APPROVED' },
         orderBy: { createdAt: 'desc' }
@@ -38,6 +44,11 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
   });
 
   if (!report) {
+    notFound();
+  }
+
+  // Aislamiento: Si no es superadmin, solo puede ver reportes de su tenant
+  if (session.role !== 'SUPERADMIN' && report.tenantId !== tenantId) {
     notFound();
   }
 

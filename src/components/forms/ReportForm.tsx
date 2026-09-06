@@ -52,7 +52,15 @@ const comprimirImagen = (file: File): Promise<string> => {
   });
 };
 
-export default function ReportForm({ parroquias }: { parroquias: string[] }) {
+export default function ReportForm({ 
+  parroquias,
+  tenantSlug,
+  tenantName,
+}: { 
+  parroquias: string[];
+  tenantSlug?: string;
+  tenantName?: string;
+}) {
   const [formData, setFormData] = useState({
     title: '',
     category: 'INFRASTRUCTURE',
@@ -108,6 +116,7 @@ export default function ReportForm({ parroquias }: { parroquias: string[] }) {
     try {
       const response = await createReport({
         ...formData,
+        tenantSlug,
         category: formData.category as any,
         urgency: formData.urgency as any
       });

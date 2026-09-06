@@ -1,15 +1,17 @@
 import React from 'react';
-import { getSettings, updateSettings } from '@/lib/actions/settings';
-import { Settings, Save, Shield, ArrowLeft } from 'lucide-react';
+import { getTenantSettings, updateTenantSettings } from '@/lib/actions/settings';
+import { Settings, Save, Shield, ArrowLeft, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SettingsPage() {
-  const settings = await getSettings();
+  const settings = await getTenantSettings();
 
   async function handleSave(formData: FormData) {
     "use server";
-    await updateSettings(formData);
+    await updateTenantSettings(formData);
     redirect("/admin");
   }
 
@@ -22,7 +24,10 @@ export default async function SettingsPage() {
               <ArrowLeft size={20} />
             </Link>
             <Settings size={24} className="text-emerald-400" />
-            <h1 className="text-xl font-bold">Configuración de la Plataforma</h1>
+            <div>
+              <h1 className="text-xl font-bold">Configuración de {settings.canton ? `Cantón ${settings.canton}` : 'la Plataforma'}</h1>
+              <p className="text-xs text-gray-400">Ajustes específicos para {settings.platformName}</p>
+            </div>
           </div>
         </div>
       </header>
@@ -33,12 +38,12 @@ export default async function SettingsPage() {
             
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                <Shield size={20} className="text-gray-400" /> Información General
+                <Shield size={20} className="text-gray-400" /> Información Institucional
               </h2>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="platformName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Nombre del GAD / Plataforma
+                    Nombre Oficial del GAD / Municipio
                   </label>
                   <input
                     type="text"
@@ -48,7 +53,18 @@ export default async function SettingsPage() {
                     required
                     className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Este nombre aparecerá en la cabecera pública de la plataforma.</p>
+                  <p className="mt-1 text-xs text-gray-500">Este nombre aparecerá en la cabecera del portal ciudadano de su cantón.</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">Cantón</label>
+                    <input type="text" disabled value={settings.canton} className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">Provincia</label>
+                    <input type="text" disabled value={settings.province} className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-600 dark:text-gray-400" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -57,10 +73,10 @@ export default async function SettingsPage() {
 
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                🧠 Prompt Maestro de Inteligencia Artificial
+                🧠 Prompt Maestro de Inteligencia Artificial para {settings.canton}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Este texto define cómo se comporta Gemini al analizar los reportes. Puedes actualizar el contexto, año en curso, o leyes directamente aquí.
+                Define cómo se comporta la IA al analizar los reportes ciudadanos de este cantón. Puedes personalizar prioridades locales o normativas territoriales.
               </p>
               <div>
                 <label htmlFor="aiPromptMaster" className="sr-only">Prompt Maestro</label>

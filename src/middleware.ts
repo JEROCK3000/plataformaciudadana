@@ -3,14 +3,17 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const adminToken = request.cookies.get('admin_token')?.value;
+  const pathname = request.nextUrl.pathname;
   
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/superadmin')) {
     if (!adminToken) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
-  if (request.nextUrl.pathname.startsWith('/login')) {
+  if (pathname.startsWith('/login')) {
     if (adminToken) {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
@@ -20,5 +23,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: ['/admin/:path*', '/superadmin/:path*', '/login'],
 };

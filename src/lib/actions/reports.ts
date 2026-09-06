@@ -10,20 +10,23 @@ export async function updateReportStatus(reportId: string, status: ReportStatus)
     const report = await prisma.report.update({
       where: { id: reportId },
       data: { status },
-      select: { id: true, title: true, parish: true },
+      select: { id: true, title: true, parish: true, tenant: { select: { slug: true } } },
     });
-    writeLog('AUDIT', 'SYSTEM', 'ADMIN', `Estado actualizado → ${status}: reporte ${report.id} (${report.title}) [${report.parish}]`);
+    const tenantSlug = report.tenant?.slug || 'GLOBAL';
+    writeLog('AUDIT', tenantSlug, 'ADMIN', `Estado actualizado → ${status}: reporte ${report.id} (${report.title}) [${report.parish}]`);
     revalidatePath('/admin');
     revalidatePath('/admin/stats');
     revalidatePath(`/admin/report/${reportId}`);
     return { success: true };
   } catch (error) {
-    writeLog('ERROR', 'SYSTEM', 'SYSTEM', `Error al actualizar estado: ${error}`);
+    writeLog('ERROR', 'GLOBAL', 'SYSTEM', `Error al actualizar estado: ${error}`);
     return { success: false };
   }
 }
 
 export async function createReport(data: {
+  tenantId?: string;
+  tenantSlug?: string;
   title: string;
   category: Category;
   parish: string;
@@ -36,8 +39,28 @@ export async function createReport(data: {
   photos?: string[];
 }) {
   try {
+    let tenantId = data.tenantId;
+
+    if (!tenantId && data.tenantSlug) {
+      const tenant = await prisma.tenant.findUnique({ where: { slug: data.tenantSlug } });
+      if (!tenant || !tenant.isActive) {
+        return { success: false, error: 'Municipio no válido o inactivo.' };
+      }
+      tenantId = tenant.id;
+    }
+
+    // Fallback al tenant por defecto si no se especificó
+    if (!tenantId) {
+      const defaultTenant = await prisma.tenant.findFirst({ where: { isActive: true } });
+      if (!defaultTenant) {
+        return { success: false, error: 'No hay municipios configurados.' };
+      }
+      tenantId = defaultTenant.id;
+    }
+
     const report = await prisma.report.create({
       data: {
+        tenantId,
         title: data.title,
         category: data.category,
         parish: data.parish,
@@ -48,13 +71,26 @@ export async function createReport(data: {
         citizenContact: data.citizenContact || null,
         privacyAccepted: data.privacyAccepted,
         photos: data.photos || [],
-      }
+      },
+      include: {
+        tenant: { select: { slug: true } },
+      },
     });
 
-    writeLog('INFO', 'SYSTEM', 'ANON_USER', `Reporte ciudadano creado: ${report.id} (${report.title})`);
+    const tenantSlug = report.tenant?.slug || 'GLOBAL';
+    writeLog('INFO', tenantSlug, 'ANON_USER', `Reporte ciudadano creado: ${report.id} (${report.title}) [${report.parish}]`);
+    
+    revalidatePath('/');
+    if (report.tenant?.slug) {
+      revalidatePath(`/${report.tenant.slug}`);
+    }
+    revalidatePath('/admin');
+    revalidatePath('/admin/stats');
+    
     return { success: true, report };
   } catch (error) {
-    writeLog('ERROR', 'SYSTEM', 'SYSTEM', `Error al crear reporte: ${error}`);
+    const msg = error instanceof Error ? error.message : String(error);
+    writeLog('ERROR', 'GLOBAL', 'SYSTEM', `Error al crear reporte: ${msg}`);
     return { success: false, error: 'No se pudo guardar el reporte' };
   }
 }
@@ -64,10 +100,11 @@ export async function voteReport(reportId: string) {
     const report = await prisma.report.update({
       where: { id: reportId },
       data: { votes: { increment: 1 } },
-      select: { id: true }
+      select: { id: true, tenant: { select: { slug: true } } },
     });
     
-    writeLog('INFO', 'SYSTEM', 'ANON_USER', `Voto registrado para reporte: ${report.id}`);
+    const tenantSlug = report.tenant?.slug || 'GLOBAL';
+    writeLog('INFO', tenantSlug, 'ANON_USER', `Voto registrado para reporte: ${report.id}`);
     return { success: true };
   } catch (error) {
     console.error("Error al votar:", error);
