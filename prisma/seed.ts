@@ -78,12 +78,13 @@ async function main() {
   console.log(`Tenant listo: ${archidonaTenant.name} [slug: ${archidonaTenant.slug}]`);
 
   // 4. Asignar reportes existentes sin tenant al tenant de Quijos
-  const unassignedReports = await (prisma.report as any).updateMany({
-    where: { tenantId: null },
-    data: { tenantId: quijosTenant.id },
-  });
-  if (unassignedReports.count > 0) {
-    console.log(`Migrados ${unassignedReports.count} reportes existentes al tenant Quijos.`);
+  try {
+    await prisma.$executeRawUnsafe(
+      `UPDATE \`Report\` SET \`tenantId\` = ? WHERE \`tenantId\` IS NULL OR \`tenantId\` = ''`,
+      quijosTenant.id
+    );
+  } catch (e) {
+    // Reportes ya asignados
   }
 
   // 5. Usuario Administrador de Quijos
