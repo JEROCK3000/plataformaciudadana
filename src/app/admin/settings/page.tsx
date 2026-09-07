@@ -73,10 +73,10 @@ export default async function SettingsPage() {
 
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                🧠 Prompt Maestro de Inteligencia Artificial para {settings.canton}
+                Reglas del Motor de Análisis Inteligente para {settings.canton}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Define cómo se comporta la IA al analizar los reportes ciudadanos de este cantón. Puedes personalizar prioridades locales o normativas territoriales.
+                Define los criterios y lineamientos con los que el motor analítico evalúa y prioriza los reportes ciudadanos de este cantón. Puedes personalizar normativas territoriales.
               </p>
               <div>
                 <label htmlFor="aiPromptMaster" className="sr-only">Prompt Maestro</label>

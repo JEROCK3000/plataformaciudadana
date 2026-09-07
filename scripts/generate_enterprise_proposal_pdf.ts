@@ -150,53 +150,56 @@ function createEnterprisePresentation(): jsPDF {
   doc.text('ARQUITECTURA DE MODERNIZACIÓN', 32, 94);
   doc.text('INSTITUCIONAL PARA GADs MUNICIPALES', 32, 104);
 
-  // Destacado Dorado
-  doc.setFontSize(14.5);
+  // Destacado Dorado ajustado sin desborde
+  doc.setFontSize(12);
   doc.setTextColor(COLORS.gold[0], COLORS.gold[1], COLORS.gold[2]);
-  doc.text('ECOSISTEMA INTEGRADO: PLATAFORMA CIUDADANA + G-CRM + G-ERP MUNICIPAL', 32, 115);
+  doc.text('ECOSISTEMA INTEGRADO PARA GOBIERNOS LOCALES (CANTÓN Y PARROQUIAS):', 32, 114);
+  doc.text('PLATAFORMA CIUDADANA + G-CRM + G-ERP MUNICIPAL', 32, 120);
 
   // Subtítulo descriptivo
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(COLORS.textMuted[0], COLORS.textMuted[1], COLORS.textMuted[2]);
   doc.text(
     'Modelo integral para transformar la queja y necesidad barrial en órdenes de trabajo automatizadas,',
     32,
-    125
+    127
   );
   doc.text(
     'control riguroso de inventarios y cuadrillas, trazabilidad presupuestaria y transparencia pública absoluta.',
     32,
-    131
+    133
   );
 
   // Tarjeta de Metadatos
   doc.setFillColor(COLORS.navy[0], COLORS.navy[1], COLORS.navy[2]);
   doc.setDrawColor(COLORS.slateLight[0], COLORS.slateLight[1], COLORS.slateLight[2]);
   doc.setLineWidth(0.5);
-  doc.roundedRect(32, 147, 160, 44, 3, 3, 'FD');
+  doc.roundedRect(32, 145, 160, 46, 3, 3, 'FD');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(COLORS.gold[0], COLORS.gold[1], COLORS.gold[2]);
-  doc.text('PRESENTADO A:', 40, 155);
+  doc.text('PRESENTADO A:', 40, 153);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
+  doc.setFontSize(9);
   doc.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  doc.text('Alcaldía Municipal, Direcciones Departamentales y Concejo Cantonal', 40, 161);
+  doc.text('Alcaldía Municipal, Juntas Parroquiales, Directores y Concejo Cantonal', 40, 158.5);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(COLORS.gold[0], COLORS.gold[1], COLORS.gold[2]);
-  doc.text('DESARROLLADO Y PRESENTADO POR:', 40, 171);
+  doc.text('DESARROLLADO Y PRESENTADO POR:', 40, 167);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
   doc.setTextColor(COLORS.white[0], COLORS.white[1], COLORS.white[2]);
-  doc.text('SOLINTEEC DEVTECH S.A.S.', 40, 177);
+  doc.text('SOLINTEEC DEVTECH S.A.S.', 40, 173);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(COLORS.textMuted[0], COLORS.textMuted[1], COLORS.textMuted[2]);
-  doc.text('Ingeniería de Software Gubernamental • Arquitectura Cloud SaaS • Ciberseguridad', 40, 183);
+  doc.text('Dirección GovTech & Modernización Institucional • Arquitectura Cloud SaaS', 40, 178.5);
+  doc.setTextColor(COLORS.gold[0], COLORS.gold[1], COLORS.gold[2]);
+  doc.text('projects@solinteec.com • pquishpe@solinteec.com • https://solinteec.com', 40, 184);
 
   // Métricas en portada derecha
   const drawImpactMetric = (y: number, val: string, desc: string) => {
@@ -521,10 +524,10 @@ function createEnterprisePresentation(): jsPDF {
       color: COLORS.gold,
       desc: 'El ciudadano nunca más tiene que ir al municipio a preguntar "¿cómo va mi trámite?". El sistema le informa activamente.',
       features: [
-        'Rastreo público en web con su código de ticket (ej. QUI-2026-0001)',
-        'Notificaciones de avance en 4 fases: Recibido → En Revisión → Obra → Resuelto',
+        'Rastreo público en web con código de ticket (ej. QUI-2026-0001)',
+        'Notificaciones de avance: Recibido > En Revisión > Obra > Resuelto',
         'Integración con canales masivos (WhatsApp Business API / SMS de alerta)',
-        'Encuesta de satisfacción de 1 a 5 estrellas al concluir el trabajo',
+        'Encuesta vecinal de satisfacción de 1 a 5 estrellas al concluir el trabajo',
       ],
     },
     {
@@ -793,7 +796,7 @@ function createEnterprisePresentation(): jsPDF {
         '6. Cierre',
         'Alcaldía & Ciudadano',
         'El ticket pasa a estado RESUELTO. La web ciudadana muestra la comparativa Antes vs. Después.',
-        'El vecino califica la atención (5★). El caso se suma al informe oficial de la Alcaldía.',
+        'El vecino califica la atención (5 estrellas). El caso se consolida en el informe oficial de Alcaldía.',
         'Total: 4h',
       ],
     ],
@@ -807,14 +810,14 @@ function createEnterprisePresentation(): jsPDF {
     bodyStyles: {
       textColor: COLORS.textPrimary as [number, number, number],
       fontSize: 8,
-      cellPadding: 3.5,
+      cellPadding: 3,
     },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 26 },
-      1: { fontStyle: 'bold', cellWidth: 42 },
-      2: { cellWidth: 95 },
-      3: { cellWidth: 80 },
-      4: { fontStyle: 'bold', halign: 'center', cellWidth: 22 },
+      0: { fontStyle: 'bold', cellWidth: 24 },
+      1: { fontStyle: 'bold', cellWidth: 38 },
+      2: { cellWidth: 94 },
+      3: { cellWidth: 84 },
+      4: { fontStyle: 'bold', halign: 'center', cellWidth: 25 },
     },
     alternateRowStyles: {
       fillColor: [248, 250, 252],
@@ -925,7 +928,7 @@ function createEnterprisePresentation(): jsPDF {
       time: 'Semana 13 a 16',
       status: 'INTELIGENCIA ESTRATÉGICA',
       color: COLORS.gold,
-      title: 'BI del Alcalde, Predicción IA & Transparencia',
+      title: 'BI del Alcalde, Analítica Predictiva & Transparencia',
       deliverables: [
         'Dashboard Ejecutivo para Alcaldía con KPIs en tiempo real',
         'Modelo predictivo de fallas viales e hídricas por temporada',
@@ -1085,7 +1088,8 @@ function createEnterprisePresentation(): jsPDF {
     { label: 'Soporte y Operación', value: 'Acompañamiento presencial y soporte técnico 24/7' },
     { label: 'Infraestructura', value: 'Servidores de alta disponibilidad, copias de seguridad continuas' },
     { label: 'Sitio Oficial', value: 'https://solinteec.com • https://plataforma.solinteec.com' },
-    { label: 'Contacto Directo', value: 'contacto@solinteec.com • Área de Soluciones de Gobierno' },
+    { label: 'Contacto Directo', value: 'projects@solinteec.com • pquishpe@solinteec.com' },
+    { label: 'División Técnica', value: 'Dirección GovTech & Modernización Institucional' },
   ];
 
   let cdY = 125;

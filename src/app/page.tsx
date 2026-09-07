@@ -52,14 +52,14 @@ export default async function HomePage() {
             Arquitectura SaaS Multitenant Activa
           </span>
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Gestión Territorial y Participación Ciudadana con IA
+            Gestión Territorial y Participación Ciudadana Moderna e Inteligente
           </h2>
           <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300">
             Cada GAD Municipal cuenta con su propio portal independiente, análisis normativo del COOTAD y canalización directa de necesidades barriales.
           </p>
           <div className="pt-2 flex flex-wrap justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1.5"><CheckCircle2 size={16} className="text-emerald-500" /> Aislamiento de datos</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={16} className="text-emerald-500" /> Inteligencia Artificial SERCOP / COOTAD</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={16} className="text-emerald-500" /> Marco Legal y Normativo SERCOP / COOTAD</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 size={16} className="text-emerald-500" /> Total reportes en red: {totalReports}</span>
           </div>
         </div>

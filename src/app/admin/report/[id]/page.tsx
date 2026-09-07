@@ -175,7 +175,7 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
         
         {report.aiAnalysis && (
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mt-4">
-             <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-white">Análisis IA Actual:</h3>
+             <h3 className="text-lg font-bold mb-4 text-gray-800 dark:text-white">Análisis y Diagnóstico Técnico Sugerido:</h3>
              <div className="prose prose-sm dark:prose-invert max-w-none">
                <ReactMarkdown>{report.aiAnalysis}</ReactMarkdown>
              </div>
