@@ -62,7 +62,7 @@ export default function NewTenantPage() {
                 className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-r-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-            <p className="text-[11px] text-gray-400 mt-1">Solo minúsculas sin espacios (ej. tena, quijos, archidona)</p>
+            <p className="text-[11px] text-gray-400 mt-1">Solo minúsculas sin espacios (ej. quijos)</p>
           </div>
 
           <div>
