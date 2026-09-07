@@ -1,12 +1,15 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
 import { notFound } from 'next/navigation';
-import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, Shield, Globe } from 'lucide-react';
+import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, Shield, Globe, Tag, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import SingleReportAI from '@/components/ui/SingleReportAI';
 import ReactMarkdown from 'react-markdown';
-import { updateReportStatus } from '@/lib/actions/reports';
-import { ReportStatus } from '@prisma/client';
+import { requireTenantAdmin } from '@/lib/auth/session';
+import TechnicalResolutionForm from '@/components/admin/TechnicalResolutionForm';
+import { DEPARTMENT_LABELS } from '@/lib/reports/excel';
+
+export const dynamic = 'force-dynamic';
 
 const STATUS_LABELS: Record<string, string> = {
   RECEIVED:    'Recibido',
@@ -23,10 +26,6 @@ const STATUS_STYLES: Record<string, string> = {
   RESOLVED:    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
   REJECTED:    'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 };
-
-import { requireTenantAdmin } from '@/lib/auth/session';
-
-export const dynamic = 'force-dynamic';
 
 export default async function AdminSingleReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -72,11 +71,20 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
                 <ArrowLeft size={20} />
               </Link>
               <Shield size={24} className="text-emerald-400" />
-              <h1 className="text-xl font-bold">Gestión de Reporte</h1>
+              <div>
+                <h1 className="text-xl font-bold">Gestión de Reporte</h1>
+                <p className="text-xs text-gray-400">
+                  {report.tenant?.name} • Ticket: <span className="text-emerald-400 font-mono font-bold">{report.ticketCode || 'SIN-TICKET'}</span>
+                </p>
+              </div>
             </div>
             <div className="flex items-center">
-              <Link href="/" className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors" title="Volver al Portal Público">
-                <Globe size={18} /> Portal
+              <Link
+                href={report.tenant ? `/${report.tenant.slug}` : "/"}
+                className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                title="Volver al Portal Público de este cantón"
+              >
+                <Globe size={18} /> Portal Ciudadano
               </Link>
             </div>
           </div>
@@ -85,47 +93,37 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
-        {/* Cambio de Estado */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Estado actual del reporte</p>
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${STATUS_STYLES[report.status] ?? 'bg-gray-100 text-gray-700'}`}>
-              {STATUS_LABELS[report.status] ?? report.status}
-            </span>
-          </div>
-          <form action={async (formData: FormData) => {
-            'use server';
-            const newStatus = formData.get('status') as ReportStatus;
-            if (newStatus) await updateReportStatus(report.id, newStatus);
-          }} className="flex items-center gap-3">
-            <select
-              name="status"
-              defaultValue={report.status}
-              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              {(Object.entries(STATUS_LABELS) as [string, string][]).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
-              ))}
-            </select>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-              Actualizar
-            </button>
-          </form>
-        </div>
+        {/* Módulo de Gestión y Cierre Técnico */}
+        <TechnicalResolutionForm
+          reportId={report.id}
+          currentStatus={report.status}
+          currentDepartment={report.department}
+          currentNotes={report.resolutionNotes}
+          currentPhotos={(report.resolutionPhotos as string[]) || []}
+          originalPhotos={(report.photos as string[]) || []}
+        />
 
         {/* Cabecera del Reporte */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 md:p-8">
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {report.ticketCode && (
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300 dark:border-purple-800 flex items-center gap-1">
+                  <Tag size={12} /> {report.ticketCode}
+                </span>
+              )}
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
                 {categoryLabels[report.category] || report.category}
+              </span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
+                <Building2 size={12} /> {DEPARTMENT_LABELS[report.department] || report.department}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[report.status] ?? 'bg-gray-100 text-gray-700'}`}>
                 {STATUS_LABELS[report.status] ?? report.status}
               </span>
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{report.title}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">{report.title}</h2>
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-2">
@@ -148,7 +146,7 @@ export default async function AdminSingleReportPage({ params }: { params: Promis
             {report.photos && (report.photos as string[]).length > 0 && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                  Evidencia Fotográfica
+                  Evidencia Fotográfica Inicial (Ciudadana)
                 </h3>
                 <div className={`grid gap-4 ${(report.photos as string[]).length === 1 ? 'grid-cols-1' : (report.photos as string[]).length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
                   {(report.photos as string[]).map((photo, idx) => (

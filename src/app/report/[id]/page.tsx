@@ -1,10 +1,13 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
 import { notFound } from 'next/navigation';
-import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, BrainCircuit } from 'lucide-react';
+import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, BrainCircuit, Tag, Building2, CheckCircle2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import CommentsSection from '@/components/ui/CommentsSection';
+import { DEPARTMENT_LABELS } from '@/lib/reports/excel';
+
+export const dynamic = 'force-dynamic';
 
 export default async function SingleReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -48,19 +51,26 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
     LOW:    'Urgencia Baja',
   };
 
+  const resolutionPhotos = (report.resolutionPhotos as string[]) || [];
+  const originalPhotos = (report.photos as string[]) || [];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-12">
       <header className="bg-emerald-800 dark:bg-emerald-950 text-white shadow-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
-              <Link href={report.tenant ? `/${report.tenant.slug}` : "/"} className="p-2 hover:bg-emerald-700 dark:hover:bg-emerald-900 rounded-full transition-colors" title={`Volver al portal de ${report.tenant?.canton || 'inicio'}`}>
+              <Link
+                href={report.tenant ? `/${report.tenant.slug}` : "/"}
+                className="p-2 hover:bg-emerald-700 dark:hover:bg-emerald-900 rounded-full transition-colors"
+                title={`Volver al portal de ${report.tenant?.canton || 'inicio'}`}
+              >
                 <ArrowLeft size={20} />
               </Link>
               <div>
                 <h1 className="text-xl font-bold">Detalle del Reporte Ciudadano</h1>
                 {report.tenant && (
-                  <p className="text-xs text-emerald-200">{report.tenant.name}</p>
+                  <p className="text-xs text-emerald-200">{report.tenant.name} • Cantón {report.tenant.canton}</p>
                 )}
               </div>
             </div>
@@ -73,9 +83,17 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
         {/* Cabecera del Reporte */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 md:p-8">
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {report.ticketCode && (
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300 dark:border-purple-800 flex items-center gap-1">
+                  <Tag size={12} /> {report.ticketCode}
+                </span>
+              )}
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
                 {categoryLabels[report.category] || report.category}
+              </span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 flex items-center gap-1">
+                <Building2 size={12} /> {DEPARTMENT_LABELS[report.department] || report.department}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                 report.status === 'RESOLVED'    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300' :
@@ -93,7 +111,7 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
               </span>
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{report.title}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">{report.title}</h2>
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-2">
@@ -108,18 +126,18 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
 
             <div className="prose dark:prose-invert max-w-none mb-8">
               <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
-                <Info size={18} className="text-gray-400" /> Descripción del Problema
+                <Info size={18} className="text-gray-400" /> Descripción de la Necesidad
               </h3>
               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{report.description}</p>
             </div>
 
-            {report.photos && (report.photos as string[]).length > 0 && (
+            {originalPhotos.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                  Evidencia Fotográfica
+                  Evidencia Fotográfica Inicial
                 </h3>
-                <div className={`grid gap-4 ${(report.photos as string[]).length === 1 ? 'grid-cols-1' : (report.photos as string[]).length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
-                  {(report.photos as string[]).map((photo, idx) => (
+                <div className={`grid gap-4 ${originalPhotos.length === 1 ? 'grid-cols-1' : originalPhotos.length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
+                  {originalPhotos.map((photo, idx) => (
                     <img key={idx} src={photo} alt={`${report.title} - Foto ${idx + 1}`} className="rounded-xl object-cover bg-gray-100 dark:bg-gray-900 w-full h-48 md:h-64 shadow-sm border border-gray-200 dark:border-gray-700" />
                   ))}
                 </div>
@@ -139,12 +157,66 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
+        {/* Sección de Solución Municipal y Comparativa Antes vs Después */}
+        {(report.status === 'RESOLVED' || report.resolutionNotes || resolutionPhotos.length > 0) && (
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 p-6 md:p-8 space-y-5">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+              <CheckCircle2 size={24} className="text-emerald-600" />
+              <div>
+                <h3 className="text-xl font-bold">Respuesta y Cierre Municipal</h3>
+                {report.resolvedAt && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    Intervención concluida el {new Date(report.resolvedAt).toLocaleDateString('es-EC')}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {report.resolutionNotes && (
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900 text-sm text-gray-700 dark:text-gray-200">
+                <p className="font-semibold text-xs text-emerald-700 dark:text-emerald-300 mb-1">Nota Oficial de la Dirección Municipal:</p>
+                <p className="whitespace-pre-wrap">{report.resolutionNotes}</p>
+              </div>
+            )}
+
+            {/* Comparativa Visual Antes vs Después */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+                <Sparkles size={14} className="text-amber-500" /> Evidencia Fotográfica: Antes vs. Después
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Problema Inicial (Antes)</span>
+                  {originalPhotos.length > 0 ? (
+                    <img src={originalPhotos[0]} alt="Antes" className="rounded-xl object-cover w-full h-48 border border-gray-300 dark:border-gray-700" />
+                  ) : (
+                    <div className="h-48 rounded-xl bg-gray-100 dark:bg-gray-800 border border-dashed flex items-center justify-center text-xs text-gray-400">
+                      Sin fotografía inicial
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Solución Ejecutada (Después)</span>
+                  {resolutionPhotos.length > 0 ? (
+                    <img src={resolutionPhotos[0]} alt="Después" className="rounded-xl object-cover w-full h-48 border-2 border-emerald-500 shadow-sm" />
+                  ) : (
+                    <div className="h-48 rounded-xl bg-emerald-100/40 dark:bg-emerald-900/20 border border-dashed border-emerald-300 flex items-center justify-center text-xs text-emerald-600">
+                      Intervención finalizada sin foto
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Análisis de la IA (Solo lectura para ciudadanos) */}
         {report.aiAnalysis && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-100 dark:border-purple-900 overflow-hidden">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <BrainCircuit size={20} /> Análisis de Viabilidad (Emitido por IA)
+                <BrainCircuit size={20} /> Análisis de Viabilidad Jurídica (Emitido por IA)
               </h3>
             </div>
             <div className="p-6 md:p-8 prose prose-sm prose-emerald dark:prose-invert max-w-none">
@@ -153,7 +225,7 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
           </div>
         )}
 
-        {/* Comentarios */}
+        {/* Sección de Comentarios Moderados */}
         <CommentsSection reportId={report.id} initialComments={report.comments} />
 
       </main>

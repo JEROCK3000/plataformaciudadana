@@ -168,6 +168,8 @@ async function main() {
         neighborhood: 'Sector Central',
         description: 'Baja presión de agua potable durante horas pico afectando a más de 50 familias del sector.',
         status: 'RECEIVED',
+        ticketCode: 'ARC-2026-0001',
+        department: 'AGUA_SANEAMIENTO',
         votes: 4,
         citizenName: 'Comunidad Cotundo',
       },
