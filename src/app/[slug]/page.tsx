@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma';
 import { notFound } from 'next/navigation';
 import ReportForm from '@/components/forms/ReportForm';
 import ReportCard from '@/components/ui/ReportCard';
+import TicketTracker from '@/components/ui/TicketTracker';
 import { Building2, List, Search, MapPin, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -69,8 +70,10 @@ export default async function TenantPublicPortal({ params }: { params: Promise<{
             />
           </div>
 
-          {/* Listado a la derecha */}
+          {/* Listado y Tracker a la derecha */}
           <div className="lg:col-span-7 space-y-6">
+            <TicketTracker tenantSlug={tenant.slug} cantonName={tenant.canton} />
+
             <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center">
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
                 <List size={20} />

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, Map, Building2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, FileSpreadsheet, Map, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   ParishBarChart,
@@ -150,16 +150,34 @@ export default async function StatsPage() {
               <h1 className="text-xl font-bold">KPIs y Estadísticas — {tenant?.canton || 'Cantón'}</h1>
               <p className="text-xs text-gray-400">Distribución de reportes ciudadanos de {tenant?.name || 'GAD'}</p>
             </div>
-            {tenant?.slug === 'quijos' && (
+            <div className="flex items-center gap-2">
               <a
-                href="/mapa-prototipo.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-sm font-bold shadow transition-colors"
+                href="/api/reports/export/excel"
+                download
+                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow transition-colors"
+                title="Descargar informe ejecutivo en Excel (.xlsx)"
               >
-                <Map size={16} /> Ver Mapa Prototipo
+                <FileSpreadsheet size={15} /> Excel (.xlsx)
               </a>
-            )}
+              <a
+                href="/api/reports/export/pdf"
+                download
+                className="flex items-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold shadow transition-colors"
+                title="Descargar informe oficial en PDF"
+              >
+                <FileText size={15} /> PDF Oficial
+              </a>
+              {tenant?.slug === 'quijos' && (
+                <a
+                  href="/mapa-prototipo.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-xs font-bold shadow transition-colors"
+                >
+                  <Map size={15} /> Mapa Prototipo
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </header>
