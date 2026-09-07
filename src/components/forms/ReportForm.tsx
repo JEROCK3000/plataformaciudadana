@@ -52,6 +52,78 @@ const comprimirImagen = (file: File): Promise<string> => {
   });
 };
 
+// Catálogo oficial de barrios y sectores por parroquia (Cantón Quijos)
+export const BARRIOS_POR_PARROQUIA: Record<string, string[]> = {
+  'San Francisco de Borja': [
+    'Barrio San Francisco',
+    'Barrio La Victoria',
+    'Barrio Central',
+    'Barrio Pedro Dalmazo',
+    'Barrio San José',
+    'Barrio El Paraíso',
+    'Barrio El Carmen',
+    'Barrio Santa Teresita',
+    'Barrio Primavera',
+    'Barrio La Florida',
+    'Barrio Campo Alegre',
+    'Sector San Fermín',
+    'Sector Campo Libre',
+  ],
+  'Baeza': [
+    'Barrio Baeza Colonial (Antigua)',
+    'Barrio Central (Nueva)',
+    'Barrio Los Nogales',
+    'Barrio Jardines del Valle',
+    'Urbanización Nueva Andalucía',
+    'Sector Machángara',
+    'Sector San Bernardo',
+    'Sector 14 de Mayo',
+    'Sector Chaco Chico',
+  ],
+  'Papallacta': [
+    'Barrio Central',
+    'Valle de Baños (Termas)',
+    'Barrio El Rosal',
+    'Barrio El Mirador',
+    'Barrio El Cebollar',
+    'Sector El Tambo (Jamanco)',
+    'Sector Chalpi',
+    'Sector San Antonio',
+    'Sector Santa Catalina',
+  ],
+  'Cuyuja': [
+    'Barrio Central',
+    'Barrio 12 de Febrero',
+    'Sector Maspa',
+    'Sector Alejandría',
+    'Sector Guango',
+    'Sector Jatuntinahua',
+    'Sector La Victoria (Cuyuja)',
+    'Sector Laurel',
+    'Sector Quijos Huaico',
+    'Sector San Víctor / Molana',
+  ],
+  'Cosanga': [
+    'Barrio Central',
+    'Barrio Las Palmas',
+    'Barrio 10 de Marzo / La Unión',
+    'Sector Yanayacu',
+    'Sector Cabañas San Isidro',
+    'Sector Bermejo',
+    'Sector Guayusa',
+    'Sector Cosanga Alto',
+    'Sector Huila',
+  ],
+  'Sumaco': [
+    'Centro Poblado Sumaco',
+    'Sector Río Pacayacu',
+    'Sector Río Chontayacu',
+    'Sector Río Borja Alto',
+    'Sector Río Borja',
+    'Sector Interoceánica',
+  ],
+};
+
 export default function ReportForm({ 
   parroquias,
   tenantSlug,
@@ -73,6 +145,8 @@ export default function ReportForm({
     privacyAccepted: false,
     photos: [] as string[]
   });
+
+  const availableBarrios = BARRIOS_POR_PARROQUIA[formData.parish] || [];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -103,10 +177,19 @@ export default function ReportForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
-    }));
+
+    if (name === 'parish') {
+      setFormData(prev => ({ 
+        ...prev, 
+        parish: value,
+        neighborhood: '',
+      }));
+    } else {
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: type === 'checkbox' ? checked : value 
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -215,15 +298,68 @@ export default function ReportForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Barrio / Sector <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                name="neighborhood"
-                required
-                value={formData.neighborhood}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
-              />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Barrio / Sector <span className="text-red-500">*</span>
+                </label>
+                {availableBarrios.length > 0 && (
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                    {availableBarrios.length} sectores oficiales
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <input 
+                  type="text" 
+                  name="neighborhood"
+                  list="barrios-suggestions"
+                  required
+                  placeholder={availableBarrios.length > 0 ? `Selecciona o escribe (ej. ${availableBarrios[0]})` : "Escribe tu barrio o sector..."}
+                  value={formData.neighborhood}
+                  onChange={handleInputChange}
+                  autoComplete="off"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors"
+                />
+                <datalist id="barrios-suggestions">
+                  {availableBarrios.map((b) => (
+                    <option key={b} value={b} />
+                  ))}
+                </datalist>
+              </div>
+
+              {/* Botones de selección rápida de barrios precargados */}
+              {availableBarrios.length > 0 && (
+                <div className="mt-2.5">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5 flex items-center justify-between">
+                    <span>Sugerencias de {formData.parish}:</span>
+                    {formData.neighborhood && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, neighborhood: '' }))}
+                        className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
+                    {availableBarrios.map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, neighborhood: b }))}
+                        className={`text-xs px-2.5 py-1 rounded-md transition-all border text-left ${
+                          formData.neighborhood === b
+                            ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-sm'
+                            : 'bg-gray-100 dark:bg-gray-700/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'
+                        }`}
+                      >
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
