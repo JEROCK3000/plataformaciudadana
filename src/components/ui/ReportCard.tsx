@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { MapPin, User, CheckCircle, Home, Shield, Droplets, Zap, Leaf, GraduationCap, List } from 'lucide-react';
 import type { Report } from '@prisma/client';
-import { voteReport } from '@/lib/actions/reports';
+import SupportButton from '@/components/ui/SupportButton';
 
 const CATEGORY_META: Record<string, { label: string, icon: any, color: string }> = {
   INFRASTRUCTURE: { label: 'Infraestructura', icon: Home, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
@@ -23,30 +23,12 @@ const URGENCY_META: Record<string, { label: string, color: string }> = {
 };
 
 export default function ReportCard({ report }: { report: Report }) {
-  const [votes, setVotes] = useState(report.votes);
-  const [isVoting, setIsVoting] = useState(false);
-
   const photos = report.photos as string[] | null;
   const coverPhoto = photos && photos.length > 0 ? photos[0] : null;
 
   const metaCat = CATEGORY_META[report.category] || CATEGORY_META['OTHER'];
   const metaUrg = URGENCY_META[report.urgency] || URGENCY_META['MEDIUM'];
   const Icon = metaCat.icon;
-
-  const handleVote = async () => {
-    if (isVoting) return;
-    setIsVoting(true);
-    try {
-      const res = await voteReport(report.id);
-      if (res.success) {
-        setVotes(v => v + 1);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsVoting(false);
-    }
-  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col hover:shadow-md transition-shadow relative overflow-hidden">
@@ -92,14 +74,7 @@ export default function ReportCard({ report }: { report: Report }) {
         <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
           {new Date(report.createdAt).toLocaleDateString('es-EC')}
         </div>
-        <button 
-          onClick={handleVote}
-          disabled={isVoting}
-          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm border border-emerald-100 dark:border-emerald-800 disabled:opacity-50"
-        >
-          <CheckCircle size={16} />
-          Apoyar iniciativa ({votes})
-        </button>
+        <SupportButton reportId={report.id} initialVotes={report.votes} />
       </div>
     </div>
   );

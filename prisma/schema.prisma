@@ -19,6 +19,7 @@ model Tenant {
   parishes       Json      // Array JSON con nombres de parroquias ["Baeza", "Cosanga", ...]
   aiPromptMaster String?   @db.LongText
   plan           String    @default("ENTERPRISE")
+  requireCedulaForVotes Boolean @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -80,6 +81,7 @@ model Report {
 
   // Relaciones
   comments         Comment[]
+  votesList        ReportVote[]
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -98,6 +100,19 @@ model Comment {
   status           CommentStatus @default(APPROVED)
   
   createdAt        DateTime @default(now())
+}
+
+// Votos y Apoyos Ciudadanos a Iniciativas
+model ReportVote {
+  id         String   @id @default(uuid())
+  reportId   String
+  report     Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  voterHash  String   // SHA-256 de identificador anónimo de dispositivo + IP
+  cedula     String?  // Opcional si se requiere cédula
+  createdAt  DateTime @default(now())
+
+  @@unique([reportId, voterHash])
+  @@index([reportId])
 }
 
 enum CommentStatus {

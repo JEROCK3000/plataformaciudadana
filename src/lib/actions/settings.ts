@@ -38,6 +38,7 @@ export async function getTenantSettings() {
     province: tenant?.province || '',
     slug: tenant?.slug || '',
     plan: tenant?.plan || 'PRO',
+    requireCedulaForVotes: tenant?.requireCedulaForVotes || false,
   };
 }
 
@@ -46,6 +47,7 @@ export async function updateTenantSettings(formData: FormData) {
 
   const platformName = (formData.get("platformName") as string)?.trim();
   const aiPromptMaster = (formData.get("aiPromptMaster") as string)?.trim();
+  const requireCedulaForVotes = formData.get("requireCedulaForVotes") === "on";
 
   if (!platformName || !aiPromptMaster) {
     return { success: false, error: "Todos los campos son obligatorios." };
@@ -57,10 +59,11 @@ export async function updateTenantSettings(formData: FormData) {
       data: {
         name: platformName,
         aiPromptMaster,
+        requireCedulaForVotes,
       },
     });
 
-    writeLog('AUDIT', updated.slug, session.id, `Configuración del tenant actualizada`);
+    writeLog('AUDIT', updated.slug, session.id, `Configuración del tenant actualizada (Exigir cédula: ${requireCedulaForVotes})`);
     revalidatePath("/admin/settings");
     revalidatePath("/admin");
     revalidatePath(`/${updated.slug}`);

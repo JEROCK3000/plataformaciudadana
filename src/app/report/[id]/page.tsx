@@ -5,6 +5,7 @@ import { MapPin, User, ArrowLeft, Clock, Info, CheckCircle, BrainCircuit, Tag, B
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import CommentsSection from '@/components/ui/CommentsSection';
+import SupportButton from '@/components/ui/SupportButton';
 import { DEPARTMENT_LABELS } from '@/lib/reports/excel';
 
 export const dynamic = 'force-dynamic';
@@ -144,15 +145,12 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
               </div>
             )}
 
-            <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                 <User size={18} />
-                <span className="font-medium">{report.citizenName || "Ciudadano Anónimo"}</span>
+                <span className="font-medium text-sm">Registrado por: {report.citizenName || "Ciudadano Anónimo"}</span>
               </div>
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle size={18} />
-                <span className="font-bold">{report.votes} apoyos vecinales</span>
-              </div>
+              <SupportButton reportId={report.id} initialVotes={report.votes} />
             </div>
           </div>
         </div>

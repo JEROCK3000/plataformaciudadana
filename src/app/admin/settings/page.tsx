@@ -1,6 +1,6 @@
 import React from 'react';
 import { getTenantSettings, updateTenantSettings } from '@/lib/actions/settings';
-import { Settings, Save, Shield, ArrowLeft, Building2 } from 'lucide-react';
+import { Settings, Save, Shield, ArrowLeft, Building2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -88,6 +88,36 @@ export default async function SettingsPage() {
                   required
                   className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white font-mono"
                 />
+              </div>
+            </div>
+
+            <hr className="border-gray-200 dark:border-gray-700" />
+
+            {/* Configuración de Apoyos Ciudadanos */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+                <CheckCircle size={20} className="text-emerald-500" /> Validación de Apoyos Ciudadanos a Iniciativas
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Controla el mecanismo de verificación cuando los ciudadanos apoyan una iniciativa o reporte en el portal público.
+              </p>
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="requireCedulaForVotes"
+                    defaultChecked={settings.requireCedulaForVotes}
+                    className="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  />
+                  <div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      Exigir número de cédula ecuatoriana para validar apoyos
+                    </span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Si está activado, el ciudadano deberá ingresar su número de cédula válido (validación Módulo 10 del Registro Civil) para registrar su apoyo (1 cédula = 1 voto). Si está desactivado, el sistema valida automáticamente por huella digital de dispositivo (anti-spam sin fricción).
+                    </p>
+                  </div>
+                </label>
               </div>
             </div>
 
