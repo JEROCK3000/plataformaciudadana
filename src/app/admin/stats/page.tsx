@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, FileSpreadsheet, Map as MapIcon, Building2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, FileSpreadsheet, Map as MapIcon, Building2, FolderDown } from 'lucide-react';
 import Link from 'next/link';
 import {
   ParishBarChart,
@@ -209,6 +209,13 @@ export default async function StatsPage() {
                   <MapIcon size={15} /> Mapa Prototipo
                 </a>
               )}
+              <Link
+                href="/admin/descargas"
+                className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition-colors"
+                title="Centro de descargas y dossier ejecutivo"
+              >
+                <FolderDown size={15} /> Dossier / Descargas
+              </Link>
             </div>
           </div>
         </div>
