@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, FileSpreadsheet, Map, Building2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle, XCircle, FileText, FileSpreadsheet, Map as MapIcon, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   ParishBarChart,
@@ -55,7 +55,7 @@ export default async function StatsPage() {
 
   const parishes = (tenant?.parishes as string[]) || [];
 
-  const [reports, byParishRaw, byCategoryRaw, byUrgencyRaw, byStatusRaw] = await Promise.all([
+  const [reports, byParishRaw, byCategoryRaw, byUrgencyRaw, byStatusRaw, byParishNeighborhoodRaw] = await Promise.all([
     prisma.report.count({ where: { tenantId } }),
     prisma.report.groupBy({
       by: ['parish', 'status'],
@@ -74,6 +74,11 @@ export default async function StatsPage() {
     }),
     prisma.report.groupBy({
       by: ['status'],
+      where: { tenantId },
+      _count: { id: true },
+    }),
+    prisma.report.groupBy({
+      by: ['parish', 'neighborhood', 'status'],
       where: { tenantId },
       _count: { id: true },
     }),
@@ -127,14 +132,41 @@ export default async function StatsPage() {
   );
   const topCategoryMap = Object.fromEntries(parishTopCategory.map(r => [r.parish, r.topCategory]));
 
-  // Map data
-  const mapData = parishStats.map(s => ({
-    parish: s.parish,
-    total: s.total,
-    resolved: s.RESOLVED,
-    pending: s.RECEIVED + s.IN_REVIEW,
-    inProgress: s.IN_PROGRESS,
-  }));
+  // Map data con desglose por barrio/sector
+  const mapData = parishStats.map(s => {
+    const nRows = byParishNeighborhoodRaw.filter(r => r.parish === s.parish && r.neighborhood);
+    const nMap: Record<string, { total: number; active: number; resolved: number }> = {};
+    for (const row of nRows) {
+      const nName = (row.neighborhood || '').trim() || 'Sector General';
+      const current = nMap[nName] || { total: 0, active: 0, resolved: 0 };
+      const count = row._count.id;
+      current.total += count;
+      if (row.status === 'RESOLVED') {
+        current.resolved += count;
+      } else if (row.status === 'RECEIVED' || row.status === 'IN_REVIEW' || row.status === 'IN_PROGRESS') {
+        current.active += count;
+      }
+      nMap[nName] = current;
+    }
+
+    const neighborhoods = Object.entries(nMap)
+      .map(([name, counts]) => ({
+        name,
+        total: counts.total,
+        active: counts.active,
+        resolved: counts.resolved,
+      }))
+      .sort((a, b) => b.active - a.active || b.total - a.total);
+
+    return {
+      parish: s.parish,
+      total: s.total,
+      resolved: s.RESOLVED,
+      pending: s.RECEIVED + s.IN_REVIEW,
+      inProgress: s.IN_PROGRESS,
+      neighborhoods,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans pb-12">
@@ -174,7 +206,7 @@ export default async function StatsPage() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 rounded-lg text-xs font-bold shadow transition-colors"
                 >
-                  <Map size={15} /> Mapa Prototipo
+                  <MapIcon size={15} /> Mapa Prototipo
                 </a>
               )}
             </div>
@@ -202,7 +234,7 @@ export default async function StatsPage() {
         {tenant?.slug === 'quijos' ? (
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h2 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
-              <Map size={16} className="text-emerald-500" /> Mapa del Cantón Quijos — Reportes por Parroquia
+              <MapIcon size={16} className="text-emerald-500" /> Mapa del Cantón Quijos — Reportes por Parroquia
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
               Pasa el cursor sobre cada parroquia para ver el detalle. El color indica la intensidad de reportes.
