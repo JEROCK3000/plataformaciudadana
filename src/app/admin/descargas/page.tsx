@@ -13,7 +13,8 @@ import {
   Sparkles, 
   Layers, 
   Scale, 
-  CheckCircle2 
+  CheckCircle2,
+  Target 
 } from 'lucide-react';
 import { requireTenantAdmin } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
@@ -28,6 +29,19 @@ export default async function DescargasPage() {
   });
 
   const documents = [
+    {
+      id: 'estrategia-campana-politica',
+      title: 'Estrategia de Campaña Política & Inteligencia Territorial',
+      category: 'Inteligencia Electoral & Transición al GAD',
+      badge: 'Estrategia de Victoria',
+      badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      icon: <Target className="text-amber-600 dark:text-amber-400" size={26} />,
+      format: 'PDF Enterprise',
+      size: '3.5 MB',
+      description: 'Levantamiento de información ciudadana real en las 6 parroquias de Quijos, discurso hiperlocalizado para tarima, costos reales según CNE Art. 209 ($2.800 USD o $950/mes) y hoja de ruta para la transición directa hacia la Alcaldía Oficial.',
+      url: '/api/reports/export/campana-pdf',
+      directFile: 'SOLINTEEC_Estrategia_Tecnologica_Campana_Politica.pdf',
+    },
     {
       id: 'propuesta-crm-erp',
       title: 'Propuesta de Modernización Municipal, G-CRM & G-ERP',
