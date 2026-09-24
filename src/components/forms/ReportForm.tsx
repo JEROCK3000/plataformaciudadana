@@ -128,15 +128,27 @@ export default function ReportForm({
   parroquias,
   tenantSlug,
   tenantName,
+  initialParish,
+  campaignMode = false,
+  candidateName,
+  campaignSlogan,
 }: { 
   parroquias: string[];
   tenantSlug?: string;
   tenantName?: string;
+  initialParish?: string;
+  campaignMode?: boolean;
+  candidateName?: string | null;
+  campaignSlogan?: string | null;
 }) {
+  const defaultParish = (initialParish && parroquias.some(p => p.toLowerCase() === initialParish.toLowerCase()))
+    ? parroquias.find(p => p.toLowerCase() === initialParish.toLowerCase())!
+    : (parroquias[0] || '');
+
   const [formData, setFormData] = useState({
     title: '',
     category: 'INFRASTRUCTURE',
-    parish: parroquias[0] || '',
+    parish: defaultParish,
     neighborhood: '',
     description: '',
     urgency: 'MEDIUM',
@@ -232,9 +244,22 @@ export default function ReportForm({
 
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div className="bg-emerald-600 dark:bg-emerald-800 p-6 text-white">
-        <h2 className="text-2xl font-bold">Reportar una Necesidad</h2>
-        <p className="mt-2 text-emerald-100">Ayúdanos a identificar las prioridades de tu sector.</p>
+      <div className={campaignMode ? "bg-gradient-to-r from-amber-600 via-orange-600 to-emerald-700 p-6 text-white" : "bg-emerald-600 dark:bg-emerald-800 p-6 text-white"}>
+        {campaignMode && (
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider bg-black/40 px-2.5 py-0.5 rounded-full border border-white/20 text-amber-200">
+              {candidateName ? `Candidatura: ${candidateName}` : 'Campaña Ciudadana'}
+            </span>
+          </div>
+        )}
+        <h2 className="text-2xl font-bold">
+          {campaignMode ? 'Construyamos el Plan Cantonal' : 'Reportar una Necesidad'}
+        </h2>
+        <p className="mt-1 text-sm text-emerald-100">
+          {campaignMode 
+            ? (campaignSlogan ? `"${campaignSlogan}" • Registra la necesidad de tu barrio.` : 'Registra la necesidad de tu barrio para el Plan de Obras.') 
+            : 'Ayúdanos a identificar las prioridades de tu sector.'}
+        </p>
       </div>
 
       <div className="p-6 space-y-8">
@@ -416,29 +441,41 @@ export default function ReportForm({
 
         <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border border-gray-200 dark:border-gray-600 space-y-4">
           <div className="flex items-start gap-3">
-            <User className="text-gray-500 dark:text-gray-400 mt-1" size={20} />
+            <User className={campaignMode ? "text-amber-500 mt-1" : "text-gray-500 dark:text-gray-400 mt-1"} size={20} />
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">2. Datos de Contacto (Opcionales)</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Puedes enviar este reporte de forma anónima.</p>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                {campaignMode ? '2. Datos de Contacto para Seguimiento (Opcional)' : '2. Datos de Contacto (Opcionales)'}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {campaignMode 
+                  ? 'Déjanos tu nombre y WhatsApp para informarte cuando el candidato o brigadistas atiendan este reporte.' 
+                  : 'Puedes enviar este reporte de forma anónima si lo prefieres.'}
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {campaignMode ? 'Nombre del Vecino(a)' : 'Nombre'}
+              </label>
               <input 
                 type="text" 
                 name="citizenName"
+                placeholder={campaignMode ? "Ej. Carlos Morales" : ""}
                 value={formData.citizenName}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contacto (Tel/Email)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {campaignMode ? 'Número de WhatsApp / Celular' : 'Contacto (Tel/Email)'}
+              </label>
               <input 
                 type="text" 
                 name="citizenContact"
+                placeholder={campaignMode ? "Ej. 0987654321" : ""}
                 value={formData.citizenContact}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none"

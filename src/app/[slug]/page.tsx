@@ -9,8 +9,16 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TenantPublicPortal({ params }: { params: Promise<{ slug: string }> }) {
+export default async function TenantPublicPortal({ 
+  params,
+  searchParams,
+}: { 
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ parish?: string; brigade?: string }>;
+}) {
   const { slug } = await params;
+  const query = searchParams ? await searchParams : {};
+  const initialParish = query?.parish;
 
   const tenant = await prisma.tenant.findUnique({
     where: { slug },
@@ -30,29 +38,47 @@ export default async function TenantPublicPortal({ params }: { params: Promise<{
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
-      <header className="bg-emerald-800 dark:bg-emerald-950 text-white sticky top-0 z-10 shadow-md">
+      <header className={tenant.campaignMode 
+        ? "bg-slate-950 text-white sticky top-0 z-10 shadow-md border-b border-amber-500/40" 
+        : "bg-emerald-800 dark:bg-emerald-950 text-white sticky top-0 z-10 shadow-md"
+      }>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <Link href="/" className="p-2 hover:bg-emerald-700/50 rounded-lg text-emerald-200 hover:text-white transition-colors" title="Ver todos los municipios">
+              <Link href="/" className="p-2 hover:bg-white/10 rounded-lg text-emerald-200 hover:text-white transition-colors" title="Ver todos los municipios">
                 <ArrowLeft size={20} />
               </Link>
-              <div className="bg-white dark:bg-gray-800 p-2 rounded-lg text-emerald-800 dark:text-emerald-400 shadow-sm">
+              <div className={tenant.campaignMode 
+                ? "bg-amber-500 text-slate-950 p-2 rounded-xl shadow-md font-black" 
+                : "bg-white dark:bg-gray-800 p-2 rounded-lg text-emerald-800 dark:text-emerald-400 shadow-sm"
+              }>
                 <Building2 size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-bold leading-tight">{tenant.name}</h1>
-                <p className="text-xs text-emerald-200 font-medium tracking-wide uppercase flex items-center gap-1">
-                  <MapPin size={12} /> Cantón {tenant.canton}, {tenant.province} • Portal de Participación
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold leading-tight">{tenant.name}</h1>
+                  {tenant.campaignMode && (
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                      {tenant.campaignListNumber || 'Campaña Ciudadana'}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-emerald-200/90 font-medium tracking-wide uppercase flex items-center gap-1">
+                  <MapPin size={12} className={tenant.campaignMode ? "text-amber-400" : ""} /> 
+                  Cantón {tenant.canton}, {tenant.province} • {tenant.campaignMode && tenant.campaignSlogan ? `"${tenant.campaignSlogan}"` : 'Portal de Participación'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Link
                 href="/login"
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-700/60 hover:bg-emerald-700 text-white transition-colors"
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                  tenant.campaignMode 
+                    ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40' 
+                    : 'bg-emerald-700/60 hover:bg-emerald-700 text-white'
+                }`}
               >
-                Acceso Funcionarios
+                Acceso Sistema
               </Link>
             </div>
           </div>
@@ -67,6 +93,10 @@ export default async function TenantPublicPortal({ params }: { params: Promise<{
               parroquias={parroquias} 
               tenantSlug={tenant.slug} 
               tenantName={tenant.name} 
+              initialParish={initialParish}
+              campaignMode={tenant.campaignMode}
+              candidateName={tenant.candidateName}
+              campaignSlogan={tenant.campaignSlogan}
             />
           </div>
 

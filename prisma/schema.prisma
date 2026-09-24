@@ -20,6 +20,13 @@ model Tenant {
   aiPromptMaster String?   @db.LongText
   plan           String    @default("ENTERPRISE")
   requireCedulaForVotes Boolean @default(false)
+  
+  // Modo Campaña Política vs Institucional
+  campaignMode          Boolean   @default(false)
+  candidateName         String?
+  campaignSlogan        String?
+  campaignListNumber    String?
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
