@@ -30,6 +30,19 @@ export default async function DescargasPage() {
 
   const documents = [
     {
+      id: 'especificaciones-modo-campana',
+      title: 'Especificaciones Técnicas: Automatización & Modo Campaña',
+      category: 'Ingeniería de Software & Arquitectura Dual',
+      badge: 'Ficha Técnica de Software',
+      badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+      icon: <Sparkles className="text-emerald-600 dark:text-emerald-400" size={26} />,
+      format: 'PDF Enterprise',
+      size: '3.5 MB',
+      description: 'Especificación de ingeniería de las 4 innovaciones implementadas: Switch de automatización dual (Campaña vs. GAD Oficial), War Room con Ficha de Tarima ejecutiva e impresión A4, generador masivo de QR parroquiales con inyección URL y portal ciudadano con captura de WhatsApp.',
+      url: '/api/reports/export/especificaciones-campana-pdf',
+      directFile: 'SOLINTEEC_Especificaciones_Tecnicas_Modo_Campana.pdf',
+    },
+    {
       id: 'estrategia-campana-politica',
       title: 'Estrategia de Campaña Política & Inteligencia Territorial',
       category: 'Inteligencia Electoral & Transición al GAD',
