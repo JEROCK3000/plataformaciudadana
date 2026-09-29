@@ -35,7 +35,12 @@ export default function ImageUploadDropzone({
   const [isUploading, setIsUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showUrlInput, setShowUrlInput] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [value]);
 
   // Procesar archivo seleccionado o arrastrado
   const processFile = async (file: File) => {
@@ -190,19 +195,23 @@ export default function ImageUploadDropzone({
           <div className="w-full flex items-center justify-between gap-4 py-1">
             <div className="flex items-center gap-3.5">
               <div 
-                className={`overflow-hidden shrink-0 border-2 border-amber-400/80 shadow-md ${
-                  aspectRatio === 'circle' ? 'w-14 h-14 rounded-full' : 'w-14 h-14 rounded-xl bg-slate-900 p-1'
+                className={`overflow-hidden shrink-0 border-2 border-amber-400/80 shadow-md flex items-center justify-center ${
+                  aspectRatio === 'circle' ? 'w-14 h-14 rounded-full bg-slate-800' : 'w-14 h-14 rounded-xl bg-slate-900 p-1'
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={value} 
-                  alt="Vista previa" 
-                  className={`w-full h-full ${aspectRatio === 'circle' ? 'object-cover' : 'object-contain'}`} 
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.opacity = '0.3';
-                  }}
-                />
+                {!imgError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img 
+                    src={value} 
+                    alt="" 
+                    className={`w-full h-full ${aspectRatio === 'circle' ? 'object-cover' : 'object-contain'}`} 
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-amber-400">
+                    <ImageIcon size={22} />
+                  </div>
+                )}
               </div>
 
               <div className="text-left space-y-0.5">

@@ -330,7 +330,14 @@ export default function CampaignToggleCard({
                 <div className="w-11 h-11 rounded-full bg-slate-800 border-2 border-amber-400 overflow-hidden shrink-0 flex items-center justify-center shadow-md">
                   {candidatePhotoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={candidatePhotoUrl} alt="Candidato" className="w-full h-full object-cover" />
+                    <img 
+                      src={candidatePhotoUrl} 
+                      alt="" 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
                   ) : (
                     <User size={20} className="text-slate-400" />
                   )}
@@ -355,10 +362,17 @@ export default function CampaignToggleCard({
               </div>
 
               {/* Logo del partido a la derecha */}
-              <div className="w-10 h-10 rounded-lg bg-slate-900/80 border border-slate-700/80 p-1 shrink-0 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-slate-900/80 border border-slate-700/80 p-1 shrink-0 flex items-center justify-center overflow-hidden">
                 {partyLogoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={partyLogoUrl} alt="Logo Partido" className="w-full h-full object-contain" />
+                  <img 
+                    src={partyLogoUrl} 
+                    alt="" 
+                    className="w-full h-full object-contain" 
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
                 ) : (
                   <Flag size={16} className="text-slate-500" />
                 )}
