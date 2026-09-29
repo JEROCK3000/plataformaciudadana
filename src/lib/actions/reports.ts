@@ -6,6 +6,7 @@ import { Category, Urgency, ReportStatus, Department } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import crypto from "crypto";
+import { getParishCode } from "@/lib/utils/parishCode";
 
 const CATEGORY_TO_DEPARTMENT: Record<Category, Department> = {
   INFRASTRUCTURE: 'OBRAS_PUBLICAS',
@@ -122,11 +123,20 @@ export async function createReport(data: {
     const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
     if (!tenant) return { success: false, error: 'Municipio no encontrado' };
 
-    // Generar código de ticket único y amigable (ej. QUI-2026-0004)
+    // Generar código de ticket estructurado territorialmente (ej. QUI-SFB-2026-0005)
     const count = await prisma.report.count({ where: { tenantId } });
-    const prefix = tenant.slug.substring(0, 3).toUpperCase();
+    const cantonPrefix = tenant.slug.substring(0, 3).toUpperCase();
+    const parishPrefix = getParishCode(data.parish);
     const year = new Date().getFullYear();
-    const ticketCode = `${prefix}-${year}-${String(count + 1).padStart(4, '0')}`;
+    
+    let suffix = count + 1;
+    let ticketCode = `${cantonPrefix}-${parishPrefix}-${year}-${String(suffix).padStart(4, '0')}`;
+    
+    // Garantizar unicidad absoluta
+    while (await prisma.report.findUnique({ where: { ticketCode } })) {
+      suffix += 1;
+      ticketCode = `${cantonPrefix}-${parishPrefix}-${year}-${String(suffix).padStart(4, '0')}`;
+    }
 
     // Asignar Dirección por defecto según categoría
     const department = data.department || CATEGORY_TO_DEPARTMENT[data.category] || 'OBRAS_PUBLICAS';
