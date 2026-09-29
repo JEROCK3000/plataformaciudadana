@@ -4,6 +4,7 @@ import { Settings, Save, ArrowLeft, Building2, CheckCircle } from 'lucide-react'
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import CampaignToggleCard from '@/components/admin/CampaignToggleCard';
+import GadLogoUploader from '@/components/admin/GadLogoUploader';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,19 +70,8 @@ export default async function SettingsPage() {
                   <p className="mt-1 text-xs text-gray-500">Este nombre aparecerá en la cabecera del portal ciudadano de su cantón.</p>
                 </div>
 
-                <div>
-                  <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    URL del Escudo o Logotipo Oficial del GAD
-                  </label>
-                  <input
-                    type="text"
-                    name="logoUrl"
-                    id="logoUrl"
-                    defaultValue={settings.logoUrl}
-                    placeholder="https://.../escudo-quijos.png"
-                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Escudo o marca institucional que se mostrará cuando la plataforma opere en modo municipal formal.</p>
+                <div className="pt-2">
+                  <GadLogoUploader initialLogoUrl={settings.logoUrl} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

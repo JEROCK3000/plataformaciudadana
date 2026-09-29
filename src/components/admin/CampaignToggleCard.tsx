@@ -17,6 +17,7 @@ import {
   Check,
   RotateCcw
 } from 'lucide-react';
+import ImageUploadDropzone from '@/components/ui/ImageUploadDropzone';
 
 interface CampaignToggleCardProps {
   initialCampaignMode: boolean;
@@ -288,97 +289,27 @@ export default function CampaignToggleCard({
             </div>
           </div>
 
-          {/* Fila 2: Identidad Visual (Foto Candidato & Logo Partido) con Vista Previa en Vivo */}
+          {/* Fila 2: Identidad Visual con Drag & Drop y Botón Examinar */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-            
-            {/* Foto del Candidato */}
-            <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <label htmlFor="candidatePhotoUrl" className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                  <User size={15} className="text-amber-400" /> Fotografía Oficial del Candidato(a)
-                </label>
-                <span className="text-[10px] text-slate-400">URL de imagen (PNG / JPG)</span>
-              </div>
+            <ImageUploadDropzone
+              name="candidatePhotoUrl"
+              label="Fotografía Oficial del Candidato(a)"
+              helperText="Se mostrará en el cintillo del portal ciudadano, ficha de tarima y afiches QR."
+              value={candidatePhotoUrl}
+              onChange={(url) => setCandidatePhotoUrl(url)}
+              category="candidato"
+              aspectRatio="circle"
+            />
 
-              <div className="flex items-center gap-3.5">
-                {/* Avatar Preview */}
-                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400/80 overflow-hidden flex items-center justify-center shrink-0 shadow-md shadow-amber-500/10">
-                  {candidatePhotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={candidatePhotoUrl} 
-                      alt="Candidato" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <User size={24} className="text-slate-500" />
-                  )}
-                </div>
-
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    name="candidatePhotoUrl"
-                    id="candidatePhotoUrl"
-                    value={candidatePhotoUrl}
-                    onChange={(e) => setCandidatePhotoUrl(e.target.value)}
-                    placeholder="https://.../foto-candidato.jpg"
-                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    Aparecerá en el portal ciudadano, afiches de QR y ficha de tarima.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Logo del Partido o Movimiento */}
-            <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <label htmlFor="partyLogoUrl" className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                  <Flag size={15} className="text-amber-400" /> Logotipo del Partido o Lista
-                </label>
-                <span className="text-[10px] text-slate-400">URL de imagen (PNG fondo transp.)</span>
-              </div>
-
-              <div className="flex items-center gap-3.5">
-                {/* Logo Preview */}
-                <div className="w-14 h-14 rounded-xl bg-slate-950 border border-slate-700 p-1.5 overflow-hidden flex items-center justify-center shrink-0 shadow-md">
-                  {partyLogoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={partyLogoUrl} 
-                      alt="Logo Partido" 
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <Flag size={22} className="text-slate-500" />
-                  )}
-                </div>
-
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    name="partyLogoUrl"
-                    id="partyLogoUrl"
-                    value={partyLogoUrl}
-                    onChange={(e) => setPartyLogoUrl(e.target.value)}
-                    placeholder="https://.../logo-partido.png"
-                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    Distintivo electoral para el cintillo de cabecera y membrete de discursos.
-                  </p>
-                </div>
-              </div>
-            </div>
-
+            <ImageUploadDropzone
+              name="partyLogoUrl"
+              label="Logotipo del Partido o Lista"
+              helperText="Distintivo electoral oficial (admite PNG transparente, JPG o SVG)."
+              value={partyLogoUrl}
+              onChange={(url) => setPartyLogoUrl(url)}
+              category="partido"
+              aspectRatio="square"
+            />
           </div>
 
           {/* Simulador en Vivo: Cómo lo verá el votante en el portal ciudadano */}
