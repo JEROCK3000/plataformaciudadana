@@ -7,16 +7,17 @@ import { CATEGORY_LABELS, STATUS_LABELS, URGENCY_LABELS } from './excel';
 
 // Paleta Ejecutiva para Dossier de Campaña
 const COLORS = {
-  navy: [11, 19, 43] as [number, number, number],        // #0B132B
-  gold: [197, 155, 39] as [number, number, number],      // #C59B27
-  amber: [245, 158, 11] as [number, number, number],    // #F59E0B
-  emerald: [5, 150, 105] as [number, number, number],   // #059669
-  red: [220, 38, 38] as [number, number, number],       // #DC2626
-  slateDark: [30, 41, 59] as [number, number, number],  // #1E293B
+  navy: [11, 19, 43] as [number, number, number],          // #0B132B
+  gold: [197, 155, 39] as [number, number, number],        // #C59B27
+  amber: [245, 158, 11] as [number, number, number],      // #F59E0B
+  amberDark: [180, 83, 9] as [number, number, number],    // #B45309
+  emerald: [5, 150, 105] as [number, number, number],     // #059669
+  red: [220, 38, 38] as [number, number, number],         // #DC2626
+  slateDark: [30, 41, 59] as [number, number, number],    // #1E293B
   slateMuted: [100, 116, 139] as [number, number, number], // #64748B
-  cardBg: [248, 250, 252] as [number, number, number],  // #F8FAFC
+  cardBg: [248, 250, 252] as [number, number, number],    // #F8FAFC
   cardBorder: [226, 232, 240] as [number, number, number], // #E2E8F0
-  amberBg: [255, 251, 235] as [number, number, number], // #FFFBEB
+  amberBg: [255, 251, 235] as [number, number, number],   // #FFFBEB
   amberBorder: [253, 230, 138] as [number, number, number], // #FDE68A
   white: [255, 255, 255] as [number, number, number],
 };
@@ -25,7 +26,6 @@ function tryLoadImageBase64(imagePathOrUrl?: string | null): string | null {
   if (!imagePathOrUrl) return null;
 
   try {
-    // Si es una ruta local en /uploads/ o public/
     if (imagePathOrUrl.startsWith('/uploads/') || imagePathOrUrl.startsWith('uploads/')) {
       const cleanPath = imagePathOrUrl.replace(/^\//, '');
       const fullPath = path.join(process.cwd(), 'public', cleanPath);
@@ -41,6 +41,56 @@ function tryLoadImageBase64(imagePathOrUrl?: string | null): string | null {
   }
 
   return null;
+}
+
+/**
+ * Renderiza un bloque de discurso dinámicamente ajustando la altura de la tarjeta
+ * para que ningún texto se desborde nunca de los márgenes.
+ */
+function renderSpeechBlock(
+  doc: jsPDF,
+  startX: number,
+  startY: number,
+  width: number,
+  title: string,
+  titleColor: [number, number, number],
+  text: string,
+  isBoldItalic: boolean = false
+): number {
+  // Título del bloque
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(...titleColor);
+  doc.text(title, startX, startY);
+
+  const cardY = startY + 2.5;
+  const paddingX = 4;
+  const paddingY = 3.5;
+  const innerTextWidth = width - (paddingX * 2 + 3);
+
+  // Medir líneas de texto con exactitud matemática
+  doc.setFont('helvetica', isBoldItalic ? 'bolditalic' : 'italic');
+  doc.setFontSize(7.6);
+  const lines = doc.splitTextToSize(text, innerTextWidth);
+  const lineHeight = 3.6;
+  const cardHeight = Math.max(14, lines.length * lineHeight + paddingY * 2);
+
+  // Fondo blanco con borde suave
+  doc.setFillColor(...COLORS.white);
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(startX, cardY, width, cardHeight, 1.8, 1.8, 'FD');
+
+  // Barra de acento lateral izquierda
+  doc.setFillColor(...titleColor);
+  doc.roundedRect(startX, cardY, 1.8, cardHeight, 0.9, 0.9, 'F');
+
+  // Renderizado del texto perfectamente alineado dentro de la tarjeta
+  doc.setTextColor(...COLORS.slateDark);
+  doc.text(lines, startX + paddingX + 2, cardY + paddingY + 2.5);
+
+  // Retorna la posición Y para el siguiente bloque con espacio seguro
+  return cardY + cardHeight + 3.5;
 }
 
 export function generateTarimaPDF(
@@ -64,7 +114,7 @@ export function generateTarimaPDF(
     ? reports
     : reports.filter((r) => r.parish.toLowerCase() === selectedParish.toLowerCase());
 
-  // Métricas y Cálculos de la Parroquia
+  // Métricas de la demarcación
   const total = filteredReports.length;
   const resolved = filteredReports.filter((r) => r.status === 'RESOLVED').length;
   const active = total - resolved;
@@ -126,7 +176,6 @@ export function generateTarimaPDF(
 
   // Cargar fotos locales si aplican
   const candidatePhotoBase64 = tryLoadImageBase64(tenant.candidatePhotoUrl);
-  const partyLogoBase64 = tryLoadImageBase64(tenant.partyLogoUrl);
 
   // =========================================================================
   // PÁGINA 1: DOSSIER ESTRATÉGICO & GUION DE TARIMA (A4 VERTICAL)
@@ -145,11 +194,11 @@ export function generateTarimaPDF(
     try {
       doc.addImage(solinteecLogoBase64, 'PNG', pageWidth - 36, 6, 24, 20);
     } catch {
-      // Si falla, ignorar
+      // Ignorar si falla
     }
   }
 
-  // Foto del candidato o Avatar con borde dorado
+  // Foto del candidato o Monograma con borde dorado
   const photoSize = 26;
   const photoX = margin;
   const photoY = 8;
@@ -179,13 +228,13 @@ export function generateTarimaPDF(
   // Título y Datos del Encabezado
   const textStartX = photoX + photoSize + 6;
   
-  // Badge de Ficha
+  // Badge de Ficha Oficial
   doc.setFillColor(245, 158, 11); // Amber
   doc.roundedRect(textStartX, photoY, 78, 5, 1, 1, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(11, 19, 43);
-  doc.text('FICHA OFICIAL DE VISITA TERRITORIAL & TARIMA', textStartX + 39, photoY + 3.6, { align: 'center' });
+  doc.text('FICHA OFICIAL DE VISITA TERRITORIAL Y TARIMA', textStartX + 39, photoY + 3.6, { align: 'center' });
 
   // Título de la Parroquia / Cantón
   doc.setFont('helvetica', 'bold');
@@ -197,8 +246,8 @@ export function generateTarimaPDF(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(203, 213, 225); // Slate 300
-  doc.text(`Dossier de Inteligencia para ${candidateDisplayName} • ${listDisplayName}`, textStartX, photoY + 18);
-  doc.text(`"${sloganDisplayName}" • Cantón ${tenant.canton}`, textStartX, photoY + 22.5);
+  doc.text(`Dossier de Inteligencia para ${candidateDisplayName} | ${listDisplayName}`, textStartX, photoY + 18);
+  doc.text(`"${sloganDisplayName}" | Cantón ${tenant.canton}`, textStartX, photoY + 22.5);
 
   // Fecha y total de reportes a la derecha (debajo del logo)
   doc.setFontSize(7.5);
@@ -213,9 +262,9 @@ export function generateTarimaPDF(
   // -------------------------------------------------------------------------
   let currentY = 48;
 
-  // Header de Sección
+  // Header de Sección 1
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
+  doc.setFontSize(9.5);
   doc.setTextColor(...COLORS.navy);
   doc.text('1. RADIOGRAFÍA DEL DOLOR CIUDADANO (DATOS DUROS AUDITADOS)', margin, currentY);
 
@@ -241,9 +290,13 @@ export function generateTarimaPDF(
   if (displayCats.length > 0) {
     displayCats.forEach((c, idx) => {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
+      doc.setFontSize(7.2);
       doc.setTextColor(...COLORS.slateDark);
-      doc.text(`${idx + 1}. ${c.name.substring(0, 26)}`, margin + 4, barY);
+      
+      // Truncar nombre si es necesario para evitar desborde
+      const catLabel = `${idx + 1}. ${c.name}`;
+      const splitCat = doc.splitTextToSize(catLabel, colWidth - 28)[0];
+      doc.text(splitCat, margin + 4, barY);
 
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...COLORS.amber);
@@ -252,11 +305,11 @@ export function generateTarimaPDF(
       // Barra de progreso
       barY += 2;
       doc.setFillColor(226, 232, 240);
-      doc.roundedRect(margin + 4, barY, colWidth - 8, 2.5, 1, 1, 'F');
+      doc.roundedRect(margin + 4, barY, colWidth - 8, 2.2, 1, 1, 'F');
 
       const fillW = Math.max(2, ((colWidth - 8) * c.percentage) / 100);
       doc.setFillColor(...COLORS.amber);
-      doc.roundedRect(margin + 4, barY, fillW, 2.5, 1, 1, 'F');
+      doc.roundedRect(margin + 4, barY, fillW, 2.2, 1, 1, 'F');
 
       barY += 6.5;
     });
@@ -281,10 +334,16 @@ export function generateTarimaPDF(
   let nbY = currentY + 12;
   if (topNeighborhoods.length > 0) {
     topNeighborhoods.forEach((nb) => {
+      // Indicador vectorial de alerta (círculo rojo sólido, sin caracteres Unicode defectuosos)
+      doc.setFillColor(...COLORS.red);
+      doc.circle(colRightX + 6, nbY - 1, 1.2, 'F');
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
       doc.setTextColor(...COLORS.slateDark);
-      doc.text(`📍 ${nb.name.substring(0, 24)}`, colRightX + 4, nbY);
+      
+      const nbNameSafe = doc.splitTextToSize(nb.name, colWidth - 32)[0];
+      doc.text(nbNameSafe, colRightX + 9, nbY);
 
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...COLORS.red);
@@ -299,139 +358,102 @@ export function generateTarimaPDF(
     doc.text('Auditoría registrada a nivel de cabecera general.', colRightX + 4, nbY + 4);
   }
 
-  // Resumen de Estado en la base de la tarjeta derecha
+  // Resumen de Estado en la base de la tarjeta derecha con vectores circulares limpios
   doc.setFillColor(241, 245, 249);
   doc.roundedRect(colRightX + 3, currentY + cardHeight - 8.5, colWidth - 6, 6, 1.5, 1.5, 'F');
+
+  // Punto vectorial ámbar para Activos
+  doc.setFillColor(...COLORS.amber);
+  doc.circle(colRightX + 6.5, currentY + cardHeight - 5.5, 1.1, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.8);
   doc.setTextColor(...COLORS.slateDark);
-  doc.text(`● ${active} Activos / Clamores Pendientes`, colRightX + 6, currentY + cardHeight - 4.5);
+  doc.text(`${active} Activos / Clamores Pendientes`, colRightX + 9.5, currentY + cardHeight - 4.5);
+
+  // Punto vectorial verde para Resueltos
+  doc.setFillColor(...COLORS.emerald);
+  doc.circle(colRightX + colWidth - 26, currentY + cardHeight - 5.5, 1.1, 'F');
   doc.setTextColor(...COLORS.emerald);
-  doc.text(`● ${resolved} Resueltos`, colRightX + colWidth - 6, currentY + cardHeight - 4.5, { align: 'right' });
+  doc.text(`${resolved} Resueltos`, colRightX + colWidth - 23, currentY + cardHeight - 4.5);
 
   // -------------------------------------------------------------------------
-  // 3. SECCIÓN PRINCIPAL: GUION QUIRÚRGICO PARA LA TARIMA (QUÉ DECIR)
+  // 3. SECCIÓN PRINCIPAL: GUION QUIRÚRGICO PARA LA TARIMA (DISCURSO EXACTO)
   // -------------------------------------------------------------------------
-  currentY += cardHeight + 8;
+  currentY += cardHeight + 7;
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
+  doc.setFontSize(9.5);
   doc.setTextColor(...COLORS.navy);
   doc.text('2. ARGUMENTARIO QUIRÚRGICO PARA LA TARIMA (DISCURSO EXACTO)', margin, currentY);
 
-  currentY += 4;
+  currentY += 3.5;
 
-  // Contenedor General del Discurso (Fondo suave con borde dorado)
-  const speechBoxHeight = 160;
-  doc.setFillColor(...COLORS.amberBg);
-  doc.setDrawColor(...COLORS.amberBorder);
-  doc.setLineWidth(0.6);
-  doc.roundedRect(margin, currentY, contentWidth, speechBoxHeight, 3, 3, 'FD');
+  // Renderizado dinámico de las 4 tarjetas de discurso garantizando que NO se desborden
+  const speechWidth = contentWidth;
 
-  // Barra de acento izquierda dorada
-  doc.setFillColor(...COLORS.amber);
-  doc.roundedRect(margin, currentY, 3.5, speechBoxHeight, 1.5, 1.5, 'F');
+  // A. Apertura de Impacto
+  const textoApertura = `"Vecinos de ${selectedParish === 'TODAS' ? `todo nuestro Cantón ${tenant.canton}` : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo técnico tenemos georreferenciado cada rincón de nuestra tierra. Sabemos con absoluta certeza científica que aquí el dolor número uno que les quita el sueño es ${primaryNeed.toLowerCase()}, representando más del ${primaryNeedPct}% de los clamores que la actual administración ha ignorado desde sus escritorios."`;
+  currentY = renderSpeechBlock(
+    doc,
+    margin,
+    currentY,
+    speechWidth,
+    'A. APERTURA DE IMPACTO (CONEXIÓN Y RIGOR TÉCNICO INMEDIATO):',
+    COLORS.amberDark,
+    textoApertura
+  );
 
-  let speechY = currentY + 7;
-  const innerMargin = margin + 8;
-  const innerWidth = contentWidth - 14;
-
-  // BLOQUE A: APERTURA DE IMPACTO
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(180, 83, 9); // Amber 700
-  doc.text('A. APERTURA DE IMPACTO (CONEXIÓN Y RIGOR TÉCNICO INMEDIATO):', innerMargin, speechY);
-
-  speechY += 4.5;
-  const aperturaTexto = `"Vecinos de ${selectedParish === 'TODAS' ? `todo nuestro Cantón ${tenant.canton}` : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo técnico tenemos georreferenciado cada rincón de nuestra tierra. Sabemos con absoluta certeza científica que aquí el dolor número uno que les quita el sueño es ${primaryNeed.toLowerCase()}, representando más del ${primaryNeedPct}% de los clamores que la actual administración ha decidido ignorar desde la comodidad de sus escritorios."`;
-
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(241, 245, 249);
-  doc.roundedRect(innerMargin, speechY - 1, innerWidth, 23, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.slateDark);
-  const aperturaLines = doc.splitTextToSize(aperturaTexto, innerWidth - 6);
-  doc.text(aperturaLines, innerMargin + 3, speechY + 3.5);
-
-  speechY += 28;
-
-  // BLOQUE B: MENCIÓN DE TESTIMONIOS REALES (EFECTO DEMOLEDOR)
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(180, 83, 9); // Amber 700
-  doc.text('B. MENCIÓN DE CASOS REALES Y VECINOS (EFECTO DEMOLEDOR):', innerMargin, speechY);
-
-  speechY += 4.5;
-  let testimonioTexto = '';
+  // B. Mención de Casos Reales
+  let textoTestimonio = '';
   if (citizensWithContact.length > 0) {
     const c1 = citizensWithContact[0];
     const nombreVecino = c1.citizenName || 'uno de nuestros queridos vecinos';
     const sectorVecino = c1.neighborhood ? `en el sector de ${c1.neighborhood}` : 'en esta misma comunidad';
-    testimonioTexto = `"Aquí están las pruebas levantadas directamente con los ciudadanos. Como nos reportó el vecino ${nombreVecino} ${sectorVecino} sobre ${c1.title.toLowerCase()}. No es justo ni humano que una familia trabajadora deba esperar meses o años sin que el municipio envíe una sola cuadrilla o una respuesta formal. ¡Eso se acaba desde el primer día de nuestra gestión!"`;
+    textoTestimonio = `"Aquí están las pruebas levantadas directamente con los ciudadanos. Como nos reportó el vecino ${nombreVecino} ${sectorVecino} sobre ${c1.title.toLowerCase()}. No es justo ni humano que una familia trabajadora deba esperar meses o años sin que el municipio envíe una sola cuadrilla o una respuesta formal. ¡Eso se acaba desde el primer día de nuestra gestión!"`;
   } else {
-    testimonioTexto = `"Los vecinos de ${selectedParish === 'TODAS' ? 'nuestros barrios y parroquias' : selectedParish} nos han compartido sus denuncias con fotografías en mano del abandono de las vías, los deslaves no atendidos y la falta de agua potable. Basta ya de funcionarios que no se ensucian los zapatos con el lodo de nuestras calles."`;
+    textoTestimonio = `"Los vecinos de ${selectedParish === 'TODAS' ? 'nuestros barrios y parroquias' : selectedParish} nos han compartido sus denuncias con fotografías en mano del abandono de las vías, los deslaves no atendidos y la falta de agua potable. Basta ya de funcionarios que no se ensucian los zapatos con el lodo de nuestras calles."`;
   }
+  currentY = renderSpeechBlock(
+    doc,
+    margin,
+    currentY,
+    speechWidth,
+    'B. MENCIÓN DE CASOS REALES Y VECINOS (EFECTO DEMOLEDOR):',
+    COLORS.amberDark,
+    textoTestimonio
+  );
 
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(241, 245, 249);
-  doc.roundedRect(innerMargin, speechY - 1, innerWidth, 24, 2, 2, 'FD');
+  // C. Compromiso Técnico
+  const textoCompromiso = `"Nosotros no venimos a improvisar. Esta misma plataforma digital de participación ciudadana donde ustedes han reportado será institucionalizada en el GAD Municipal desde nuestro primer día de posesión. La maquinaria pesada de Obras Públicas y el presupuesto participativo se asignarán con base a este mapa técnico de prioridades reales, no por amiguismos ni por compadrazgos políticos."`;
+  currentY = renderSpeechBlock(
+    doc,
+    margin,
+    currentY,
+    speechWidth,
+    'C. COMPROMISO TÉCNICO Y SOLUCIÓN DIRECTA DESDE LA ALCALDÍA:',
+    COLORS.emerald,
+    textoCompromiso
+  );
 
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.slateDark);
-  const testimonioLines = doc.splitTextToSize(testimonioTexto, innerWidth - 6);
-  doc.text(testimonioLines, innerMargin + 3, speechY + 3.5);
-
-  speechY += 29;
-
-  // BLOQUE C: COMPROMISO TÉCNICO & PLAN DE GOBIERNO
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...COLORS.emerald);
-  doc.text('C. COMPROMISO TÉCNICO & SOLUCIÓN DIRECTA DESDE LA ALCALDÍA:', innerMargin, speechY);
-
-  speechY += 4.5;
-  const compromisoTexto = `"Nosotros no venimos a improvisar. Esta misma plataforma digital de participación ciudadana donde ustedes han reportado será institucionalizada en el GAD Municipal desde nuestro primer día de posesión. La maquinaria pesada de Obras Públicas y el presupuesto participativo se asignarán con base a este mapa técnico de prioridades reales, no por amiguismos ni por compadrazgos políticos."`;
-
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(241, 245, 249);
-  doc.roundedRect(innerMargin, speechY - 1, innerWidth, 23, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.slateDark);
-  const compromisoLines = doc.splitTextToSize(compromisoTexto, innerWidth - 6);
-  doc.text(compromisoLines, innerMargin + 3, speechY + 3.5);
-
-  speechY += 28;
-
-  // BLOQUE D: CIERRE TRIUNFAL & LLAMADO A LA VICTORIA
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...COLORS.navy);
-  doc.text('D. CIERRE TRIUNFAL (LLAMADO A LA VICTORIA Y ESPERANZA):', innerMargin, speechY);
-
-  speechY += 4.5;
-  const cierreTexto = `"Este 2027 no solo gana un candidato o una lista; gana la gente digna, trabajadora y honesta de ${selectedParish === 'TODAS' ? `nuestro amado Cantón ${tenant.canton}` : selectedParish}. Caminen con la frente en alto y con la seguridad de que el cambio verdadero ya es imparable. ¡Que viva ${selectedParish === 'TODAS' ? tenant.canton : selectedParish} y que viva nuestra gente victoriosa!"`;
-
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(241, 245, 249);
-  doc.roundedRect(innerMargin, speechY - 1, innerWidth, 23, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setFontSize(8.2);
-  doc.setTextColor(...COLORS.navy);
-  const cierreLines = doc.splitTextToSize(cierreTexto, innerWidth - 6);
-  doc.text(cierreLines, innerMargin + 3, speechY + 3.5);
+  // D. Cierre Triunfal
+  const textoCierre = `"Este 2027 no solo gana un candidato o una lista; gana la gente digna, trabajadora y honesta de ${selectedParish === 'TODAS' ? `nuestro amado Cantón ${tenant.canton}` : selectedParish}. Caminen con la frente en alto y con la seguridad de que el cambio verdadero ya es imparable. ¡Que viva ${selectedParish === 'TODAS' ? tenant.canton : selectedParish} y que viva nuestra gente victoriosa!"`;
+  renderSpeechBlock(
+    doc,
+    margin,
+    currentY,
+    speechWidth,
+    'D. CIERRE TRIUNFAL (LLAMADO A LA VICTORIA Y ESPERANZA):',
+    COLORS.navy,
+    textoCierre,
+    true
+  );
 
   // 4. PIE DE PÁGINA 1
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(...COLORS.slateMuted);
-  doc.text('SOLINTEEC DEVTECH S.A.S. • Cerebro de Inteligencia Electoral & Transición Institucional al GAD Municipal', margin, pageHeight - 6);
-  doc.text(`Página 1 de 2 • Candidatura Cantón ${tenant.canton}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
+  doc.text('SOLINTEEC DEVTECH S.A.S. | Cerebro de Inteligencia Electoral y Transición Institucional al GAD Municipal', margin, pageHeight - 6);
+  doc.text(`Página 1 de 2 | Candidatura Cantón ${tenant.canton}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
 
   // =========================================================================
   // PÁGINA 2: DIRECTORIO TERRITORIAL DE TESTIMONIOS & CONTACTOS (A4 VERTICAL)
@@ -459,10 +481,10 @@ export function generateTarimaPDF(
   doc.setTextColor(...COLORS.gold);
   doc.text(`${filteredReports.length} REGISTROS AUDITADOS`, pageWidth - margin, 15, { align: 'right' });
 
-  // 2. TABLA EJECUTIVA CON JSPDFAUTOTABLE
+  // 2. TABLA EJECUTIVA CON JSPDFAUTOTABLE (SIN EMOJIS, TEXTO LIMPIO Y ANCHOS FORMATEADOS)
   const tableRows = filteredReports.map((r) => [
     r.ticketCode || `QUI-${r.id.substring(0, 4).toUpperCase()}`,
-    `${r.citizenName || 'Vecino anónimo'}\n${r.citizenContact ? `📱 ${r.citizenContact}` : 'Sin teléfono'}`,
+    `${r.citizenName || 'Vecino anónimo'}\n${r.citizenContact ? `Tel: ${r.citizenContact}` : 'Sin teléfono registrado'}`,
     r.neighborhood || r.parish,
     CATEGORY_LABELS[r.category] || r.category,
     r.title.length > 55 ? `${r.title.substring(0, 52)}...` : r.title,
@@ -496,7 +518,7 @@ export function generateTarimaPDF(
       fillColor: [248, 250, 252],
     },
     columnStyles: {
-      0: { cellWidth: 26, fontStyle: 'bold', textColor: [11, 19, 43] },
+      0: { cellWidth: 28, fontStyle: 'bold', textColor: [11, 19, 43] },
       1: { cellWidth: 32 },
       2: { cellWidth: 24, fontStyle: 'bold' },
       3: { cellWidth: 26 },
@@ -509,8 +531,8 @@ export function generateTarimaPDF(
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7);
       doc.setTextColor(...COLORS.slateMuted);
-      doc.text('SOLINTEEC DEVTECH S.A.S. • Información Confidencial para Uso Estratégico de Campaña', margin, pageHeight - 6);
-      doc.text(`Página 2 de 2 • Cantón ${tenant.canton}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
+      doc.text('SOLINTEEC DEVTECH S.A.S. | Información Confidencial para Uso Estratégico de Campaña', margin, pageHeight - 6);
+      doc.text(`Página 2 de 2 | Cantón ${tenant.canton}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
     }
   });
 
