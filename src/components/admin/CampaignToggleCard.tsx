@@ -9,10 +9,13 @@ import {
   CheckCircle2, 
   Flame, 
   QrCode, 
-  FileText, 
   PhoneCall, 
-  ArrowRight,
-  Info
+  Image as ImageIcon,
+  User,
+  Flag,
+  Eye,
+  Check,
+  RotateCcw
 } from 'lucide-react';
 
 interface CampaignToggleCardProps {
@@ -20,6 +23,8 @@ interface CampaignToggleCardProps {
   initialCandidateName?: string | null;
   initialCampaignSlogan?: string | null;
   initialCampaignListNumber?: string | null;
+  initialCandidatePhotoUrl?: string | null;
+  initialPartyLogoUrl?: string | null;
 }
 
 export default function CampaignToggleCard({
@@ -27,11 +32,29 @@ export default function CampaignToggleCard({
   initialCandidateName = '',
   initialCampaignSlogan = '',
   initialCampaignListNumber = '',
+  initialCandidatePhotoUrl = '',
+  initialPartyLogoUrl = '',
 }: CampaignToggleCardProps) {
   const [enabled, setEnabled] = useState<boolean>(initialCampaignMode);
   const [candidateName, setCandidateName] = useState<string>(initialCandidateName || '');
   const [campaignSlogan, setCampaignSlogan] = useState<string>(initialCampaignSlogan || '');
   const [campaignListNumber, setCampaignListNumber] = useState<string>(initialCampaignListNumber || '');
+  const [candidatePhotoUrl, setCandidatePhotoUrl] = useState<string>(initialCandidatePhotoUrl || '');
+  const [partyLogoUrl, setPartyLogoUrl] = useState<string>(initialPartyLogoUrl || '');
+
+  // Presets rápidos para demostración ejecutiva
+  const applyDemoPreset = () => {
+    setCandidateName('Ing. Carlos Morales');
+    setCampaignSlogan('Por el Futuro y Desarrollo de Quijos');
+    setCampaignListNumber('Lista 100 - Movimiento Renovación');
+    setCandidatePhotoUrl('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=400&q=80');
+    setPartyLogoUrl('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=300&h=300&q=80');
+  };
+
+  const clearLogos = () => {
+    setCandidatePhotoUrl('');
+    setPartyLogoUrl('');
+  };
 
   return (
     <div 
@@ -41,7 +64,7 @@ export default function CampaignToggleCard({
           : 'bg-slate-900/90 border-slate-700/80 shadow-slate-950/50'
       }`}
     >
-      {/* Hidden input for form submission */}
+      {/* Hidden inputs para sincronización directa con el FormData de Server Actions */}
       <input 
         type="checkbox" 
         name="campaignMode" 
@@ -185,25 +208,39 @@ export default function CampaignToggleCard({
         </div>
 
         {/* Sección de Parametrización del Candidato */}
-        <div className={`p-5 rounded-2xl border transition-all duration-300 ${
+        <div className={`p-5 sm:p-6 rounded-2xl border transition-all duration-300 space-y-6 ${
           enabled 
             ? 'bg-slate-950/70 border-amber-500/30' 
             : 'bg-slate-950/30 border-slate-800/60 opacity-60'
         }`}>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className={enabled ? 'text-amber-400' : 'text-slate-500'} />
-              <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
-                Datos de Personalización Electoral (Cintillo & Afiches)
+              <Sparkles size={18} className={enabled ? 'text-amber-400' : 'text-slate-500'} />
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Personalización Electoral (Candidato, Lista & Branding)
               </h3>
             </div>
-            {!enabled && (
-              <span className="text-[11px] text-slate-400 italic">
-                (Se aplicarán al activar el switch)
-              </span>
-            )}
+            
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={applyDemoPreset}
+                className="text-[11px] px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-colors font-semibold"
+              >
+                Cargar Datos Demo
+              </button>
+              <button
+                type="button"
+                onClick={clearLogos}
+                className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+                title="Limpiar URLs de logos"
+              >
+                <RotateCcw size={12} />
+              </button>
+            </div>
           </div>
 
+          {/* Fila 1: Textos (Nombre, Eslogan, Lista) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label htmlFor="candidateName" className="block text-xs font-semibold text-slate-300 mb-1.5">
@@ -250,6 +287,154 @@ export default function CampaignToggleCard({
               />
             </div>
           </div>
+
+          {/* Fila 2: Identidad Visual (Foto Candidato & Logo Partido) con Vista Previa en Vivo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+            
+            {/* Foto del Candidato */}
+            <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <label htmlFor="candidatePhotoUrl" className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <User size={15} className="text-amber-400" /> Fotografía Oficial del Candidato(a)
+                </label>
+                <span className="text-[10px] text-slate-400">URL de imagen (PNG / JPG)</span>
+              </div>
+
+              <div className="flex items-center gap-3.5">
+                {/* Avatar Preview */}
+                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-amber-400/80 overflow-hidden flex items-center justify-center shrink-0 shadow-md shadow-amber-500/10">
+                  {candidatePhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={candidatePhotoUrl} 
+                      alt="Candidato" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <User size={24} className="text-slate-500" />
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    name="candidatePhotoUrl"
+                    id="candidatePhotoUrl"
+                    value={candidatePhotoUrl}
+                    onChange={(e) => setCandidatePhotoUrl(e.target.value)}
+                    placeholder="https://.../foto-candidato.jpg"
+                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Aparecerá en el portal ciudadano, afiches de QR y ficha de tarima.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Logo del Partido o Movimiento */}
+            <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <label htmlFor="partyLogoUrl" className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <Flag size={15} className="text-amber-400" /> Logotipo del Partido o Lista
+                </label>
+                <span className="text-[10px] text-slate-400">URL de imagen (PNG fondo transp.)</span>
+              </div>
+
+              <div className="flex items-center gap-3.5">
+                {/* Logo Preview */}
+                <div className="w-14 h-14 rounded-xl bg-slate-950 border border-slate-700 p-1.5 overflow-hidden flex items-center justify-center shrink-0 shadow-md">
+                  {partyLogoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={partyLogoUrl} 
+                      alt="Logo Partido" 
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <Flag size={22} className="text-slate-500" />
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    name="partyLogoUrl"
+                    id="partyLogoUrl"
+                    value={partyLogoUrl}
+                    onChange={(e) => setPartyLogoUrl(e.target.value)}
+                    placeholder="https://.../logo-partido.png"
+                    className="block w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Distintivo electoral para el cintillo de cabecera y membrete de discursos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Simulador en Vivo: Cómo lo verá el votante en el portal ciudadano */}
+          <div className="p-4 rounded-xl bg-slate-950 border border-amber-500/20 space-y-2.5">
+            <div className="flex items-center justify-between text-xs text-amber-300 font-bold">
+              <span className="flex items-center gap-1.5">
+                <Eye size={14} /> Vista Previa en Vivo: Cintillo Oficial del Portal Ciudadano
+              </span>
+              <span className="text-[10px] text-slate-400 font-normal">
+                Así lucirá en el móvil del ciudadano al ingresar a la plataforma
+              </span>
+            </div>
+
+            {/* Mockup del Cintillo */}
+            <div className="bg-gradient-to-r from-amber-950/80 via-orange-950/60 to-slate-900 border border-amber-500/50 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-md">
+              <div className="flex items-center gap-3">
+                {/* Foto circular con aro ámbar */}
+                <div className="w-11 h-11 rounded-full bg-slate-800 border-2 border-amber-400 overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                  {candidatePhotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={candidatePhotoUrl} alt="Candidato" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={20} className="text-slate-400" />
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+                      Campaña 2026
+                    </span>
+                    <span className="text-xs font-bold text-white">
+                      {candidateName || 'Nombre del Candidato'}
+                    </span>
+                    <span className="text-[11px] text-amber-300 font-semibold">
+                      {campaignListNumber ? `• ${campaignListNumber}` : ''}
+                    </span>
+                  </div>
+                  <div className="text-xs text-amber-200/90 italic mt-0.5">
+                    "{campaignSlogan || 'Eslogan oficial de campaña'}"
+                  </div>
+                </div>
+              </div>
+
+              {/* Logo del partido a la derecha */}
+              <div className="w-10 h-10 rounded-lg bg-slate-900/80 border border-slate-700/80 p-1 shrink-0 flex items-center justify-center">
+                {partyLogoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={partyLogoUrl} alt="Logo Partido" className="w-full h-full object-contain" />
+                ) : (
+                  <Flag size={16} className="text-slate-500" />
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>

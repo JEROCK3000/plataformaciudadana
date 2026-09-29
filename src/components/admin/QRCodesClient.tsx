@@ -27,6 +27,8 @@ interface QRCodesProps {
     campaignSlogan?: string | null;
     campaignListNumber?: string | null;
     campaignMode?: boolean;
+    candidatePhotoUrl?: string | null;
+    partyLogoUrl?: string | null;
   };
 }
 
@@ -306,16 +308,37 @@ export default function QRCodesClient({ tenant }: QRCodesProps) {
 
           {/* Afiche Modelo A4 (Visible en pantalla y 100% perfecto al imprimir con window.print()) */}
           <div className="bg-white text-slate-900 p-8 sm:p-10 rounded-3xl shadow-2xl border-4 border-amber-500 text-center space-y-6 print:border-none print:shadow-none print:p-0 print:m-0">
-            <div className="space-y-1">
-              <span className="text-[11px] font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                {listDisplayName} • CANTÓN {tenant.canton.toUpperCase()}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight pt-2">
-                {candidateDisplayName.toUpperCase()}
-              </h2>
-              <p className="text-sm font-bold text-amber-600 italic">
-                "{sloganDisplayName}"
-              </p>
+            {/* Header del Afiche con Foto y Logo */}
+            <div className="flex items-center justify-between gap-4 pb-3 border-b border-slate-200">
+              {tenant.candidatePhotoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.candidatePhotoUrl} 
+                  alt="Candidato" 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-amber-500 shadow-md shrink-0" 
+                />
+              ) : <div className="w-4 shrink-0" />}
+
+              <div className="space-y-1 flex-1">
+                <span className="text-[11px] font-extrabold tracking-widest uppercase px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  {listDisplayName} • CANTÓN {tenant.canton.toUpperCase()}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight pt-1">
+                  {candidateDisplayName.toUpperCase()}
+                </h2>
+                <p className="text-sm font-bold text-amber-600 italic">
+                  "{sloganDisplayName}"
+                </p>
+              </div>
+
+              {tenant.partyLogoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.partyLogoUrl} 
+                  alt="Logo Partido" 
+                  className="w-16 h-16 object-contain p-1 rounded-xl bg-slate-50 border border-slate-200 shrink-0" 
+                />
+              ) : <div className="w-4 shrink-0" />}
             </div>
 
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">

@@ -48,22 +48,48 @@ export default async function TenantPublicPortal({
               <Link href="/" className="p-2 hover:bg-white/10 rounded-lg text-emerald-200 hover:text-white transition-colors" title="Ver todos los municipios">
                 <ArrowLeft size={20} />
               </Link>
-              <div className={tenant.campaignMode 
-                ? "bg-amber-500 text-slate-950 p-2 rounded-xl shadow-md font-black" 
-                : "bg-white dark:bg-gray-800 p-2 rounded-lg text-emerald-800 dark:text-emerald-400 shadow-sm"
-              }>
-                <Building2 size={24} />
-              </div>
+              {tenant.campaignMode && tenant.candidatePhotoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.candidatePhotoUrl} 
+                  alt={tenant.candidateName || 'Candidato'} 
+                  className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shrink-0 shadow-md shadow-amber-500/20" 
+                />
+              ) : !tenant.campaignMode && tenant.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.logoUrl} 
+                  alt={tenant.name} 
+                  className="w-12 h-12 object-contain bg-white dark:bg-gray-800 p-1 rounded-lg shrink-0 shadow-sm" 
+                />
+              ) : (
+                <div className={tenant.campaignMode 
+                  ? "bg-amber-500 text-slate-950 p-2 rounded-xl shadow-md font-black shrink-0" 
+                  : "bg-white dark:bg-gray-800 p-2 rounded-lg text-emerald-800 dark:text-emerald-400 shadow-sm shrink-0"
+                }>
+                  <Building2 size={24} />
+                </div>
+              )}
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold leading-tight">{tenant.name}</h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-bold leading-tight">
+                    {tenant.campaignMode && tenant.candidateName ? tenant.candidateName : tenant.name}
+                  </h1>
                   {tenant.campaignMode && (
                     <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
                       {tenant.campaignListNumber || 'Campaña Ciudadana'}
                     </span>
                   )}
+                  {tenant.campaignMode && tenant.partyLogoUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={tenant.partyLogoUrl} 
+                      alt="Logo Lista" 
+                      className="h-6 w-auto max-w-[80px] object-contain rounded bg-slate-950/70 p-0.5 border border-amber-500/30" 
+                    />
+                  )}
                 </div>
-                <p className="text-xs text-emerald-200/90 font-medium tracking-wide uppercase flex items-center gap-1">
+                <p className="text-xs text-emerald-200/90 font-medium tracking-wide uppercase flex items-center gap-1 mt-0.5">
                   <MapPin size={12} className={tenant.campaignMode ? "text-amber-400" : ""} /> 
                   Cantón {tenant.canton}, {tenant.province} • {tenant.campaignMode && tenant.campaignSlogan ? `"${tenant.campaignSlogan}"` : 'Portal de Participación'}
                 </p>

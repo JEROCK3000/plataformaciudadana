@@ -32,6 +32,8 @@ export default async function QRCodesPage() {
         campaignSlogan: tenant.campaignSlogan,
         campaignListNumber: tenant.campaignListNumber,
         campaignMode: !!tenant.campaignMode,
+        candidatePhotoUrl: tenant.candidatePhotoUrl,
+        partyLogoUrl: tenant.partyLogoUrl,
       }}
     />
   );

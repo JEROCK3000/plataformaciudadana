@@ -43,13 +43,15 @@ export default async function SettingsPage() {
               initialCandidateName={settings.candidateName}
               initialCampaignSlogan={settings.campaignSlogan}
               initialCampaignListNumber={settings.campaignListNumber}
+              initialCandidatePhotoUrl={settings.candidatePhotoUrl}
+              initialPartyLogoUrl={settings.partyLogoUrl}
             />
 
             <hr className="border-gray-200 dark:border-gray-700" />
 
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-                <Building2 size={20} className="text-gray-400" /> Información Institucional
+                <Building2 size={20} className="text-gray-400" /> Información Institucional (Modo GAD Municipal)
               </h2>
               <div className="space-y-4">
                 <div>
@@ -65,6 +67,21 @@ export default async function SettingsPage() {
                     className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white"
                   />
                   <p className="mt-1 text-xs text-gray-500">Este nombre aparecerá en la cabecera del portal ciudadano de su cantón.</p>
+                </div>
+
+                <div>
+                  <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    URL del Escudo o Logotipo Oficial del GAD
+                  </label>
+                  <input
+                    type="text"
+                    name="logoUrl"
+                    id="logoUrl"
+                    defaultValue={settings.logoUrl}
+                    placeholder="https://.../escudo-quijos.png"
+                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm text-gray-900 dark:text-white"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Escudo o marca institucional que se mostrará cuando la plataforma opere en modo municipal formal.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

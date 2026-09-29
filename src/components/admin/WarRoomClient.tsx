@@ -48,6 +48,8 @@ interface WarRoomProps {
     campaignSlogan?: string | null;
     campaignListNumber?: string | null;
     campaignMode?: boolean;
+    candidatePhotoUrl?: string | null;
+    partyLogoUrl?: string | null;
   };
   reports: ReportItem[];
 }
@@ -137,9 +139,18 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
               <Link href="/admin" className="p-2 hover:bg-slate-800 rounded-xl transition-colors text-slate-400 hover:text-white" title="Volver al panel principal">
                 <ArrowLeft size={20} />
               </Link>
-              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
-                <Target size={24} />
-              </div>
+              {tenant.candidatePhotoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.candidatePhotoUrl} 
+                  alt="Candidato" 
+                  className="w-11 h-11 rounded-full object-cover border-2 border-amber-400 shrink-0 shadow-md shadow-amber-500/20" 
+                />
+              ) : (
+                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
+                  <Target size={24} />
+                </div>
+              )}
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
@@ -148,6 +159,14 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-black uppercase tracking-wider">
                     Tiempo Real
                   </span>
+                  {tenant.partyLogoUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={tenant.partyLogoUrl} 
+                      alt="Logo Lista" 
+                      className="h-6 w-auto max-w-[60px] object-contain rounded bg-slate-900 p-0.5 border border-slate-700" 
+                    />
+                  )}
                 </div>
                 <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
                   <span>Candidatura: <strong className="text-slate-200">{candidateDisplayName}</strong></span>
@@ -274,16 +293,36 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
           
           {/* Encabezado Ficha de Tarima */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 print:border-black/20 gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-extrabold uppercase tracking-wider mb-2 print:bg-amber-100 print:text-amber-900">
-                <Target size={14} /> Ficha Oficial de Visita Territorial & Tarima
+            <div className="flex items-center gap-4">
+              {tenant.candidatePhotoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={tenant.candidatePhotoUrl} 
+                  alt="Candidato" 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-amber-400 print:border-black shrink-0 shadow-md" 
+                />
+              )}
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-extrabold uppercase tracking-wider print:bg-gray-100 print:text-black">
+                    <Target size={13} /> Ficha Oficial de Visita Territorial & Tarima
+                  </span>
+                  {tenant.partyLogoUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={tenant.partyLogoUrl} 
+                      alt="Logo Lista" 
+                      className="h-6 w-auto max-w-[70px] object-contain rounded bg-white p-0.5 border border-slate-300 print:border-black" 
+                    />
+                  )}
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white print:text-black leading-tight">
+                  {selectedParish === 'TODAS' ? `Cantón ${tenant.canton}` : `Parroquia ${selectedParish}`}
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-400 print:text-gray-700 mt-0.5">
+                  Dossier de Inteligencia para <strong>{candidateDisplayName}</strong> • {listDisplayName} • Cantón {tenant.canton}
+                </p>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white print:text-black">
-                {selectedParish === 'TODAS' ? `Cantón ${tenant.canton}` : `Parroquia ${selectedParish}`}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 print:text-gray-600 mt-1">
-                Dossier de Inteligencia para <strong>{candidateDisplayName}</strong> • {listDisplayName} • Cantón {tenant.canton}
-              </p>
             </div>
 
             <div className="text-right flex flex-col items-start sm:items-end">

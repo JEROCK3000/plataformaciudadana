@@ -43,6 +43,9 @@ export async function getTenantSettings() {
     candidateName: tenant?.candidateName || '',
     campaignSlogan: tenant?.campaignSlogan || '',
     campaignListNumber: tenant?.campaignListNumber || '',
+    logoUrl: tenant?.logoUrl || '',
+    candidatePhotoUrl: tenant?.candidatePhotoUrl || '',
+    partyLogoUrl: tenant?.partyLogoUrl || '',
   };
 }
 
@@ -53,6 +56,11 @@ export async function updateTenantSettings(formData: FormData) {
   const aiPromptMaster = (formData.get("aiPromptMaster") as string)?.trim();
   const requireCedulaForVotes = formData.get("requireCedulaForVotes") === "on";
   
+  // Logos e Identidad
+  const logoUrl = (formData.get("logoUrl") as string)?.trim() || null;
+  const candidatePhotoUrl = (formData.get("candidatePhotoUrl") as string)?.trim() || null;
+  const partyLogoUrl = (formData.get("partyLogoUrl") as string)?.trim() || null;
+
   // Modo Campaña Política
   const campaignMode = formData.get("campaignMode") === "on";
   const candidateName = (formData.get("candidateName") as string)?.trim() || null;
@@ -70,10 +78,13 @@ export async function updateTenantSettings(formData: FormData) {
         name: platformName,
         aiPromptMaster,
         requireCedulaForVotes,
+        logoUrl,
         campaignMode,
         candidateName,
         campaignSlogan,
         campaignListNumber,
+        candidatePhotoUrl,
+        partyLogoUrl,
       },
     });
 
