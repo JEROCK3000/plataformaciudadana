@@ -1,8 +1,9 @@
 import React from 'react';
 import { getTenantSettings, updateTenantSettings } from '@/lib/actions/settings';
-import { Settings, Save, Shield, ArrowLeft, Building2, CheckCircle } from 'lucide-react';
+import { Settings, Save, ArrowLeft, Building2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import CampaignToggleCard from '@/components/admin/CampaignToggleCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,96 +37,13 @@ export default async function SettingsPage() {
         <form action={handleSave} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 md:p-8 space-y-6">
             
-            {/* MÓDULO CAMPAÑA POLÍTICA VS MODO INSTITUCIONAL */}
-            <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-emerald-500/10 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-emerald-950/30 p-6 rounded-2xl border-2 border-amber-300 dark:border-amber-700/60 shadow-sm space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/30">
-                    <Shield size={22} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                        Módulos de Campaña Política & Inteligencia Territorial
-                      </h2>
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
-                        {settings.campaignMode ? 'MODO CAMPAÑA ACTIVO' : 'MODO INSTITUCIONAL GAD'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                      Activa con un solo clic el cerebro tecnológico para la contienda electoral o la gestión municipal institucional.
-                    </p>
-                  </div>
-                </div>
-
-                <label className="relative inline-flex items-center cursor-pointer select-none self-start sm:self-center">
-                  <input
-                    type="checkbox"
-                    name="campaignMode"
-                    id="campaignModeToggle"
-                    defaultChecked={settings.campaignMode}
-                    className="sr-only peer"
-                  />
-                  <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                  <span className="ml-3 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
-                    Habilitar Modo Campaña
-                  </span>
-                </label>
-              </div>
-
-              <div className="text-xs text-gray-600 dark:text-gray-400 bg-white/70 dark:bg-gray-900/70 p-3.5 rounded-xl border border-amber-200/60 dark:border-amber-800/40 leading-relaxed">
-                <strong>¿Qué ocurre al activar este switch?</strong>
-                <ul className="list-disc list-inside mt-1.5 space-y-1 text-gray-700 dark:text-gray-300">
-                  <li><strong>War Room & Ficha de Tarima:</strong> Se habilita el panel para generar en 1 clic el resumen de prioridades barriales y nombres de vecinos para los discursos del candidato.</li>
-                  <li><strong>Generador de Códigos QR:</strong> Descarga de QR inteligentes por parroquia y brigada para material físico (afiches, volantes, microperforados).</li>
-                  <li><strong>Formulario de Captura Electoral:</strong> El formulario ciudadano solicita WhatsApp/teléfono del vecino para construir la base de simpatizantes de la campaña.</li>
-                  <li><strong>Al desactivarlo:</strong> El sistema vuelve al modo 100% formal e institucional del GAD Municipal sin dejar rastros electorales.</li>
-                </ul>
-              </div>
-
-              {/* Metadatos de Campaña */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                <div>
-                  <label htmlFor="candidateName" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Nombre del Candidato(a)
-                  </label>
-                  <input
-                    type="text"
-                    name="candidateName"
-                    id="candidateName"
-                    defaultValue={settings.candidateName}
-                    placeholder="Ej. Ing. Juan Pérez"
-                    className="block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-xs text-gray-900 dark:text-white focus:ring-amber-500 focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="campaignSlogan" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Eslogan de Campaña
-                  </label>
-                  <input
-                    type="text"
-                    name="campaignSlogan"
-                    id="campaignSlogan"
-                    defaultValue={settings.campaignSlogan}
-                    placeholder="Ej. El Quijos que Soñamos"
-                    className="block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-xs text-gray-900 dark:text-white focus:ring-amber-500 focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="campaignListNumber" className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    Lista o Movimiento Político
-                  </label>
-                  <input
-                    type="text"
-                    name="campaignListNumber"
-                    id="campaignListNumber"
-                    defaultValue={settings.campaignListNumber}
-                    placeholder="Ej. Lista 100 - Movimiento Renovación"
-                    className="block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm text-xs text-gray-900 dark:text-white focus:ring-amber-500 focus:border-amber-500"
-                  />
-                </div>
-              </div>
-            </div>
+            {/* MÓDULO CAMPAÑA POLÍTICA VS MODO INSTITUCIONAL (NUEVO COMPONENTE ENTERPRISE) */}
+            <CampaignToggleCard
+              initialCampaignMode={settings.campaignMode}
+              initialCandidateName={settings.candidateName}
+              initialCampaignSlogan={settings.campaignSlogan}
+              initialCampaignListNumber={settings.campaignListNumber}
+            />
 
             <hr className="border-gray-200 dark:border-gray-700" />
 
