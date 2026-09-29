@@ -152,14 +152,21 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                   <Target size={24} />
                 </div>
               )}
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
-                    WAR ROOM <span className="text-amber-400">• Inteligencia Territorial de Campaña</span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                    WAR ROOM <span className="text-amber-400 font-bold hidden xs:inline">• Inteligencia Territorial</span>
                   </h1>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-black uppercase tracking-wider">
-                    Tiempo Real
+                  
+                  {/* Badge LIVE / TIEMPO REAL Titilante de Alto Impacto */}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/30 text-[10px] font-black uppercase tracking-wider shadow-[0_0_12px_rgba(239,68,68,0.25)] select-none">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                    <span>LIVE • TIEMPO REAL</span>
                   </span>
+
                   {tenant.partyLogoUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img 
@@ -169,39 +176,39 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                     />
                   )}
                 </div>
-                <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
                   <span>Candidatura: <strong className="text-slate-200">{candidateDisplayName}</strong></span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>{listDisplayName}</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span className="text-amber-300 italic">"{sloganDisplayName}"</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
               <Link 
                 href="/admin/qr-codes" 
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
+                className="flex-1 sm:flex-none justify-center px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
               >
-                Descargar Códigos QR
+                Códigos QR
               </Link>
               <a
                 href={`/api/reports/export/tarima-pdf?parish=${encodeURIComponent(selectedParish)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
+                className="flex-1 sm:flex-none justify-center px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5"
                 title="Generar y descargar documento PDF oficial para el mitin"
               >
-                <Download size={16} /> Descargar Ficha de Tarima (PDF)
+                <Download size={15} />
+                <span>Ficha Tarima (PDF)</span>
               </a>
               <button
                 onClick={() => window.print()}
-                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors flex items-center gap-1.5"
+                className="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors hidden sm:flex items-center gap-1"
                 title="Imprimir pantalla actual"
               >
-                <Printer size={16} />
-                <span className="hidden sm:inline text-xs">Imprimir</span>
+                <Printer size={15} />
               </button>
             </div>
           </div>
@@ -480,8 +487,8 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-thin">
+            <table className="min-w-[640px] w-full text-left text-xs">
               <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-700">
                 <tr>
                   <th className="py-3 px-4">Ciudadano</th>
