@@ -26,6 +26,7 @@ interface QRCodesProps {
     candidateName?: string | null;
     campaignSlogan?: string | null;
     campaignListNumber?: string | null;
+    campaignMode?: boolean;
   };
 }
 
@@ -134,6 +135,22 @@ export default function QRCodesClient({ tenant }: QRCodesProps) {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
+        {/* Banner Informativo si Modo Campaña está desactivado en la Configuración General */}
+        {tenant.campaignMode === false && (
+          <div className="print:hidden bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-amber-200 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1 rounded-md bg-amber-500 text-slate-950 font-bold text-xs">Aviso</span>
+              <span><strong>Modo Campaña actualmente Desactivado en Ajustes:</strong> Los códigos QR seguirán funcionando y dirigiendo a los ciudadanos, pero el portal público está operando en formato institucional hasta que actives el Modo Campaña.</span>
+            </div>
+            <Link 
+              href="/admin/settings" 
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shrink-0 transition-colors"
+            >
+              Activar en Configuración
+            </Link>
+          </div>
+        )}
+
         {/* Controles de Configuración */}
         <div className="bg-slate-850 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 print:hidden">
           <div>

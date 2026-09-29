@@ -43,25 +43,25 @@ export default async function AdminDashboard() {
                 <Globe size={18} /> Portal
               </Link>
 
-              {/* MÓDULOS EXCLUSIVOS SI MODO CAMPAÑA ESTÁ ACTIVO */}
-              {tenant?.campaignMode && (
-                <>
-                  <Link 
-                    href="/admin/war-room" 
-                    className="flex items-center gap-1.5 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 px-2.5 py-1 rounded-lg transition-colors font-bold shadow-sm"
-                    title="Centro de Inteligencia de Campaña & Discurso"
-                  >
-                    <Target size={16} className="text-amber-400" /> War Room / Tarima
-                  </Link>
-                  <Link 
-                    href="/admin/qr-codes" 
-                    className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-gray-800"
-                    title="Generador de Códigos QR para Brigadas"
-                  >
-                    <QrCode size={16} /> Códigos QR
-                  </Link>
-                </>
-              )}
+              {/* MÓDULOS DE INTELIGENCIA ELECTORAL / MODO CAMPAÑA */}
+              <Link 
+                href="/admin/war-room" 
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm ${
+                  tenant?.campaignMode 
+                    ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40' 
+                    : 'text-amber-400 hover:text-amber-300 hover:bg-gray-800'
+                }`}
+                title="Centro de Inteligencia de Campaña & Discurso"
+              >
+                <Target size={16} className="text-amber-400" /> War Room
+              </Link>
+              <Link 
+                href="/admin/qr-codes" 
+                className="flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300 transition-colors font-medium text-xs px-2 py-1 rounded-lg hover:bg-gray-800"
+                title="Generador de Códigos QR para Brigadas"
+              >
+                <QrCode size={16} /> Códigos QR
+              </Link>
 
               <Link href="/admin/stats" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                 <BarChart3 size={18} /> Estadísticas
@@ -88,7 +88,7 @@ export default async function AdminDashboard() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* BANNER DINÁMICO SI MODO CAMPAÑA ESTÁ ACTIVO */}
-        {tenant?.campaignMode && (
+        {tenant?.campaignMode ? (
           <div className="mb-6 bg-gradient-to-r from-amber-950/70 via-orange-950/40 to-slate-900 border-2 border-amber-500/50 rounded-2xl p-5 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="p-3 rounded-2xl bg-amber-500 text-slate-950 font-black flex items-center justify-center shadow-lg shadow-amber-500/30">
@@ -124,6 +124,39 @@ export default async function AdminDashboard() {
                 className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5"
               >
                 <QrCode size={15} /> Códigos QR
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center border border-amber-500/30 shrink-0">
+                <Target size={20} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/30">
+                    Módulo de Campaña Electoral
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">Modo Institucional Actual</span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Puedes activar el <strong>Modo Campaña Política</strong> en Configuración para personalizar el portal ciudadano, o acceder directamente al <strong>War Room</strong> y al <strong>Generador de Códigos QR</strong>.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link 
+                href="/admin/war-room" 
+                className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5"
+              >
+                <Target size={14} /> War Room
+              </Link>
+              <Link 
+                href="/admin/settings" 
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs rounded-xl border border-slate-700 transition-all"
+              >
+                Ajustes
               </Link>
             </div>
           </div>

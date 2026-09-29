@@ -17,11 +17,6 @@ export default async function QRCodesPage() {
     redirect('/admin');
   }
 
-  // Si el modo campaña está desactivado, redirigir al panel normal
-  if (!tenant.campaignMode) {
-    redirect('/admin');
-  }
-
   const parishes = Array.isArray(tenant.parishes) 
     ? (tenant.parishes as string[]) 
     : [];
@@ -36,6 +31,7 @@ export default async function QRCodesPage() {
         candidateName: tenant.candidateName,
         campaignSlogan: tenant.campaignSlogan,
         campaignListNumber: tenant.campaignListNumber,
+        campaignMode: !!tenant.campaignMode,
       }}
     />
   );

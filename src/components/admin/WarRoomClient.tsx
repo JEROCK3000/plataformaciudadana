@@ -47,6 +47,7 @@ interface WarRoomProps {
     candidateName?: string | null;
     campaignSlogan?: string | null;
     campaignListNumber?: string | null;
+    campaignMode?: boolean;
   };
   reports: ReportItem[];
 }
@@ -179,6 +180,22 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
+        {/* Banner Informativo si Modo Campaña está desactivado en la Configuración General */}
+        {tenant.campaignMode === false && (
+          <div className="print:hidden bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-amber-200 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1 rounded-md bg-amber-500 text-slate-950 font-bold text-xs">Aviso</span>
+              <span><strong>Modo Campaña actualmente Desactivado en Ajustes:</strong> El portal ciudadano público está operando en formato institucional. Puedes activarlo con 1 clic para habilitar el cintillo del candidato y la captura de WhatsApp.</span>
+            </div>
+            <Link 
+              href="/admin/settings" 
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shrink-0 transition-colors"
+            >
+              Activar en Configuración
+            </Link>
+          </div>
+        )}
+
         {/* Selector de Parroquias (Pills Horizontales) */}
         <div className="print:hidden">
           <div className="flex items-center justify-between mb-3">

@@ -17,11 +17,6 @@ export default async function WarRoomPage() {
     redirect('/admin');
   }
 
-  // Si el modo campaña está desactivado, redirigir al panel normal
-  if (!tenant.campaignMode) {
-    redirect('/admin');
-  }
-
   const reports = await prisma.report.findMany({
     where: { tenantId },
     orderBy: { createdAt: 'desc' },
@@ -56,6 +51,7 @@ export default async function WarRoomPage() {
         candidateName: tenant.candidateName,
         campaignSlogan: tenant.campaignSlogan,
         campaignListNumber: tenant.campaignListNumber,
+        campaignMode: !!tenant.campaignMode,
       }}
       reports={reports.map(r => ({
         ...r,
