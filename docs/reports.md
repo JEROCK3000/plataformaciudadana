@@ -21,6 +21,15 @@ Este proyecto cumple estrictamente las políticas de generación de reportes ins
 - **Motivo de elección**: Generación ligera y de alto rendimiento en el servidor (Node.js) sin necesidad de levantar instancias pesadas de navegadores headless (Puppeteer).
 - **Diseño**: Orientación horizontal (Landscape A4), encabezado verde institucional (Emerald), bloque resumen superior, tabla estructurada con auto-wrap y pie de página dinámico ("Página X de Y").
 
+### C. Ficha Oficial de Tarima & Dossier Electoral: `jspdf` + `jspdf-autotable`
+- **Motivo de elección**: Generación de un dossier ejecutivo de campaña en formato vertical A4 (2 páginas exactas), que sustituye la impresión precaria del navegador por un documento vectorial de alto calibre.
+- **Página 1 (Dossier Estratégico & Guion de Tarima)**:
+  - Cintillo oficial de campaña con foto del candidato, logo/número de lista y cantón.
+  - Radiografía métrica del dolor ciudadano (% de vialidad, agua, obras y barrios críticos).
+  - Guion de 4 bloques para discurso en tarima: Apertura de Impacto, Mención de Casos Reales con nombres de vecinos, Compromiso Técnico y Cierre Triunfal.
+- **Página 2 (Auditoría Territorial & Testimonios)**:
+  - Tabla ejecutiva con tickets parroquiales (`QUI-[PARROQUIA]-2026-XXXX`), datos de contacto WhatsApp de vecinos y estado del clamor para avanzada territorial.
+
 ---
 
 ## 3. Endpoints Disponibles
@@ -31,13 +40,17 @@ Los reportes se descargan mediante Route Handlers autenticados que validan el `t
   ```http
   GET /api/reports/export/excel?parish=Baeza&status=RECEIVED&department=OBRAS_PUBLICAS
   ```
-- **PDF**:
+- **PDF de Gestión Municipal**:
   ```http
   GET /api/reports/export/pdf?parish=Baeza&status=RECEIVED&department=OBRAS_PUBLICAS
   ```
+- **Ficha de Tarima y Dossier Electoral (PDF A4)**:
+  ```http
+  GET /api/reports/export/tarima-pdf?parish=San+Francisco+de+Borja
+  ```
 
 Ambos endpoints generan un nombre de archivo normalizado y fechado:
-`Reporte-[tenantSlug]-[YYYY-MM-DD].xlsx` y `Reporte-[tenantSlug]-[YYYY-MM-DD].pdf`
+`Reporte-[tenantSlug]-[YYYY-MM-DD].xlsx`, `Reporte-[tenantSlug]-[YYYY-MM-DD].pdf` y `Ficha_Tarima_[tenantSlug]_[parroquia]_[YYYY-MM-DD].pdf`
 
 ---
 

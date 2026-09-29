@@ -6,6 +6,7 @@ import {
   ArrowLeft, 
   Target, 
   Printer, 
+  Download,
   MapPin, 
   Users, 
   AlertTriangle, 
@@ -178,18 +179,29 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <Link 
                 href="/admin/qr-codes" 
                 className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
               >
                 Descargar Códigos QR
               </Link>
+              <a
+                href={`/api/reports/export/tarima-pdf?parish=${encodeURIComponent(selectedParish)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
+                title="Generar y descargar documento PDF oficial para el mitin"
+              >
+                <Download size={16} /> Descargar Ficha de Tarima (PDF)
+              </a>
               <button
                 onClick={() => window.print()}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
+                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors flex items-center gap-1.5"
+                title="Imprimir pantalla actual"
               >
-                <Printer size={16} /> Imprimir Ficha de Tarima
+                <Printer size={16} />
+                <span className="hidden sm:inline text-xs">Imprimir</span>
               </button>
             </div>
           </div>
@@ -333,6 +345,16 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
               <span className="text-[11px] text-emerald-400 font-semibold mt-0.5 print:text-gray-700">
                 {stats.total} reportes ciudadanos auditados
               </span>
+              <div className="mt-2.5 print:hidden">
+                <a
+                  href={`/api/reports/export/tarima-pdf?parish=${encodeURIComponent(selectedParish)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md hover:shadow-amber-500/20"
+                >
+                  <Download size={13} /> Exportar Dossier PDF (A4)
+                </a>
+              </div>
             </div>
           </div>
 
