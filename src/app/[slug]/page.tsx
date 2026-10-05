@@ -123,6 +123,8 @@ export default async function TenantPublicPortal({
               campaignMode={tenant.campaignMode}
               candidateName={tenant.candidateName}
               campaignSlogan={tenant.campaignSlogan}
+              citizenTermSingularM={tenant.citizenTermSingularM}
+              citizenTermSingularF={tenant.citizenTermSingularF}
             />
           </div>
 

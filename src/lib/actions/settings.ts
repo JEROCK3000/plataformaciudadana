@@ -46,6 +46,9 @@ export async function getTenantSettings() {
     logoUrl: tenant?.logoUrl || '',
     candidatePhotoUrl: tenant?.candidatePhotoUrl || '',
     partyLogoUrl: tenant?.partyLogoUrl || '',
+    citizenTermSingularM: tenant?.citizenTermSingularM || 'Ciudadano',
+    citizenTermSingularF: tenant?.citizenTermSingularF || 'Ciudadana',
+    citizenTermPlural: tenant?.citizenTermPlural || 'Ciudadanos',
   };
 }
 
@@ -60,6 +63,11 @@ export async function updateTenantSettings(formData: FormData) {
   const logoUrl = (formData.get("logoUrl") as string)?.trim() || null;
   const candidatePhotoUrl = (formData.get("candidatePhotoUrl") as string)?.trim() || null;
   const partyLogoUrl = (formData.get("partyLogoUrl") as string)?.trim() || null;
+
+  // Terminología Ciudadana (Configurable: Ciudadano/a, Vecino/a, Amigo/a, etc.)
+  const citizenTermSingularM = (formData.get("citizenTermSingularM") as string)?.trim() || 'Ciudadano';
+  const citizenTermSingularF = (formData.get("citizenTermSingularF") as string)?.trim() || 'Ciudadana';
+  const citizenTermPlural = (formData.get("citizenTermPlural") as string)?.trim() || 'Ciudadanos';
 
   // Modo Campaña Política
   const campaignMode = formData.get("campaignMode") === "on";
@@ -85,6 +93,9 @@ export async function updateTenantSettings(formData: FormData) {
         campaignListNumber,
         candidatePhotoUrl,
         partyLogoUrl,
+        citizenTermSingularM,
+        citizenTermSingularF,
+        citizenTermPlural,
       },
     });
 

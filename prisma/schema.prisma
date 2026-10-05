@@ -29,6 +29,11 @@ model Tenant {
   candidatePhotoUrl     String?   @db.LongText
   partyLogoUrl          String?   @db.LongText
 
+  // Terminología y Tratamiento Ciudadano Configurable (Ciudadano/a, Vecino/a, Amigo/a, etc.)
+  citizenTermSingularM  String    @default("Ciudadano")
+  citizenTermSingularF  String    @default("Ciudadana")
+  citizenTermPlural     String    @default("Ciudadanos")
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 

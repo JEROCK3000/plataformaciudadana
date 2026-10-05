@@ -388,11 +388,16 @@ export function generateTarimaPDF(
 
   currentY += 3.5;
 
+  // Terminología configurable del tenant
+  const termSingularM = (tenant as any).citizenTermSingularM || 'Ciudadano';
+  const termSingularF = (tenant as any).citizenTermSingularF || 'Ciudadana';
+  const termPlural = (tenant as any).citizenTermPlural || 'Ciudadanos';
+
   // Renderizado dinámico de las 4 tarjetas de discurso garantizando que NO se desborden
   const speechWidth = contentWidth;
 
   // A. Apertura de Impacto
-  const textoApertura = `"Vecinos de ${selectedParish === 'TODAS' ? `todo nuestro Cantón ${tenant.canton}` : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo técnico tenemos georreferenciado cada rincón de nuestra tierra. Sabemos con absoluta certeza científica que aquí el dolor número uno que les quita el sueño es ${primaryNeed.toLowerCase()}, representando más del ${primaryNeedPct}% de los clamores que la actual administración ha ignorado desde sus escritorios."`;
+  const textoApertura = `"${termPlural} de ${selectedParish === 'TODAS' ? `todo nuestro Cantón ${tenant.canton}` : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo técnico tenemos georreferenciado cada rincón de nuestra tierra. Sabemos con absoluta certeza científica que aquí el dolor número uno que les quita el sueño es ${primaryNeed.toLowerCase()}, representando más del ${primaryNeedPct}% de los clamores que la actual administración ha ignorado desde sus escritorios."`;
   currentY = renderSpeechBlock(
     doc,
     margin,
@@ -407,18 +412,18 @@ export function generateTarimaPDF(
   let textoTestimonio = '';
   if (citizensWithContact.length > 0) {
     const c1 = citizensWithContact[0];
-    const nombreVecino = c1.citizenName || 'uno de nuestros queridos vecinos';
+    const nombrePersona = c1.citizenName || `uno de nuestros ${termPlural.toLowerCase()}`;
     const sectorVecino = c1.neighborhood ? `en el sector de ${c1.neighborhood}` : 'en esta misma comunidad';
-    textoTestimonio = `"Aquí están las pruebas levantadas directamente con los ciudadanos. Como nos reportó el vecino ${nombreVecino} ${sectorVecino} sobre ${c1.title.toLowerCase()}. No es justo ni humano que una familia trabajadora deba esperar meses o años sin que el municipio envíe una sola cuadrilla o una respuesta formal. ¡Eso se acaba desde el primer día de nuestra gestión!"`;
+    textoTestimonio = `"Aquí están las pruebas levantadas directamente con los ${termPlural.toLowerCase()}. Como nos reportó ${termSingularM.toLowerCase()} ${nombrePersona} ${sectorVecino} sobre ${c1.title.toLowerCase()}. No es justo ni humano que una familia trabajadora deba esperar meses o años sin que el municipio envíe una sola cuadrilla o una respuesta formal. ¡Eso se acaba desde el primer día de nuestra gestión!"`;
   } else {
-    textoTestimonio = `"Los vecinos de ${selectedParish === 'TODAS' ? 'nuestros barrios y parroquias' : selectedParish} nos han compartido sus denuncias con fotografías en mano del abandono de las vías, los deslaves no atendidos y la falta de agua potable. Basta ya de funcionarios que no se ensucian los zapatos con el lodo de nuestras calles."`;
+    textoTestimonio = `"Los ${termPlural.toLowerCase()} de ${selectedParish === 'TODAS' ? 'nuestros barrios y parroquias' : selectedParish} nos han compartido sus denuncias con fotografías en mano del abandono de las vías, los deslaves no atendidos y la falta de agua potable. Basta ya de funcionarios que no se ensucian los zapatos con el lodo de nuestras calles."`;
   }
   currentY = renderSpeechBlock(
     doc,
     margin,
     currentY,
     speechWidth,
-    'B. MENCIÓN DE CASOS REALES Y VECINOS (EFECTO DEMOLEDOR):',
+    `B. MENCIÓN DE CASOS REALES Y ${termPlural.toUpperCase()} (EFECTO DEMOLEDOR):`,
     COLORS.amberDark,
     textoTestimonio
   );
@@ -484,7 +489,7 @@ export function generateTarimaPDF(
   // 2. TABLA EJECUTIVA CON JSPDFAUTOTABLE (SIN EMOJIS, TEXTO LIMPIO Y ANCHOS FORMATEADOS)
   const tableRows = filteredReports.map((r) => [
     r.ticketCode || `QUI-${r.id.substring(0, 4).toUpperCase()}`,
-    `${r.citizenName || 'Vecino anónimo'}\n${r.citizenContact ? `Tel: ${r.citizenContact}` : 'Sin teléfono registrado'}`,
+    `${r.citizenName || `${termSingularM} anónimo`}\n${r.citizenContact ? `Tel: ${r.citizenContact}` : 'Sin teléfono registrado'}`,
     r.neighborhood || r.parish,
     CATEGORY_LABELS[r.category] || r.category,
     r.title.length > 55 ? `${r.title.substring(0, 52)}...` : r.title,
@@ -495,7 +500,7 @@ export function generateTarimaPDF(
   autoTable(doc, {
     startY: 32,
     margin: { left: margin, right: margin, bottom: 20 },
-    head: [['Código', 'Ciudadano / Contacto', 'Barrio', 'Prioridad', 'Descripción del Clamor', 'Estado', 'Urgencia']],
+    head: [['Código', `${termSingularM} / Contacto`, 'Barrio', 'Prioridad', 'Descripción del Clamor', 'Estado', 'Urgencia']],
     body: tableRows.length > 0 ? tableRows : [
       ['-', 'Sin registros aún', selectedParish, '-', 'No hay denuncias reportadas para este sector.', 'AL DÍA', 'BAJA']
     ],

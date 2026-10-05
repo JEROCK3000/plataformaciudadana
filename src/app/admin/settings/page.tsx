@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import CampaignToggleCard from '@/components/admin/CampaignToggleCard';
 import GadLogoUploader from '@/components/admin/GadLogoUploader';
+import CitizenTerminologyCard from '@/components/admin/CitizenTerminologyCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +47,13 @@ export default async function SettingsPage() {
               initialCampaignListNumber={settings.campaignListNumber}
               initialCandidatePhotoUrl={settings.candidatePhotoUrl}
               initialPartyLogoUrl={settings.partyLogoUrl}
+            />
+
+            {/* MÓDULO TERMINOLOGÍA Y TRATAMIENTO CIUDADANO (CIUDADANO, AMIGO, VECINO, COMPAÑERO) */}
+            <CitizenTerminologyCard
+              initialSingularM={settings.citizenTermSingularM}
+              initialSingularF={settings.citizenTermSingularF}
+              initialPlural={settings.citizenTermPlural}
             />
 
             <hr className="border-gray-200 dark:border-gray-700" />

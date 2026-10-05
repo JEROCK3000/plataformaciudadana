@@ -54,6 +54,9 @@ export default async function WarRoomPage() {
         campaignMode: !!tenant.campaignMode,
         candidatePhotoUrl: tenant.candidatePhotoUrl,
         partyLogoUrl: tenant.partyLogoUrl,
+        citizenTermSingularM: tenant.citizenTermSingularM,
+        citizenTermSingularF: tenant.citizenTermSingularF,
+        citizenTermPlural: tenant.citizenTermPlural,
       }}
       reports={reports.map(r => ({
         ...r,

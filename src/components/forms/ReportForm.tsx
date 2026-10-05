@@ -132,6 +132,8 @@ export default function ReportForm({
   campaignMode = false,
   candidateName,
   campaignSlogan,
+  citizenTermSingularM = 'Ciudadano',
+  citizenTermSingularF = 'Ciudadana',
 }: { 
   parroquias: string[];
   tenantSlug?: string;
@@ -140,6 +142,8 @@ export default function ReportForm({
   campaignMode?: boolean;
   candidateName?: string | null;
   campaignSlogan?: string | null;
+  citizenTermSingularM?: string | null;
+  citizenTermSingularF?: string | null;
 }) {
   const defaultParish = (initialParish && parroquias.some(p => p.toLowerCase() === initialParish.toLowerCase()))
     ? parroquias.find(p => p.toLowerCase() === initialParish.toLowerCase())!
@@ -457,7 +461,7 @@ export default function ReportForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {campaignMode ? 'Nombre del Vecino(a)' : 'Nombre'}
+                {campaignMode ? `Nombre del ${citizenTermSingularM || 'Ciudadano'}(a)` : 'Nombre'}
               </label>
               <input 
                 type="text" 

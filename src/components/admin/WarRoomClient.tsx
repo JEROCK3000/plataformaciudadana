@@ -51,6 +51,9 @@ interface WarRoomProps {
     campaignMode?: boolean;
     candidatePhotoUrl?: string | null;
     partyLogoUrl?: string | null;
+    citizenTermSingularM?: string | null;
+    citizenTermSingularF?: string | null;
+    citizenTermPlural?: string | null;
   };
   reports: ReportItem[];
 }
@@ -66,6 +69,10 @@ const CATEGORY_NAMES: Record<string, string> = {
 };
 
 export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
+  const termSingularM = tenant.citizenTermSingularM || 'Ciudadano';
+  const termSingularF = tenant.citizenTermSingularF || 'Ciudadana';
+  const termPlural = tenant.citizenTermPlural || 'Ciudadanos';
+
   const parishes = ['TODAS', ...(tenant.parishes || [])];
   const [selectedParish, setSelectedParish] = useState<string>('TODAS');
   const [showSpeechCard, setShowSpeechCard] = useState<boolean>(true);
@@ -296,7 +303,7 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
           </div>
 
           <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Vecinos con Contacto</span>
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{termPlural} con Contacto</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-3xl font-black text-emerald-400">{stats.contactsCount}</span>
               <span className="text-xs text-emerald-300/80 font-medium">listos para WhatsApp</span>
@@ -427,7 +434,7 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                     Apertura de Impacto (Conexión Inmediata):
                   </span>
                   <p className="text-xs sm:text-sm text-slate-200 print:text-gray-900 italic leading-relaxed bg-slate-900/70 print:bg-white p-3.5 rounded-xl border border-slate-800 print:border-gray-200">
-                    "Vecinos de {selectedParish === 'TODAS' ? tenant.canton : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo tenemos georreferenciado cada rincón del cantón. Sabemos con precisión que aquí el dolor número uno es <strong>{stats.primaryNeed.toLowerCase()}</strong>, que representa más del <strong>{stats.primaryNeedPct}%</strong> de los clamores no atendidos por la actual administración."
+                    "{termPlural} de {selectedParish === 'TODAS' ? tenant.canton : selectedParish}: Yo no vengo a esta tarima a adivinar ni a ofrecerles castillos en el aire. Con nuestro equipo tenemos georreferenciado cada rincón del cantón. Sabemos con precisión que aquí el dolor número uno es <strong>{stats.primaryNeed.toLowerCase()}</strong>, que representa más del <strong>{stats.primaryNeedPct}%</strong> de los clamores no atendidos por la actual administración."
                   </p>
                 </div>
 
@@ -438,11 +445,11 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                   <p className="text-xs sm:text-sm text-slate-200 print:text-gray-900 italic leading-relaxed bg-slate-900/70 print:bg-white p-3.5 rounded-xl border border-slate-800 print:border-gray-200">
                     {citizensWithContact.length > 0 ? (
                       <>
-                        "Aquí están los reportes que los propios vecinos han levantado con fotografías. Como nos comunicó el vecino <strong>{citizensWithContact[0]?.citizenName || 'de la comunidad'}</strong> en el sector de <strong>{citizensWithContact[0]?.neighborhood}</strong> sobre {citizensWithContact[0]?.title.toLowerCase()}. No es justo que hayan tenido que esperar meses sin una respuesta formal de sus autoridades."
+                        "Aquí están los reportes que los propios {termPlural.toLowerCase()} han levantado con fotografías. Como nos comunicó {termSingularM.toLowerCase()} <strong>{citizensWithContact[0]?.citizenName || 'de la comunidad'}</strong> en el sector de <strong>{citizensWithContact[0]?.neighborhood}</strong> sobre {citizensWithContact[0]?.title.toLowerCase()}. No es justo que hayan tenido que esperar meses sin una respuesta formal de sus autoridades."
                       </>
                     ) : (
                       <>
-                        "Los vecinos de {selectedParish === 'TODAS' ? 'nuestros barrios' : selectedParish} nos han compartido sus fotografías del abandono de las vías y la falta de agua potable. Basta de funcionarios de escritorio que no pisan el lodo de nuestras comunidades."
+                        "Los {termPlural.toLowerCase()} de {selectedParish === 'TODAS' ? 'nuestros barrios' : selectedParish} nos han compartido sus fotografías del abandono de las vías y la falta de agua potable. Basta de funcionarios de escritorio que no pisan el lodo de nuestras comunidades."
                       </>
                     )}
                   </p>
@@ -476,14 +483,14 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Users size={20} className="text-amber-400" /> Directorio de Vecinos & Contactos ({filteredReports.length})
+                <Users size={20} className="text-amber-400" /> Directorio de {termPlural} & Contactos ({filteredReports.length})
               </h3>
               <p className="text-xs text-slate-400">
-                Base de datos de ciudadanos que han registrado problemas en {selectedParish}. Listos para contacto y fidelización cívica.
+                Base de datos de {termPlural.toLowerCase()} que han registrado problemas en {selectedParish}. Listos para contacto y fidelización cívica.
               </p>
             </div>
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 self-start sm:self-center">
-              {stats.contactsCount} vecinos con WhatsApp
+              {stats.contactsCount} {termPlural.toLowerCase()} con WhatsApp
             </span>
           </div>
 
@@ -491,7 +498,7 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
             <table className="min-w-[640px] w-full text-left text-xs">
               <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-700">
                 <tr>
-                  <th className="py-3 px-4">Ciudadano</th>
+                  <th className="py-3 px-4">{termSingularM}</th>
                   <th className="py-3 px-4">Parroquia / Barrio</th>
                   <th className="py-3 px-4">Necesidad Reportada</th>
                   <th className="py-3 px-4">Urgencia</th>
@@ -503,14 +510,14 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
                   const cleanPhone = r.citizenContact ? r.citizenContact.replace(/\D/g, '') : null;
                   const waUrl = cleanPhone 
                     ? `https://wa.me/593${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(
-                        `Hola ${r.citizenName || 'vecino'}, te saludamos de parte del equipo de ${candidateDisplayName}. Vimos tu reporte sobre "${r.title}" en el sector ${r.neighborhood}. El candidato está al tanto y queremos compartirte nuestra propuesta para resolverlo.`
+                        `Hola ${r.citizenName || termSingularM.toLowerCase()}, te saludamos de parte del equipo de ${candidateDisplayName}. Vimos tu reporte sobre "${r.title}" en el sector ${r.neighborhood}. El candidato está al tanto y queremos compartirte nuestra propuesta para resolverlo.`
                       )}`
                     : null;
 
                   return (
                     <tr key={r.id} className="hover:bg-slate-800/60 transition-colors">
                       <td className="py-3 px-4">
-                        <span className="font-bold text-white block">{r.citizenName || 'Ciudadano Vecinal'}</span>
+                        <span className="font-bold text-white block">{r.citizenName || `${termSingularM} Territorial`}</span>
                         {r.citizenContact && (
                           <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
                             <Phone size={11} className="text-emerald-400" /> {r.citizenContact}
