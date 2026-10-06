@@ -19,14 +19,15 @@ El módulo opera bajo la ruta protegida:
 Está estructurado en 3 secciones operativas:
 
 ### A. Tablero en Vivo (Conteo Rápido de Actas)
-- **Barra de Avance Global:** Porcentaje de actas escrutadas vs total de mesas electorales del cantón.
-- **Gran Marcador de Tendencia:** Curva en tiempo real de votos:
-  - Votos del Candidato y Lista oficial.
-  - Votos del Principal Rival / Contendor.
-  - Votos de otros movimientos.
-  - Votos blancos y nulos.
-- **Margen de Ventaja:** Cálculo matemático inmediato de la brecha de votos requerida para asegurar la victoria.
-- **Semáforo Territorial por Parroquias:** Indicador visual (Verde: Ganando, Rojo: En desventaja, Gris: Sin actas) para Baeza, San Francisco de Borja, Cuyuja, Cosanga y Papallacta.
+- **Barra de Avance Global:** Porcentaje de actas escrutadas vs total de 20 mesas receptoras del voto del cantón.
+- **Gran Marcador de Tendencia (Los 4 Candidatos Oficiales de Quijos):** Curva en tiempo real de votos:
+  - **Brandon Aliaga** (Alianza PSC Lista 6 - Pachakutik Lista 18) — Candidatura Principal (Verde Esmeralda).
+  - **Renán Balladares** (ADN Lista 7 - Acción Democrática Nacional) — Exalcalde (Púrpura / Violeta ADN).
+  - **Aracely Ruiz** (Alianza 3-8 / Partido Sociedad Patriótica) — Candidata (Rojo Rosado).
+  - **William Guerrero** (Alianza Unidos por Quijos) — Candidato (Celeste Sky).
+  - Votos en blanco y nulos (Gris Pizarra).
+- **Margen de Ventaja:** Cálculo matemático inmediato de la brecha de votos requerida sobre el rival directo con mayor votación para asegurar la victoria.
+- **Semáforo Territorial por Parroquias:** Indicador visual (Verde: Ganando, Rojo: En desventaja, Gris: Sin actas) para Baeza, San Francisco de Borja, Cuyuja, Cosanga, Papallacta y Sumaco.
 - **Galería de Actas Oficiales:** Registro fotográfico de cada acta transmitida con visualizador en alta resolución para sustento legal ante el CNE.
 
 ### B. Transmisión Móvil de Actas (Para Delegados y Brigadistas)

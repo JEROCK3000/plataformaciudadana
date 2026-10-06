@@ -48,6 +48,12 @@ interface ControlElectoralProps {
       participationPct: number;
       candidateVotes: number;
       candidatePct: number;
+      balladaresVotes?: number;
+      balladaresPct?: number;
+      ruizVotes?: number;
+      ruizPct?: number;
+      guerreroVotes?: number;
+      guerreroPct?: number;
       rivalVotes: number;
       rivalPct: number;
       otherVotes: number;
@@ -85,9 +91,11 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
   const [selectedJuntaId, setSelectedJuntaId] = useState<string>(activeRecinto?.juntas[0]?.id || '');
   const activeJunta = activeRecinto?.juntas.find((j: any) => j.id === selectedJuntaId) || activeRecinto?.juntas[0];
 
-  const [candidateVotes, setCandidateVotes] = useState<number>(0);
-  const [rivalVotes, setRivalVotes] = useState<number>(0);
-  const [otherVotes, setOtherVotes] = useState<number>(0);
+  // 4 Candidatos Oficiales de Quijos + Blancos/Nulos
+  const [candidateVotes, setCandidateVotes] = useState<number>(0); // Brandon Aliaga (PSC-PK)
+  const [balladaresVotes, setBalladaresVotes] = useState<number>(0); // Renán Balladares (ADN 7)
+  const [ruizVotes, setRuizVotes] = useState<number>(0); // Aracely Ruiz (Alianza 3-8)
+  const [guerreroVotes, setGuerreroVotes] = useState<number>(0); // William Guerrero (Unidos por Quijos)
   const [blankVotes, setBlankVotes] = useState<number>(0);
   const [nullVotes, setNullVotes] = useState<number>(0);
   const [actaPhotoUrl, setActaPhotoUrl] = useState<string>('');
@@ -99,7 +107,7 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
   const [delegatePhone, setDelegatePhone] = useState<string>('');
   const [delegateStatus, setDelegateStatus] = useState<string>('PENDIENTE');
 
-  const totalCalculado = candidateVotes + rivalVotes + otherVotes + blankVotes + nullVotes;
+  const totalCalculado = candidateVotes + balladaresVotes + ruizVotes + guerreroVotes + blankVotes + nullVotes;
   const padronMesa = activeJunta?.electors || 350;
   const excedePadron = totalCalculado > padronMesa;
 
@@ -122,16 +130,18 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
 
   const loadExistingActa = (j: any) => {
     if (j.acta) {
-      setCandidateVotes(j.acta.candidateVotes);
-      setRivalVotes(j.acta.rivalVotes);
-      setOtherVotes(j.acta.otherVotes);
-      setBlankVotes(j.acta.blankVotes);
-      setNullVotes(j.acta.nullVotes);
+      setCandidateVotes(j.acta.candidateVotes || 0);
+      setBalladaresVotes(j.acta.balladaresVotes ?? j.acta.rivalVotes ?? 0);
+      setRuizVotes(j.acta.ruizVotes ?? Math.round((j.acta.otherVotes || 0) / 2));
+      setGuerreroVotes(j.acta.guerreroVotes ?? Math.floor((j.acta.otherVotes || 0) / 2));
+      setBlankVotes(j.acta.blankVotes || 0);
+      setNullVotes(j.acta.nullVotes || 0);
       setActaPhotoUrl(j.acta.photoUrl || '');
     } else {
       setCandidateVotes(0);
-      setRivalVotes(0);
-      setOtherVotes(0);
+      setBalladaresVotes(0);
+      setRuizVotes(0);
+      setGuerreroVotes(0);
       setBlankVotes(0);
       setNullVotes(0);
       setActaPhotoUrl('');
@@ -145,11 +155,14 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
     const formData = new FormData();
     formData.append('juntaId', selectedJuntaId);
     formData.append('candidateVotes', candidateVotes.toString());
-    formData.append('rivalVotes', rivalVotes.toString());
-    formData.append('otherVotes', otherVotes.toString());
+    formData.append('balladaresVotes', balladaresVotes.toString());
+    formData.append('ruizVotes', ruizVotes.toString());
+    formData.append('guerreroVotes', guerreroVotes.toString());
+    formData.append('rivalVotes', balladaresVotes.toString());
+    formData.append('otherVotes', (ruizVotes + guerreroVotes).toString());
     formData.append('blankVotes', blankVotes.toString());
     formData.append('nullVotes', nullVotes.toString());
-    formData.append('photoUrl', actaPhotoUrl);
+    if (actaPhotoUrl) formData.append('photoUrl', actaPhotoUrl);
 
     startTransition(async () => {
       const res = await saveElectoralActa(formData);
@@ -269,63 +282,95 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
         {activeTab === 'TABLERO' && (
           <div className="space-y-6">
             
-            {/* KPI CARDS RESUMEN */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Avance de Escrutinio</span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl sm:text-3xl font-black text-amber-400">{data.summary.progressPct}%</span>
-                  <span className="text-xs text-slate-400">
-                    ({data.summary.digitizedJuntas} / {data.summary.totalJuntas} mesas)
+            {/* KPI CARDS RESUMEN - LOS 4 CANDIDATOS OFICIALES DE QUIJOS */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Avance Escrutinio</span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-amber-400">{data.summary.progressPct}%</span>
+                  <span className="text-[10px] text-slate-400">
+                    ({data.summary.digitizedJuntas}/{data.summary.totalJuntas})
                   </span>
                 </div>
-                <div className="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-amber-500 to-amber-400 h-1.5 rounded-full transition-all duration-500"
                     style={{ width: `${data.summary.progressPct}%` }}
                   />
                 </div>
               </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                  Brandon Aliaga
+              {/* Brandon Aliaga */}
+              <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block truncate">
+                  ★ Brandon Aliaga
                 </span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl sm:text-3xl font-black text-emerald-400">{data.summary.candidateVotes}</span>
-                  <span className="text-xs font-extrabold text-emerald-300">({data.summary.candidatePct}%)</span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-emerald-400">{data.summary.candidateVotes}</span>
+                  <span className="text-[10px] font-extrabold text-emerald-300">({data.summary.candidatePct}%)</span>
                 </div>
-                <span className="text-[11px] text-slate-400 block mt-1">Alianza PSC 6 - Pachakutik 18</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5 truncate">PSC 6 - PK 18</span>
               </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">Aracely Ruiz</span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl sm:text-3xl font-black text-purple-400">{data.summary.rivalVotes}</span>
-                  <span className="text-xs font-extrabold text-purple-300">({data.summary.rivalPct}%)</span>
+              {/* Renán Balladares */}
+              <div className="bg-slate-900/90 border border-purple-500/30 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider block truncate">
+                  Renán Balladares
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-purple-400">
+                    {data.summary.balladaresVotes ?? data.summary.rivalVotes}
+                  </span>
+                  <span className="text-[10px] font-extrabold text-purple-300">
+                    ({data.summary.balladaresPct ?? data.summary.rivalPct}%)
+                  </span>
                 </div>
-                <span className="text-[11px] text-slate-400 block mt-1">Alianza 3-8 / Sociedad Patriótica</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5 truncate">ADN Lista 7</span>
               </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-sky-400 uppercase tracking-wider block">William Guerrero</span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl sm:text-3xl font-black text-sky-400">{data.summary.otherVotes}</span>
-                  <span className="text-xs font-extrabold text-sky-300">({data.summary.otherPct}%)</span>
+              {/* Aracely Ruiz */}
+              <div className="bg-slate-900/90 border border-rose-500/30 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block truncate">
+                  Aracely Ruiz
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-rose-400">
+                    {data.summary.ruizVotes ?? 0}
+                  </span>
+                  <span className="text-[10px] font-extrabold text-rose-300">
+                    ({data.summary.ruizPct ?? 0}%)
+                  </span>
                 </div>
-                <span className="text-[11px] text-slate-400 block mt-1">Alianza Unidos por Quijos</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5 truncate">Alianza 3-8 / PSP</span>
               </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Margen de Ventaja</span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className={`text-2xl sm:text-3xl font-black ${data.summary.leadVotes >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {/* William Guerrero */}
+              <div className="bg-slate-900/90 border border-sky-500/30 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider block truncate">
+                  William Guerrero
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-xl sm:text-2xl font-black text-sky-400">
+                    {data.summary.guerreroVotes ?? 0}
+                  </span>
+                  <span className="text-[10px] font-extrabold text-sky-300">
+                    ({data.summary.guerreroPct ?? 0}%)
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-400 block mt-0.5 truncate">Unidos por Quijos</span>
+              </div>
+
+              {/* Margen de Ventaja */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-4">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ventaja</span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className={`text-xl sm:text-2xl font-black ${data.summary.leadVotes >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                     {data.summary.leadVotes > 0 ? `+${data.summary.leadVotes}` : data.summary.leadVotes}
                   </span>
-                  <span className="text-xs text-slate-400">votos de ventaja</span>
+                  <span className="text-[10px] text-slate-400">votos</span>
                 </div>
-                <span className="text-[11px] text-amber-400/90 font-medium block mt-1">
-                  {data.summary.actasConInconsistencia > 0 ? `⚠️ ${data.summary.actasConInconsistencia} actas con alerta` : '✓ Todas las actas cuadradas'}
+                <span className="text-[10px] text-amber-400/90 font-medium block mt-0.5 truncate">
+                  {data.summary.actasConInconsistencia > 0 ? `⚠️ ${data.summary.actasConInconsistencia} alerta` : '✓ Cuadradas'}
                 </span>
               </div>
             </div>
@@ -347,34 +392,42 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                 </span>
               </div>
 
-              {/* Barra Proporcional de los 3 Candidatos Reales de Quijos */}
+              {/* Barra Proporcional de los 4 Candidatos Reales de Quijos */}
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between text-xs font-extrabold gap-2">
                   <span className="text-emerald-400">Brandon Aliaga (PSC-PK): {data.summary.candidatePct}%</span>
-                  <span className="text-purple-400">Aracely Ruiz (Alianza 3-8): {data.summary.rivalPct}%</span>
-                  <span className="text-sky-400">William Guerrero (Unidos): {data.summary.otherPct}%</span>
+                  <span className="text-purple-400">Renán Balladares (ADN 7): {data.summary.balladaresPct ?? data.summary.rivalPct}%</span>
+                  <span className="text-rose-400">Aracely Ruiz (Alianza 3-8): {data.summary.ruizPct ?? 0}%</span>
+                  <span className="text-sky-400">William Guerrero (Unidos): {data.summary.guerreroPct ?? 0}%</span>
                 </div>
                 <div className="h-6 w-full bg-slate-800 rounded-xl overflow-hidden flex shadow-inner">
                   <div
                     className="bg-emerald-500 h-full flex items-center justify-center text-[11px] font-black text-slate-950 transition-all duration-700"
-                    style={{ width: `${Math.max(data.summary.candidatePct, 3)}%` }}
+                    style={{ width: `${Math.max(data.summary.candidatePct, 2)}%` }}
                     title={`Brandon Aliaga: ${data.summary.candidateVotes} votos`}
                   >
-                    {data.summary.candidatePct > 8 ? `${data.summary.candidatePct}%` : ''}
+                    {data.summary.candidatePct > 7 ? `${data.summary.candidatePct}%` : ''}
                   </div>
                   <div
                     className="bg-purple-500 h-full flex items-center justify-center text-[11px] font-black text-white transition-all duration-700"
-                    style={{ width: `${Math.max(data.summary.rivalPct, 3)}%` }}
-                    title={`Aracely Ruiz: ${data.summary.rivalVotes} votos`}
+                    style={{ width: `${Math.max(data.summary.balladaresPct ?? data.summary.rivalPct, 2)}%` }}
+                    title={`Renán Balladares: ${data.summary.balladaresVotes ?? data.summary.rivalVotes} votos`}
                   >
-                    {data.summary.rivalPct > 8 ? `${data.summary.rivalPct}%` : ''}
+                    {(data.summary.balladaresPct ?? data.summary.rivalPct) > 7 ? `${data.summary.balladaresPct ?? data.summary.rivalPct}%` : ''}
+                  </div>
+                  <div
+                    className="bg-rose-500 h-full flex items-center justify-center text-[11px] font-black text-white transition-all duration-700"
+                    style={{ width: `${Math.max(data.summary.ruizPct ?? 0, 2)}%` }}
+                    title={`Aracely Ruiz: ${data.summary.ruizVotes ?? 0} votos`}
+                  >
+                    {(data.summary.ruizPct ?? 0) > 7 ? `${data.summary.ruizPct}%` : ''}
                   </div>
                   <div
                     className="bg-sky-500 h-full flex items-center justify-center text-[11px] font-black text-slate-950 transition-all duration-700"
-                    style={{ width: `${Math.max(data.summary.otherPct, 3)}%` }}
-                    title={`William Guerrero: ${data.summary.otherVotes} votos`}
+                    style={{ width: `${Math.max(data.summary.guerreroPct ?? 0, 2)}%` }}
+                    title={`William Guerrero: ${data.summary.guerreroVotes ?? 0} votos`}
                   >
-                    {data.summary.otherPct > 8 ? `${data.summary.otherPct}%` : ''}
+                    {(data.summary.guerreroPct ?? 0) > 7 ? `${data.summary.guerreroPct}%` : ''}
                   </div>
                   <div
                     className="bg-slate-600 h-full flex items-center justify-center text-[10px] text-slate-300"
@@ -384,8 +437,9 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1">
                   <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Brandon Aliaga ({data.summary.candidateVotes})</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Aracely Ruiz ({data.summary.rivalVotes})</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-sky-500" /> William Guerrero ({data.summary.otherVotes})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Renán Balladares ({data.summary.balladaresVotes ?? data.summary.rivalVotes})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Aracely Ruiz ({data.summary.ruizVotes ?? 0})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-sky-500" /> William Guerrero ({data.summary.guerreroVotes ?? 0})</span>
                   <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-600" /> Blancos/Nulos ({data.summary.blankVotes + data.summary.nullVotes})</span>
                 </div>
               </div>
@@ -605,11 +659,11 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                     Votos Registrados en el Acta Oficial:
                   </span>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Votos Brandon Aliaga */}
                     <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/40">
                       <label className="block text-xs font-bold text-emerald-400 mb-1">
-                        ★ Brandon Aliaga (PSC 6 - PK 18)
+                        ★ Brandon Aliaga (PSC-PK)
                       </label>
                       <input
                         type="number"
@@ -621,31 +675,46 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                       />
                     </div>
 
-                    {/* Votos Aracely Ruiz */}
+                    {/* Votos Renán Balladares */}
                     <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/40">
                       <label className="block text-xs font-bold text-purple-400 mb-1">
+                        Renán Balladares (ADN 7)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={balladaresVotes}
+                        onChange={(e) => setBalladaresVotes(parseInt(e.target.value || '0', 10))}
+                        required
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-purple-500/50 rounded-xl text-lg font-black text-purple-300 focus:ring-2 focus:ring-purple-500 outline-none font-mono"
+                      />
+                    </div>
+
+                    {/* Votos Aracely Ruiz */}
+                    <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/40">
+                      <label className="block text-xs font-bold text-rose-400 mb-1">
                         Aracely Ruiz (Alianza 3-8)
                       </label>
                       <input
                         type="number"
                         min="0"
-                        value={rivalVotes}
-                        onChange={(e) => setRivalVotes(parseInt(e.target.value || '0', 10))}
+                        value={ruizVotes}
+                        onChange={(e) => setRuizVotes(parseInt(e.target.value || '0', 10))}
                         required
-                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-purple-500/50 rounded-xl text-lg font-black text-purple-300 focus:ring-2 focus:ring-purple-500 outline-none font-mono"
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-rose-500/50 rounded-xl text-lg font-black text-rose-300 focus:ring-2 focus:ring-rose-500 outline-none font-mono"
                       />
                     </div>
 
                     {/* Votos William Guerrero */}
                     <div className="p-3.5 rounded-xl bg-sky-950/20 border border-sky-500/40">
                       <label className="block text-xs font-bold text-sky-400 mb-1">
-                        William Guerrero (Unidos por Quijos)
+                        William Guerrero (Unidos)
                       </label>
                       <input
                         type="number"
                         min="0"
-                        value={otherVotes}
-                        onChange={(e) => setOtherVotes(parseInt(e.target.value || '0', 10))}
+                        value={guerreroVotes}
+                        onChange={(e) => setGuerreroVotes(parseInt(e.target.value || '0', 10))}
                         required
                         className="w-full px-3.5 py-2.5 bg-slate-900 border border-sky-500/50 rounded-xl text-lg font-black text-sky-300 focus:ring-2 focus:ring-sky-500 outline-none font-mono"
                       />

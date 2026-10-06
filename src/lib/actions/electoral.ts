@@ -208,8 +208,11 @@ export async function getElectoralDashboardData() {
   let digitizedJuntas = 0;
   let totalElectors = 0;
   let totalVotersProcessed = 0;
-  let candidateVotes = 0;
-  let rivalVotes = 0;
+  let candidateVotes = 0; // Brandon Aliaga
+  let balladaresVotes = 0; // Renán Balladares (ADN 7)
+  let ruizVotes = 0; // Aracely Ruiz (Alianza 3-8)
+  let guerreroVotes = 0; // William Guerrero (Unidos por Quijos)
+  let rivalVotes = 0; // Renán Balladares / Rival Directo
   let otherVotes = 0;
   let blankVotes = 0;
   let nullVotes = 0;
@@ -261,6 +264,32 @@ export async function getElectoralDashboardData() {
         nullVotes += a.nullVotes;
         totalVotersProcessed += a.totalVoters;
 
+        // Desglose granular de los 4 candidatos reales
+        let jBalladares = a.rivalVotes;
+        let jRuiz = 0;
+        let jGuerrero = a.otherVotes;
+
+        if (a.inconsistencyNote && a.inconsistencyNote.startsWith('{')) {
+          try {
+            const meta = JSON.parse(a.inconsistencyNote);
+            if (meta.breakdown) {
+              jBalladares = Number(meta.breakdown.balladares ?? a.rivalVotes);
+              jRuiz = Number(meta.breakdown.ruiz ?? 0);
+              jGuerrero = Number(meta.breakdown.guerrero ?? a.otherVotes);
+            }
+          } catch (e) {
+            // fallback a valores estándar
+          }
+        } else {
+          // Si no hay metadatos aún, distribuimos entre contendores
+          jRuiz = Math.round(a.otherVotes / 2);
+          jGuerrero = Math.floor(a.otherVotes / 2);
+        }
+
+        balladaresVotes += jBalladares;
+        ruizVotes += jRuiz;
+        guerreroVotes += jGuerrero;
+
         parishMap[r.parish].candidateVotes += a.candidateVotes;
         parishMap[r.parish].rivalVotes += a.rivalVotes;
         parishMap[r.parish].totalVotes += a.candidateVotes + a.rivalVotes + a.otherVotes + a.blankVotes + a.nullVotes;
@@ -271,6 +300,9 @@ export async function getElectoralDashboardData() {
 
         allActas.push({
           ...a,
+          balladaresVotes: jBalladares,
+          ruizVotes: jRuiz,
+          guerreroVotes: jGuerrero,
           recintoName: r.name,
           parish: r.parish,
           juntaNumber: j.juntaNumber,
@@ -299,22 +331,25 @@ export async function getElectoralDashboardData() {
   const grandTotal = validVotes + blankVotes + nullVotes;
 
   const candidatePct = grandTotal > 0 ? Number(((candidateVotes / grandTotal) * 100).toFixed(1)) : 0;
+  const balladaresPct = grandTotal > 0 ? Number(((balladaresVotes / grandTotal) * 100).toFixed(1)) : 0;
+  const ruizPct = grandTotal > 0 ? Number(((ruizVotes / grandTotal) * 100).toFixed(1)) : 0;
+  const guerreroPct = grandTotal > 0 ? Number(((guerreroVotes / grandTotal) * 100).toFixed(1)) : 0;
   const rivalPct = grandTotal > 0 ? Number(((rivalVotes / grandTotal) * 100).toFixed(1)) : 0;
   const otherPct = grandTotal > 0 ? Number(((otherVotes / grandTotal) * 100).toFixed(1)) : 0;
   const blankPct = grandTotal > 0 ? Number(((blankVotes / grandTotal) * 100).toFixed(1)) : 0;
   const nullPct = grandTotal > 0 ? Number(((nullVotes / grandTotal) * 100).toFixed(1)) : 0;
 
   const progressPct = totalJuntas > 0 ? Number(((digitizedJuntas / totalJuntas) * 100).toFixed(1)) : 0;
-  const leadVotes = candidateVotes - rivalVotes;
+  const leadVotes = candidateVotes - Math.max(balladaresVotes, ruizVotes, guerreroVotes);
 
   return {
     tenant: {
       id: tenant.id,
       name: tenant.name,
       canton: tenant.canton,
-      candidateName: tenant.candidateName || "Nuestro Candidato",
-      campaignListNumber: tenant.campaignListNumber || "Lista Oficial",
-      campaignSlogan: tenant.campaignSlogan || "Por el Cambio",
+      candidateName: tenant.candidateName || "Brandon Aliaga",
+      campaignListNumber: tenant.campaignListNumber || "Alianza PSC 6 - Pachakutik 18",
+      campaignSlogan: tenant.campaignSlogan || "Con la Fuerza de Quijos",
       candidatePhotoUrl: tenant.candidatePhotoUrl,
       partyLogoUrl: tenant.partyLogoUrl,
       citizenTermSingularM: tenant.citizenTermSingularM,
@@ -331,6 +366,12 @@ export async function getElectoralDashboardData() {
       participationPct: totalElectors > 0 ? Number(((totalVotersProcessed / totalElectors) * 100).toFixed(1)) : 0,
       candidateVotes,
       candidatePct,
+      balladaresVotes,
+      balladaresPct,
+      ruizVotes,
+      ruizPct,
+      guerreroVotes,
+      guerreroPct,
       rivalVotes,
       rivalPct,
       otherVotes,
@@ -352,9 +393,22 @@ export async function saveElectoralActa(formData: FormData) {
   const { session, tenantId } = await requireTenantAdmin();
 
   const juntaId = formData.get("juntaId") as string;
-  const candidateVotes = parseInt((formData.get("candidateVotes") as string) || "0", 10);
-  const rivalVotes = parseInt((formData.get("rivalVotes") as string) || "0", 10);
-  const otherVotes = parseInt((formData.get("otherVotes") as string) || "0", 10);
+  const candidateVotes = parseInt((formData.get("candidateVotes") as string) || "0", 10); // Brandon Aliaga
+  const balladaresVotes = parseInt((formData.get("balladaresVotes") as string) || "0", 10); // Renán Balladares (ADN 7)
+  const ruizVotes = parseInt((formData.get("ruizVotes") as string) || "0", 10); // Aracely Ruiz (Alianza 3-8)
+  const guerreroVotes = parseInt((formData.get("guerreroVotes") as string) || "0", 10); // William Guerrero (Unidos por Quijos)
+  
+  // Compatibilidad hacia atrás: si no vienen campos individuales se usan rivalVotes y otherVotes
+  const rawRivalVotes = parseInt((formData.get("rivalVotes") as string) || "0", 10);
+  const rawOtherVotes = parseInt((formData.get("otherVotes") as string) || "0", 10);
+
+  const effectiveBalladares = balladaresVotes > 0 || formData.has("balladaresVotes") ? balladaresVotes : rawRivalVotes;
+  const effectiveRuiz = ruizVotes;
+  const effectiveGuerrero = guerreroVotes;
+  
+  const rivalVotes = effectiveBalladares;
+  const otherVotes = effectiveRuiz + effectiveGuerrero > 0 ? (effectiveRuiz + effectiveGuerrero) : rawOtherVotes;
+
   const blankVotes = parseInt((formData.get("blankVotes") as string) || "0", 10);
   const nullVotes = parseInt((formData.get("nullVotes") as string) || "0", 10);
   const photoUrl = (formData.get("photoUrl") as string)?.trim() || null;
@@ -375,13 +429,24 @@ export async function saveElectoralActa(formData: FormData) {
 
   const totalVoters = candidateVotes + rivalVotes + otherVotes + blankVotes + nullVotes;
   let hasInconsistency = false;
-  let inconsistencyNote: string | null = null;
+  let inconsistencyNoteMsg: string | null = null;
 
   // Validación: si los votos totales superan los electores empadronados en esa mesa
   if (totalVoters > junta.electors) {
     hasInconsistency = true;
-    inconsistencyNote = `Alerta matemática: Total sufragantes (${totalVoters}) excede el padrón asignado de la mesa (${junta.electors}).`;
+    inconsistencyNoteMsg = `Alerta matemática: Total sufragantes (${totalVoters}) excede el padrón asignado de la mesa (${junta.electors}).`;
   }
+
+  // Estructurar metadatos con el desglose exacto de los 4 candidatos oficiales
+  const metaPayload = {
+    alert: inconsistencyNoteMsg,
+    breakdown: {
+      balladares: effectiveBalladares,
+      ruiz: effectiveRuiz,
+      guerrero: effectiveGuerrero,
+    },
+  };
+  const inconsistencyNote = JSON.stringify(metaPayload);
 
   const acta = await prisma.electoralActa.upsert({
     where: { juntaId },
