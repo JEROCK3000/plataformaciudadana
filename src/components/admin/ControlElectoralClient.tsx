@@ -289,26 +289,35 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
 
               <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
                 <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                  {data.tenant.candidateName}
+                  Brandon Aliaga
                 </span>
                 <div className="flex items-baseline gap-2 mt-1">
                   <span className="text-2xl sm:text-3xl font-black text-emerald-400">{data.summary.candidateVotes}</span>
                   <span className="text-xs font-extrabold text-emerald-300">({data.summary.candidatePct}%)</span>
                 </div>
-                <span className="text-[11px] text-slate-400 block mt-1">{data.tenant.campaignListNumber}</span>
+                <span className="text-[11px] text-slate-400 block mt-1">Alianza PSC 6 - Pachakutik 18</span>
               </div>
 
               <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-rose-400 uppercase tracking-wider block">Principal Oposición</span>
+                <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">Aracely Ruiz</span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl sm:text-3xl font-black text-rose-400">{data.summary.rivalVotes}</span>
-                  <span className="text-xs font-extrabold text-rose-300">({data.summary.rivalPct}%)</span>
+                  <span className="text-2xl sm:text-3xl font-black text-purple-400">{data.summary.rivalVotes}</span>
+                  <span className="text-xs font-extrabold text-purple-300">({data.summary.rivalPct}%)</span>
                 </div>
-                <span className="text-[11px] text-slate-400 block mt-1">Suma de contendor rival</span>
+                <span className="text-[11px] text-slate-400 block mt-1">Alianza 3-8 / Sociedad Patriótica</span>
               </div>
 
               <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Diferencia / Margen</span>
+                <span className="text-[11px] font-bold text-sky-400 uppercase tracking-wider block">William Guerrero</span>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl sm:text-3xl font-black text-sky-400">{data.summary.otherVotes}</span>
+                  <span className="text-xs font-extrabold text-sky-300">({data.summary.otherPct}%)</span>
+                </div>
+                <span className="text-[11px] text-slate-400 block mt-1">Alianza Unidos por Quijos</span>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Margen de Ventaja</span>
                 <div className="flex items-baseline gap-2 mt-1">
                   <span className={`text-2xl sm:text-3xl font-black ${data.summary.leadVotes >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                     {data.summary.leadVotes > 0 ? `+${data.summary.leadVotes}` : data.summary.leadVotes}
@@ -338,32 +347,35 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                 </span>
               </div>
 
-              {/* Barra Proporcional */}
+              {/* Barra Proporcional de los 3 Candidatos Reales de Quijos */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs font-extrabold">
-                  <span className="text-emerald-400">{data.tenant.candidateName}: {data.summary.candidatePct}%</span>
-                  <span className="text-rose-400">Rival Principal: {data.summary.rivalPct}%</span>
+                <div className="flex flex-wrap items-center justify-between text-xs font-extrabold gap-2">
+                  <span className="text-emerald-400">Brandon Aliaga (PSC-PK): {data.summary.candidatePct}%</span>
+                  <span className="text-purple-400">Aracely Ruiz (Alianza 3-8): {data.summary.rivalPct}%</span>
+                  <span className="text-sky-400">William Guerrero (Unidos): {data.summary.otherPct}%</span>
                 </div>
                 <div className="h-6 w-full bg-slate-800 rounded-xl overflow-hidden flex shadow-inner">
                   <div
                     className="bg-emerald-500 h-full flex items-center justify-center text-[11px] font-black text-slate-950 transition-all duration-700"
                     style={{ width: `${Math.max(data.summary.candidatePct, 3)}%` }}
-                    title={`Candidato: ${data.summary.candidateVotes} votos`}
+                    title={`Brandon Aliaga: ${data.summary.candidateVotes} votos`}
                   >
-                    {data.summary.candidatePct > 10 ? `${data.summary.candidatePct}%` : ''}
+                    {data.summary.candidatePct > 8 ? `${data.summary.candidatePct}%` : ''}
                   </div>
                   <div
-                    className="bg-rose-500 h-full flex items-center justify-center text-[11px] font-black text-white transition-all duration-700"
+                    className="bg-purple-500 h-full flex items-center justify-center text-[11px] font-black text-white transition-all duration-700"
                     style={{ width: `${Math.max(data.summary.rivalPct, 3)}%` }}
-                    title={`Rival: ${data.summary.rivalVotes} votos`}
+                    title={`Aracely Ruiz: ${data.summary.rivalVotes} votos`}
                   >
-                    {data.summary.rivalPct > 10 ? `${data.summary.rivalPct}%` : ''}
+                    {data.summary.rivalPct > 8 ? `${data.summary.rivalPct}%` : ''}
                   </div>
                   <div
-                    className="bg-amber-500 h-full flex items-center justify-center text-[11px] font-black text-slate-950 transition-all duration-700"
-                    style={{ width: `${Math.max(data.summary.otherPct, 2)}%` }}
-                    title={`Otros: ${data.summary.otherVotes} votos`}
-                  />
+                    className="bg-sky-500 h-full flex items-center justify-center text-[11px] font-black text-slate-950 transition-all duration-700"
+                    style={{ width: `${Math.max(data.summary.otherPct, 3)}%` }}
+                    title={`William Guerrero: ${data.summary.otherVotes} votos`}
+                  >
+                    {data.summary.otherPct > 8 ? `${data.summary.otherPct}%` : ''}
+                  </div>
                   <div
                     className="bg-slate-600 h-full flex items-center justify-center text-[10px] text-slate-300"
                     style={{ width: `${Math.max(data.summary.blankPct + data.summary.nullPct, 2)}%` }}
@@ -371,9 +383,9 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> {data.tenant.candidateName}</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Rival Principal</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Otros ({data.summary.otherVotes})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Brandon Aliaga ({data.summary.candidateVotes})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Aracely Ruiz ({data.summary.rivalVotes})</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-sky-500" /> William Guerrero ({data.summary.otherVotes})</span>
                   <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-600" /> Blancos/Nulos ({data.summary.blankVotes + data.summary.nullVotes})</span>
                 </div>
               </div>
@@ -593,11 +605,11 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                     Votos Registrados en el Acta Oficial:
                   </span>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Votos Candidato */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Votos Brandon Aliaga */}
                     <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/40">
                       <label className="block text-xs font-bold text-emerald-400 mb-1">
-                        ★ {data.tenant.candidateName} ({data.tenant.campaignListNumber})
+                        ★ Brandon Aliaga (PSC 6 - PK 18)
                       </label>
                       <input
                         type="number"
@@ -609,10 +621,10 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                       />
                     </div>
 
-                    {/* Votos Rival */}
-                    <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/40">
-                      <label className="block text-xs font-bold text-rose-400 mb-1">
-                        Principal Rival / Contendor
+                    {/* Votos Aracely Ruiz */}
+                    <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/40">
+                      <label className="block text-xs font-bold text-purple-400 mb-1">
+                        Aracely Ruiz (Alianza 3-8)
                       </label>
                       <input
                         type="number"
@@ -620,24 +632,29 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                         value={rivalVotes}
                         onChange={(e) => setRivalVotes(parseInt(e.target.value || '0', 10))}
                         required
-                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-rose-500/50 rounded-xl text-lg font-black text-rose-300 focus:ring-2 focus:ring-rose-500 outline-none font-mono"
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-purple-500/50 rounded-xl text-lg font-black text-purple-300 focus:ring-2 focus:ring-purple-500 outline-none font-mono"
                       />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-400 mb-1">Otros Candidatos</label>
+                    {/* Votos William Guerrero */}
+                    <div className="p-3.5 rounded-xl bg-sky-950/20 border border-sky-500/40">
+                      <label className="block text-xs font-bold text-sky-400 mb-1">
+                        William Guerrero (Unidos por Quijos)
+                      </label>
                       <input
                         type="number"
                         min="0"
                         value={otherVotes}
                         onChange={(e) => setOtherVotes(parseInt(e.target.value || '0', 10))}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-sm font-bold text-slate-200 outline-none font-mono"
+                        required
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-sky-500/50 rounded-xl text-lg font-black text-sky-300 focus:ring-2 focus:ring-sky-500 outline-none font-mono"
                       />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-400 mb-1">Votos Blancos</label>
+                      <label className="block text-[11px] font-semibold text-slate-400 mb-1">Votos en Blanco</label>
                       <input
                         type="number"
                         min="0"
