@@ -39,6 +39,9 @@ model Tenant {
 
   users          User[]
   reports        Report[]
+  recintos       ElectoralRecinto[]
+  juntas         ElectoralJunta[]
+  actas          ElectoralActa[]
 }
 
 // Usuarios Administradores de la Plataforma
@@ -180,3 +183,98 @@ model SystemSettings {
   aiPromptMaster String   @db.LongText
   updatedAt      DateTime @updatedAt
 }
+
+// ============================================================
+// MÓDULO DE CONTROL ELECTORAL Y DÍA D (E-DAY WAR MACHINE)
+// ============================================================
+
+enum JuntaGender {
+  MASCULINO
+  FEMENINO
+  MIXTO
+}
+
+enum DelegateStatus {
+  PENDIENTE
+  CONFIRMADO
+  EN_MESA
+  AUSENTE
+}
+
+enum ActaStatus {
+  PENDIENTE
+  DIGITADA
+  VERIFICADA
+  IMPUGNADA
+}
+
+model ElectoralRecinto {
+  id              String           @id @default(uuid())
+  tenantId        String
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  name            String           // Ej: "Unidad Educativa Baeza"
+  parish          String           // Ej: "Baeza", "San Francisco de Borja", etc.
+  address         String?          // Ej: "Av. de los Quijos y 12 de Febrero"
+  electors        Int              @default(0) // Total empadronados en el recinto
+  coordinatorName String?          // Coordinador de recinto
+  coordinatorPhone String?         // Teléfono / WhatsApp del coordinador
+
+  juntas          ElectoralJunta[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([tenantId, parish])
+}
+
+model ElectoralJunta {
+  id              String           @id @default(uuid())
+  tenantId        String
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  recintoId       String
+  recinto         ElectoralRecinto @relation(fields: [recintoId], references: [id], onDelete: Cascade)
+
+  juntaNumber     Int              // Número de Junta: 1, 2, 3...
+  gender          JuntaGender      @default(MASCULINO)
+  electors        Int              @default(350) // Número de electores empadronados
+
+  delegateName    String?          // Nombre del delegado / veedor de mesa
+  delegatePhone   String?          // Teléfono / WhatsApp
+  delegateStatus  DelegateStatus   @default(PENDIENTE)
+
+  acta            ElectoralActa?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([recintoId, juntaNumber, gender])
+  @@index([tenantId])
+}
+
+model ElectoralActa {
+  id               String          @id @default(uuid())
+  tenantId         String
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  juntaId          String          @unique
+  junta            ElectoralJunta  @relation(fields: [juntaId], references: [id], onDelete: Cascade)
+
+  candidateVotes   Int             @default(0)
+  rivalVotes       Int             @default(0)
+  otherVotes       Int             @default(0)
+  blankVotes       Int             @default(0)
+  nullVotes        Int             @default(0)
+  totalVoters      Int             @default(0)
+
+  photoUrl         String?         @db.LongText
+  status           ActaStatus      @default(DIGITADA)
+  hasInconsistency Boolean         @default(false)
+  inconsistencyNote String?        @db.Text
+  digitizedBy      String?
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([tenantId, status])
+}
+

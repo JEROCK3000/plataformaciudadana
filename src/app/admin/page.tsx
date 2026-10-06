@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, QrCode } from 'lucide-react';
+import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, QrCode, Vote } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '@/lib/actions/auth';
 import { requireTenantAdmin } from '@/lib/auth/session';
@@ -44,6 +44,17 @@ export default async function AdminDashboard() {
               </Link>
 
               {/* MÓDULOS DE INTELIGENCIA ELECTORAL / MODO CAMPAÑA */}
+              <Link 
+                href="/admin/control-electoral" 
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm ${
+                  tenant?.campaignMode 
+                    ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/40' 
+                    : 'text-red-400 hover:text-red-300 hover:bg-gray-800'
+                }`}
+                title="Control Electoral Día D & Conteo Rápido de Actas"
+              >
+                <Vote size={16} className="text-red-400" /> Día D
+              </Link>
               <Link 
                 href="/admin/war-room" 
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm ${
@@ -113,6 +124,12 @@ export default async function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-2.5 self-start sm:self-center">
+              <Link 
+                href="/admin/control-electoral" 
+                className="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+              >
+                <Vote size={15} /> Control Electoral
+              </Link>
               <Link 
                 href="/admin/war-room" 
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"

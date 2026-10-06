@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Clock,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Vote
 } from 'lucide-react';
 
 interface ReportItem {
@@ -194,6 +195,14 @@ export default function WarRoomClient({ tenant, reports }: WarRoomProps) {
             </div>
 
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
+              <Link 
+                href="/admin/control-electoral" 
+                className="flex-1 sm:flex-none justify-center px-3.5 py-2 rounded-xl bg-red-600/90 hover:bg-red-500 text-white text-xs font-bold shadow-md shadow-red-500/20 transition-all flex items-center gap-1.5"
+                title="Conteo Rápido y Control de Actas Día D"
+              >
+                <Vote size={14} />
+                <span>Control Electoral</span>
+              </Link>
               <Link 
                 href="/admin/qr-codes" 
                 className="flex-1 sm:flex-none justify-center px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors flex items-center gap-1.5"
