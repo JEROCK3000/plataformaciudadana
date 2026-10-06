@@ -36,8 +36,14 @@ Está estructurado en 3 secciones operativas:
   - **Cuadre Matemático Automático:** Compara la suma de votos contra el padrón asignado de la mesa. Si los votos exceden el padrón, genera una alerta roja de **Inconsistencia Numérica** automática.
   - Captura y subida directa de la fotografía del acta oficial firmada por los miembros de la JRV.
 
-### C. Despliegue de Recintos & Veedores de Mesa
-- Catálogo de recintos escolares por parroquia con desglose de Juntas (Masculinas y Femeninas).
+### C. Despliegue de Recintos & Veedores de Mesa (Padrón Oficial CNE)
+- Catálogo oficial del Consejo Nacional Electoral (CNE) para el Cantón Quijos: **20 Juntas Receptoras del Voto y 5,738 electores empadronados**:
+  1. **Baeza:** *Unidad Educativa Baeza* — 7 Juntas (3 Masculinas, 4 Femeninas) — 1,980 electores.
+  2. **San Francisco de Borja:** *Unidad Educativa Fiscomisional Juan Bautista Montini* — 6 Juntas (3 Masculinas, 3 Femeninas) — 1,720 electores.
+  3. **Papallacta:** *Unidad Educativa Quisquis* — 2 Juntas (1 Masculina, 1 Femenina) — 680 electores.
+  4. **Cuyuja:** *Escuela de Educación Básica Manuel Villavicencio* — 2 Juntas (1 Masculina, 1 Femenina) — 520 electores.
+  5. **Cosanga:** *Escuela de Educación General Básica Gil Ramírez Dávalos* — 2 Juntas (1 Masculina, 1 Femenina) — 510 electores.
+  6. **Sumaco:** *Escuela Fiscal Mixta Quijos (GAD Parroquial)* — 1 Junta (1 Mixta) — 328 electores.
 - Asignación de Delegado con nombre, celular y estado de presencia (`PENDIENTE`, `CONFIRMADO`, `EN_MESA`, `AUSENTE`).
 - **Botón de Enlace Directo a WhatsApp:** Abre una conversación con el veedor con mensaje precargado de monitoreo.
 

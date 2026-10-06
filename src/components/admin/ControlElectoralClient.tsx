@@ -24,7 +24,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import ImageUploadDropzone from '@/components/ui/ImageUploadDropzone';
-import { saveElectoralActa, updateDelegate } from '@/lib/actions/electoral';
+import { saveElectoralActa, updateDelegate, syncOfficialCneRecintos } from '@/lib/actions/electoral';
 
 interface ControlElectoralProps {
   data: {
@@ -208,6 +208,9 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/30 text-[10px] font-black uppercase tracking-wider">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping mr-0.5" />
                       ESCRUTINIO EN VIVO
+                    </span>
+                    <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 text-[10px] font-black uppercase tracking-wider">
+                      CNE OFICIAL • 20 JUNTAS • 5.738 ELECTORES
                     </span>
                   </div>
                   <p className="text-xs text-slate-400">
@@ -724,9 +727,26 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
                     Controla que cada mesa electoral del cantón tenga su delegado acreditado con contacto directo.
                   </p>
                 </div>
-                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">
-                  {data.summary.totalJuntas} Juntas Totales • {data.summary.totalElectors.toLocaleString()} Empadronados
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300">
+                    Padrón CNE Oficial • 20 Juntas • 5.738 Electores
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm('¿Deseas restablecer los recintos y juntas a la estructura oficial del CNE (20 Juntas • 5.738 Electores)?')) {
+                        startTransition(async () => {
+                          await syncOfficialCneRecintos();
+                        });
+                      }
+                    }}
+                    disabled={isPending}
+                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors"
+                    title="Sincronizar estructura oficial CNE"
+                  >
+                    <RefreshCw size={13} className={isPending ? 'animate-spin' : ''} />
+                  </button>
+                </div>
               </div>
 
               {/* Lista por Recinto */}

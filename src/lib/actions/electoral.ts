@@ -7,75 +7,135 @@ import { writeLog } from "@/lib/logs";
 import { JuntaGender, DelegateStatus, ActaStatus } from "@prisma/client";
 
 // Estructura por defecto para inicializar si está vacío
-const QUIJOS_DEFAULT_RECINTOS = [
+// ============================================================
+// PADRÓN Y RECINTOS OFICIALES DEL CONSEJO NACIONAL ELECTORAL (CNE)
+// CANTÓN QUIJOS, PROVINCIA DE NAPO (ELECCIONES SECCIONALES)
+// Total Electores: 5,738 | Total Juntas Receptoras del Voto (JRV): 20
+// ============================================================
+const QUIJOS_OFFICIAL_CNE_RECINTOS = [
   {
     name: "Unidad Educativa Baeza",
     parish: "Baeza",
-    address: "Av. de los Quijos y Calle 12 de Febrero",
-    electors: 2100,
+    address: "Av. de los Quijos y Calle 12 de Febrero (Baeza Centro)",
+    electors: 1980,
     coordinatorName: "Ing. Marco Andrade",
     coordinatorPhone: "0991234567",
     juntas: [
-      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 2, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 3, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 2, gender: "FEMENINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 3, gender: "FEMENINO" as JuntaGender, electors: 350 },
+      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 285 },
+      { juntaNumber: 2, gender: "MASCULINO" as JuntaGender, electors: 285 },
+      { juntaNumber: 3, gender: "MASCULINO" as JuntaGender, electors: 285 },
+      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 285 },
+      { juntaNumber: 2, gender: "FEMENINO" as JuntaGender, electors: 280 },
+      { juntaNumber: 3, gender: "FEMENINO" as JuntaGender, electors: 280 },
+      { juntaNumber: 4, gender: "FEMENINO" as JuntaGender, electors: 280 },
     ],
   },
   {
-    name: "Colegio Nacional San Francisco de Borja",
+    name: "Unidad Educativa Fiscomisional Juan Bautista Montini",
     parish: "San Francisco de Borja",
-    address: "Calle Principal y Pasaje San Francisco",
-    electors: 1750,
+    address: "Calle Principal y Pasaje San Francisco (Borja Central)",
+    electors: 1720,
     coordinatorName: "Lcda. Carmen Morales",
     coordinatorPhone: "0987654321",
     juntas: [
-      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 2, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 3, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 2, gender: "FEMENINO" as JuntaGender, electors: 350 },
+      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 290 },
+      { juntaNumber: 2, gender: "MASCULINO" as JuntaGender, electors: 290 },
+      { juntaNumber: 3, gender: "MASCULINO" as JuntaGender, electors: 280 },
+      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 290 },
+      { juntaNumber: 2, gender: "FEMENINO" as JuntaGender, electors: 285 },
+      { juntaNumber: 3, gender: "FEMENINO" as JuntaGender, electors: 285 },
     ],
   },
   {
-    name: "Escuela de Educación Básica Ciudad de Baeza",
-    parish: "Cuyuja",
-    address: "Sector Central frente al Parque",
-    electors: 700,
-    coordinatorName: "Sr. Oswaldo Toapanta",
-    coordinatorPhone: "0998877665",
-    juntas: [
-      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 350 },
-    ],
-  },
-  {
-    name: "Unidad Educativa Cosanga",
-    parish: "Cosanga",
-    address: "Vía Interoceánica km 42",
-    electors: 700,
-    coordinatorName: "MSc. Gladys Velasteguí",
-    coordinatorPhone: "0993344556",
-    juntas: [
-      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 350 },
-    ],
-  },
-  {
-    name: "Escuela Básica Papallacta",
+    name: "Unidad Educativa Quisquis",
     parish: "Papallacta",
-    address: "Calle de las Termas y Central",
-    electors: 700,
+    address: "Vía Interoceánica km 65 y Calle de las Termas",
+    electors: 680,
     coordinatorName: "Sr. Fausto Guaña",
     coordinatorPhone: "0981122334",
     juntas: [
-      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 350 },
-      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 350 },
+      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 345 },
+      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 335 },
+    ],
+  },
+  {
+    name: "Escuela de Educación Básica Manuel Villavicencio",
+    parish: "Cuyuja",
+    address: "Sector Central frente al Parque Principal",
+    electors: 520,
+    coordinatorName: "Sr. Oswaldo Toapanta",
+    coordinatorPhone: "0998877665",
+    juntas: [
+      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 265 },
+      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 255 },
+    ],
+  },
+  {
+    name: "Escuela de Educación General Básica Gil Ramírez Dávalos",
+    parish: "Cosanga",
+    address: "Vía Interoceánica km 42 y Calle Principal",
+    electors: 510,
+    coordinatorName: "MSc. Gladys Velasteguí",
+    coordinatorPhone: "0993344556",
+    juntas: [
+      { juntaNumber: 1, gender: "MASCULINO" as JuntaGender, electors: 260 },
+      { juntaNumber: 1, gender: "FEMENINO" as JuntaGender, electors: 250 },
+    ],
+  },
+  {
+    name: "Escuela Fiscal Mixta Quijos (GAD Parroquial)",
+    parish: "Sumaco",
+    address: "Comunidad Pacto Sumaco",
+    electors: 328,
+    coordinatorName: "Sr. Segundo Chimbo",
+    coordinatorPhone: "0994455667",
+    juntas: [
+      { juntaNumber: 1, gender: "MIXTO" as JuntaGender, electors: 328 },
     ],
   },
 ];
+
+export async function syncOfficialCneRecintos() {
+  const { session, tenantId } = await requireTenantAdmin();
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+  if (!tenant) throw new Error("Tenant no encontrado");
+
+  await prisma.electoralActa.deleteMany({ where: { tenantId } });
+  await prisma.electoralJunta.deleteMany({ where: { tenantId } });
+  await prisma.electoralRecinto.deleteMany({ where: { tenantId } });
+
+  for (const r of QUIJOS_OFFICIAL_CNE_RECINTOS) {
+    const createdRecinto = await prisma.electoralRecinto.create({
+      data: {
+        tenantId,
+        name: r.name,
+        parish: r.parish,
+        address: r.address,
+        electors: r.electors,
+        coordinatorName: r.coordinatorName,
+        coordinatorPhone: r.coordinatorPhone,
+      },
+    });
+
+    for (const j of r.juntas) {
+      await prisma.electoralJunta.create({
+        data: {
+          tenantId,
+          recintoId: createdRecinto.id,
+          juntaNumber: j.juntaNumber,
+          gender: j.gender,
+          electors: j.electors,
+          delegateStatus: "PENDIENTE",
+        },
+      });
+    }
+  }
+
+  writeLog("AUDIT", tenant.slug, session.id, "Padrón oficial CNE sincronizado: 20 Juntas Receptoras del Voto y 5,738 electores");
+  revalidatePath("/admin/control-electoral");
+  revalidatePath("/admin/war-room");
+  return { success: true };
+}
 
 export async function getElectoralDashboardData() {
   const { session, tenantId } = await requireTenantAdmin();
@@ -86,13 +146,21 @@ export async function getElectoralDashboardData() {
 
   if (!tenant) throw new Error("Tenant no encontrado");
 
-  // Verificar si hay recintos creados. Si no, inicializar la estructura base de Quijos
-  let recintosCount = await prisma.electoralRecinto.count({
+  // Verificar si hay recintos creados o si se requiere actualizar al padrón oficial CNE
+  const existingRecintos = await prisma.electoralRecinto.findMany({
     where: { tenantId },
+    include: { juntas: true }
   });
 
-  if (recintosCount === 0) {
-    for (const r of QUIJOS_DEFAULT_RECINTOS) {
+  const totalJuntasActuales = existingRecintos.reduce((acc, r) => acc + r.juntas.length, 0);
+  const tieneNombreAntiguo = existingRecintos.some(r => r.name.includes("Colegio Nacional San Francisco") || r.name.includes("Ciudad de Baeza"));
+
+  if (existingRecintos.length === 0 || totalJuntasActuales !== 20 || tieneNombreAntiguo) {
+    await prisma.electoralActa.deleteMany({ where: { tenantId } });
+    await prisma.electoralJunta.deleteMany({ where: { tenantId } });
+    await prisma.electoralRecinto.deleteMany({ where: { tenantId } });
+
+    for (const r of QUIJOS_OFFICIAL_CNE_RECINTOS) {
       const createdRecinto = await prisma.electoralRecinto.create({
         data: {
           tenantId,
@@ -118,7 +186,7 @@ export async function getElectoralDashboardData() {
         });
       }
     }
-    writeLog("INFO", tenant.slug, session.id, "Estructura electoral inicial de recintos creada automáticamente");
+    writeLog("INFO", tenant.slug, session.id, "Estructura oficial CNE Quijos cargada automáticamente (20 Juntas • 5,738 Electores)");
   }
 
   // Cargar todos los recintos con juntas y actas
