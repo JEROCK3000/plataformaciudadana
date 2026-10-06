@@ -43,36 +43,32 @@ export default async function AdminDashboard() {
                 <Globe size={18} /> Portal
               </Link>
 
-              {/* MÓDULOS DE INTELIGENCIA ELECTORAL / MODO CAMPAÑA */}
-              <Link 
-                href="/admin/control-electoral" 
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm ${
-                  tenant?.campaignMode 
-                    ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/40' 
-                    : 'text-red-400 hover:text-red-300 hover:bg-gray-800'
-                }`}
-                title="Control Electoral Día D & Conteo Rápido de Actas"
-              >
-                <Vote size={16} className="text-red-400" /> Día D
-              </Link>
-              <Link 
-                href="/admin/war-room" 
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm ${
-                  tenant?.campaignMode 
-                    ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40' 
-                    : 'text-amber-400 hover:text-amber-300 hover:bg-gray-800'
-                }`}
-                title="Centro de Inteligencia de Campaña & Discurso"
-              >
-                <Target size={16} className="text-amber-400" /> War Room
-              </Link>
-              <Link 
-                href="/admin/qr-codes" 
-                className="flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300 transition-colors font-medium text-xs px-2 py-1 rounded-lg hover:bg-gray-800"
-                title="Generador de Códigos QR para Brigadas"
-              >
-                <QrCode size={16} /> Códigos QR
-              </Link>
+              {/* MÓDULOS DE INTELIGENCIA ELECTORAL / MODO CAMPAÑA (SE OCULTAN EN MODO GAD) */}
+              {tenant?.campaignMode && (
+                <>
+                  <Link 
+                    href="/admin/control-electoral" 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/40"
+                    title="Control Electoral Día D & Conteo Rápido de Actas"
+                  >
+                    <Vote size={16} className="text-red-400" /> Día D
+                  </Link>
+                  <Link 
+                    href="/admin/war-room" 
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40"
+                    title="Centro de Inteligencia de Campaña & Discurso"
+                  >
+                    <Target size={16} className="text-amber-400" /> War Room
+                  </Link>
+                  <Link 
+                    href="/admin/qr-codes" 
+                    className="flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300 transition-colors font-medium text-xs px-2 py-1 rounded-lg hover:bg-gray-800"
+                    title="Generador de Códigos QR para Brigadas"
+                  >
+                    <QrCode size={16} /> Códigos QR
+                  </Link>
+                </>
+              )}
 
               <Link href="/admin/stats" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
                 <BarChart3 size={18} /> Estadísticas

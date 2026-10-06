@@ -85,7 +85,7 @@ const QUIJOS_OFFICIAL_CNE_RECINTOS = [
   {
     name: "Escuela Fiscal Mixta Quijos (GAD Parroquial)",
     parish: "Sumaco",
-    address: "Comunidad Pacto Sumaco",
+    address: "Sector Salahonda / Central (a 3 km de San Francisco de Borja)",
     electors: 328,
     coordinatorName: "Sr. Segundo Chimbo",
     coordinatorPhone: "0994455667",
