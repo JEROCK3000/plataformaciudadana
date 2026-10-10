@@ -11,7 +11,10 @@ import {
   ShieldCheck, 
   Flame, 
   Radio,
-  ExternalLink
+  ExternalLink,
+  Calculator,
+  Calendar,
+  Users
 } from 'lucide-react';
 
 interface TacticalMenuProps {
@@ -155,6 +158,74 @@ export default function AdminHeaderTacticalMenu({
               <ExternalLink size={13} className="text-slate-600 group-hover:text-red-400 transition-colors" />
             </Link>
 
+            {/* CALCULADORA DE UMBRAL */}
+            <Link
+              href="/admin/calculadora-victoria"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 group-hover:scale-105 transition-transform">
+                  <Calculator size={16} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors flex items-center gap-1.5">
+                    Calculadora de Victoria
+                    <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 text-[9px] rounded font-black">Meta 1,850</span>
+                  </h4>
+                  <p className="text-[10px] text-slate-400">
+                    Simulador matemático de umbral cantonal
+                  </p>
+                </div>
+              </div>
+              <ExternalLink size={13} className="text-slate-600 group-hover:text-amber-400 transition-colors" />
+            </Link>
+
+            {/* AGENDA TERRITORIAL */}
+            <Link
+              href="/admin/agenda-territorial"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 group-hover:scale-105 transition-transform">
+                  <Calendar size={16} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                    Agenda de Territorio
+                  </h4>
+                  <p className="text-[10px] text-slate-400">
+                    Caminatas y discursos conectados a quejas
+                  </p>
+                </div>
+              </div>
+              <ExternalLink size={13} className="text-slate-600 group-hover:text-emerald-400 transition-colors" />
+            </Link>
+
+            {/* PADRÓN ELECTORAL / VOTO SEGURO */}
+            <Link
+              href="/admin/padron-electoral"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 group-hover:scale-105 transition-transform">
+                  <Users size={16} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">
+                    Padrón y Voto Seguro
+                  </h4>
+                  <p className="text-[10px] text-slate-400">
+                    Chequeo de asistencia y transporte Día D
+                  </p>
+                </div>
+              </div>
+              <ExternalLink size={13} className="text-slate-600 group-hover:text-blue-400 transition-colors" />
+            </Link>
+
+            {/* CÓDIGOS QR */}
             <Link
               href="/admin/qr-codes"
               onClick={() => setIsOpen(false)}

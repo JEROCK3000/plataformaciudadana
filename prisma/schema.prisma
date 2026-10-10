@@ -42,6 +42,9 @@ model Tenant {
   recintos       ElectoralRecinto[]
   juntas         ElectoralJunta[]
   actas          ElectoralActa[]
+  scenarios      CampaignScenario[]
+  activities     CampaignActivity[]
+  voters         VoterRoll[]
 }
 
 // Usuarios Administradores de la Plataforma
@@ -221,6 +224,7 @@ model ElectoralRecinto {
   coordinatorPhone String?         // Teléfono / WhatsApp del coordinador
 
   juntas          ElectoralJunta[]
+  voters          VoterRoll[]
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -244,6 +248,7 @@ model ElectoralJunta {
   delegateStatus  DelegateStatus   @default(PENDIENTE)
 
   acta            ElectoralActa?
+  voters          VoterRoll[]
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -276,5 +281,150 @@ model ElectoralActa {
   updatedAt        DateTime        @updatedAt
 
   @@index([tenantId, status])
+}
+
+// ============================================================
+// ENUMS DE LOS NUEVOS MÓDULOS ESTRATÉGICOS
+// ============================================================
+
+enum ActivityType {
+  CAMINATA
+  CARAVANA
+  MITIN
+  REUNION_VECINAL
+  PUERTA_A_PUERTA
+  BRIGADA_COMUNITARIA
+  VOLANTEO_FERIA
+  OTRO
+}
+
+enum ActivityStatus {
+  PLANIFICADA
+  CONFIRMADA
+  EN_CURSO
+  COMPLETADA
+  CANCELADA
+}
+
+enum CommitmentLevel {
+  SEGURO
+  PROBABLE
+  INDECISO
+  RIVAL
+}
+
+// ============================================================
+// MÓDULO 1: CALCULADORA DEL UMBRAL DE VICTORIA CANTONAL
+// ============================================================
+
+model CampaignScenario {
+  id                   String    @id @default(uuid())
+  tenantId             String
+  tenant               Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  name                 String    // Ej: "Escenario Base Seccionales", "Escenario Meta Máxima"
+  description          String?   @db.Text
+  expectedTurnoutRate  Float     @default(86.0) // Porcentaje de participación esperada (ej: 86%)
+  nullBlankRate        Float     @default(11.5) // Porcentaje estimado de blancos y nulos (ej: 11.5%)
+  targetCandidateVotes Int       @default(1750) // Meta votos Brandon Aliaga
+  
+  // Metas detalladas por Parroquia en formato JSON
+  parishGoals          Json
+  
+  // Estimaciones de votación para rivales en formato JSON
+  rivalEstimates       Json?
+
+  isDefault            Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+// ============================================================
+// MÓDULO 2: AGENDA TÁCTICA DE TERRITORIO Y CAMINATAS
+// ============================================================
+
+model CampaignActivity {
+  id                 String          @id @default(uuid())
+  tenantId           String
+  tenant             Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  title              String          // Ej: "Caminata y Puerta a Puerta Barrio Central y Mercado"
+  type               ActivityType    @default(CAMINATA)
+  parish             String          // Baeza, San Francisco de Borja, Cosanga, etc.
+  sector             String          // Barrio, Caserío o Sector específico
+  date               DateTime        // Fecha y hora programada
+  status             ActivityStatus  @default(PLANIFICADA)
+
+  responsibleName    String?         // Nombre del jefe de avanzada o brigadista líder
+  responsiblePhone   String?         // Contacto telefónico
+  meetingPoint       String?         // Punto de concentración (ej. Frente al Parque Central)
+  
+  estimatedAttendees Int             @default(0)
+  actualAttendees    Int             @default(0)
+
+  logisticsNotes     String?         @db.Text // Banderas, volantes, megáfono, transporte, refrigerios
+  speechFocus        String?         @db.Text // Ejes del discurso (vinculado a necesidades ciudadanas)
+  relatedCategory    Category?       // Categoría principal del reclamo ciudadano que se abordará
+
+  photos             Json?           // Fotos de la actividad
+  notes              String?         @db.Text
+
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@index([tenantId, parish])
+  @@index([tenantId, date])
+  @@index([tenantId, status])
+}
+
+// ============================================================
+// MÓDULO 3: PADRÓN ELECTORAL Y CHEQUEO DÍA D (VOTO SEGURO)
+// ============================================================
+
+model VoterRoll {
+  id                 String           @id @default(uuid())
+  tenantId           String
+  tenant             Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  cedula             String
+  fullName           String
+  parish             String           // Parroquia
+  
+  recintoId          String?
+  recinto            ElectoralRecinto? @relation(fields: [recintoId], references: [id], onDelete: SetNull)
+  
+  juntaId            String?
+  junta              ElectoralJunta?  @relation(fields: [juntaId], references: [id], onDelete: SetNull)
+  
+  juntaNumber        Int?             // Número de JRV
+  gender             JuntaGender?     // Femenino / Masculino / Mixto
+
+  phone              String?
+  neighborhood       String?          // Barrio o comunidad de residencia
+  
+  commitmentLevel    CommitmentLevel  @default(SEGURO) // SEGURO, PROBABLE, INDECISO, RIVAL
+  isSympathizer      Boolean          @default(true)
+
+  // Control en tiempo real durante el Día D
+  hasVoted           Boolean          @default(false)
+  votedAt            DateTime?
+
+  // Movilización y Logística el Día de la Elección
+  needsTransport     Boolean          @default(false)
+  transportAddress   String?          // Dirección para recogida si requiere vehículo
+  volunteerAssigned  String?          // Brigadista o taxista asignado para la movilización
+
+  notes              String?          @db.Text
+
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([tenantId, cedula])
+  @@index([tenantId, parish])
+  @@index([tenantId, hasVoted])
+  @@index([tenantId, commitmentLevel])
+  @@index([tenantId, recintoId])
 }
 

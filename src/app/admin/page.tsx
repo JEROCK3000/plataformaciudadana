@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, Vote, QrCode } from 'lucide-react';
+import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, Vote, QrCode, Calculator, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '@/lib/actions/auth';
 import { requireTenantAdmin } from '@/lib/auth/session';
@@ -148,24 +148,39 @@ export default async function AdminDashboard() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 self-start sm:self-center">
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+              <Link 
+                href="/admin/calculadora-victoria" 
+                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                title="Simulador de Umbral de Victoria"
+              >
+                <Calculator size={14} /> Umbral Victoria
+              </Link>
+              <Link 
+                href="/admin/agenda-territorial" 
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                title="Agenda de Caminatas y Mitines"
+              >
+                <Calendar size={14} /> Agenda Territorio
+              </Link>
+              <Link 
+                href="/admin/padron-electoral" 
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                title="Padrón y Chequeo Día D"
+              >
+                <Users size={14} /> Padrón / Voto
+              </Link>
               <Link 
                 href="/admin/control-electoral" 
-                className="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
               >
-                <Vote size={15} /> Control Electoral
+                <Vote size={14} /> Día D (20 JRVs)
               </Link>
               <Link 
                 href="/admin/war-room" 
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5"
               >
-                <Target size={15} /> Abrir War Room
-              </Link>
-              <Link 
-                href="/admin/qr-codes" 
-                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5"
-              >
-                <QrCode size={15} /> Códigos QR
+                <Target size={14} /> War Room
               </Link>
             </div>
           </div>
