@@ -1,10 +1,11 @@
 import React from 'react';
 import { prisma } from '@/lib/db/prisma';
-import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, QrCode, Vote } from 'lucide-react';
+import { Shield, Settings, Users, LogOut, Globe, BarChart3, Building2, FolderDown, Target, Vote, QrCode } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '@/lib/actions/auth';
 import { requireTenantAdmin } from '@/lib/auth/session';
 import ReportsAdminTable from '@/components/admin/ReportsAdminTable';
+import AdminHeaderTacticalMenu from '@/components/admin/AdminHeaderTacticalMenu';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,69 +23,97 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <header className="bg-gray-900 dark:bg-black text-white shadow-md">
+      <header className="bg-gray-900 dark:bg-black text-white shadow-md border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <Shield size={24} className="text-emerald-400" />
+          <div className="flex flex-wrap lg:flex-nowrap justify-between items-center py-3 gap-2">
+            
+            {/* IDENTIDAD / BRANDING (Compacto y elegante) */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                <Shield size={20} />
+              </div>
               <div>
-                <h1 className="text-xl font-bold leading-tight">Panel de Administración</h1>
-                <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
-                  <Building2 size={12} /> {tenant?.name || 'GAD Municipal'} (Cantón {tenant?.canton || ''})
+                <h1 className="text-base sm:text-lg font-black leading-tight tracking-tight">Panel de Administración</h1>
+                <p className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                  <Building2 size={11} /> {tenant?.name || 'GAD Municipal'} • Cantón {tenant?.canton || 'Quijos'}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-sm font-medium">
+
+            {/* MENÚ SUPERIOR EN 1 SOLA LÍNEA UNIFICADA */}
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold shrink-0">
+              
+              {/* Enlace al Portal Ciudadano */}
               <Link 
                 href={tenant ? `/${tenant.slug}` : "/"} 
-                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors border-r border-gray-700 pr-3 mr-1" 
-                title="Volver al Portal Ciudadano de este cantón"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors" 
+                title="Ver Portal Ciudadano público"
               >
-                <Globe size={18} /> Portal
+                <Globe size={15} />
+                <span className="hidden sm:inline">Portal</span>
               </Link>
 
-              {/* MÓDULOS DE INTELIGENCIA ELECTORAL / MODO CAMPAÑA (SE OCULTAN EN MODO GAD) */}
+              <span className="w-px h-4 bg-gray-800" />
+
+              {/* CÁPSULA TÁCTICA ELECTORAL DE 1 SOLA LÍNEA (MODO CAMPAÑA) */}
               {tenant?.campaignMode && (
-                <>
-                  <Link 
-                    href="/admin/control-electoral" 
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/40"
-                    title="Control Electoral Día D & Conteo Rápido de Actas"
-                  >
-                    <Vote size={16} className="text-red-400" /> Día D
-                  </Link>
-                  <Link 
-                    href="/admin/war-room" 
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors font-bold text-xs shadow-sm bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40"
-                    title="Centro de Inteligencia de Campaña & Discurso"
-                  >
-                    <Target size={16} className="text-amber-400" /> War Room
-                  </Link>
-                  <Link 
-                    href="/admin/qr-codes" 
-                    className="flex items-center gap-1.5 text-amber-400/90 hover:text-amber-300 transition-colors font-medium text-xs px-2 py-1 rounded-lg hover:bg-gray-800"
-                    title="Generador de Códigos QR para Brigadas"
-                  >
-                    <QrCode size={16} /> Códigos QR
-                  </Link>
-                </>
+                <AdminHeaderTacticalMenu 
+                  candidateName={tenant.candidateName} 
+                  campaignListNumber={tenant.campaignListNumber} 
+                />
               )}
 
-              <Link href="/admin/stats" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                <BarChart3 size={18} /> Estadísticas
+              {/* Estadísticas */}
+              <Link 
+                href="/admin/stats" 
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:text-emerald-400 hover:bg-gray-800/80 transition-colors text-gray-300"
+                title="Métricas y Estadísticas Cantonales"
+              >
+                <BarChart3 size={15} className="text-emerald-400" />
+                <span className="hidden xl:inline">Estadísticas</span>
               </Link>
-              <Link href="/admin/descargas" className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold">
-                <FolderDown size={18} /> Descargas
+
+              {/* Descargas Oficiales */}
+              <Link 
+                href="/admin/descargas" 
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors font-bold"
+                title="Descarga de PDFs y Excel Oficial"
+              >
+                <FolderDown size={15} />
+                <span className="hidden md:inline">Descargas</span>
               </Link>
-              <Link href="/admin/settings" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                <Settings size={18} /> Configuración
+
+              {/* Configuración */}
+              <Link 
+                href="/admin/settings" 
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:text-emerald-400 hover:bg-gray-800/80 transition-colors text-gray-300"
+                title="Ajustes de Plataforma y Campaña"
+              >
+                <Settings size={15} />
+                <span className="hidden lg:inline">Ajustes</span>
               </Link>
-              <Link href="/admin/users" className="flex items-center gap-2 hover:text-emerald-400 transition-colors">
-                <Users size={18} /> Usuarios
+
+              {/* Usuarios */}
+              <Link 
+                href="/admin/users" 
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:text-emerald-400 hover:bg-gray-800/80 transition-colors text-gray-300"
+                title="Gestión de Usuarios y Roles"
+              >
+                <Users size={15} />
+                <span className="hidden xl:inline">Usuarios</span>
               </Link>
-              <form action={logoutAction}>
-                <button type="submit" className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors ml-2 border-l border-gray-700 pl-3">
-                  <LogOut size={18} /> Salir
+
+              <span className="w-px h-4 bg-gray-800" />
+
+              {/* Botón Salir */}
+              <form action={logoutAction} className="inline-flex">
+                <button 
+                  type="submit" 
+                  className="flex items-center gap-1 px-2 py-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                  title="Cerrar sesión"
+                >
+                  <LogOut size={15} />
+                  <span className="hidden sm:inline">Salir</span>
                 </button>
               </form>
             </div>
