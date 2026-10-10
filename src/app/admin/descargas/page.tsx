@@ -14,7 +14,8 @@ import {
   Layers, 
   Scale, 
   CheckCircle2,
-  Target 
+  Target,
+  GraduationCap
 } from 'lucide-react';
 import { requireTenantAdmin } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
@@ -29,6 +30,19 @@ export default async function DescargasPage() {
   });
 
   const documents = [
+    {
+      id: 'capacitacion-exposicion-campana',
+      title: 'Manual de Capacitación, Exposición & Soporte Día D',
+      category: 'Inducción de Comando, Avanzada & 20 Delegados',
+      badge: 'Presentación Ejecutiva (Deck A4)',
+      badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      icon: <GraduationCap className="text-amber-600 dark:text-amber-400" size={26} />,
+      format: 'PDF Enterprise',
+      size: '3.4 MB',
+      description: 'Diapositivas y protocolo para la capacitación del candidato Brandon Aliaga, equipo de avanzada y 20 delegados de mesa. Incluye reglas de la Calculadora de Victoria, Agenda de Territorio con discurso por quejas ciudadanas, Operación Remolque de las 13:00 y cronograma hora por hora del Día D.',
+      url: '/api/reports/export/capacitacion-pdf',
+      directFile: 'SOLINTEEC_Manual_Capacitacion_Exposicion_Campana_Quijos.pdf',
+    },
     {
       id: 'especificaciones-modo-campana',
       title: 'Especificaciones Técnicas: Automatización & Modo Campaña',
