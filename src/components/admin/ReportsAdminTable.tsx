@@ -20,8 +20,11 @@ import {
   HardHat, 
   Sparkles,
   ChevronRight,
-  UserCheck
+  UserCheck,
+  GitMerge,
+  Users
 } from 'lucide-react';
+import ReportModerationModal from '@/components/admin/ReportModerationModal';
 
 interface ReportItem {
   id: string;
@@ -40,6 +43,11 @@ interface ReportItem {
   resolutionPhotos: any;
   resolutionNotes: string | null;
   resolvedAt: Date | string | null;
+  moderationStatus?: any;
+  moderationNotes?: string | null;
+  parentReportId?: string | null;
+  duplicateCount?: number;
+  supportCount?: number;
   createdAt: Date | string;
 }
 
@@ -94,6 +102,8 @@ export default function ReportsAdminTable({
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedUrgency, setSelectedUrgency] = useState('');
+  const [selectedModeration, setSelectedModeration] = useState('');
+  const [moderatingReport, setModeratingReport] = useState<ReportItem | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // Filtrado reactivo en memoria
@@ -111,10 +121,11 @@ export default function ReportsAdminTable({
       const matchesDepartment = selectedDepartment === '' || report.department === selectedDepartment;
       const matchesStatus = selectedStatus === '' || report.status === selectedStatus;
       const matchesUrgency = selectedUrgency === '' || report.urgency === selectedUrgency;
+      const matchesModeration = selectedModeration === '' || (report.moderationStatus || 'APPROVED') === selectedModeration;
 
-      return matchesSearch && matchesParish && matchesDepartment && matchesStatus && matchesUrgency;
+      return matchesSearch && matchesParish && matchesDepartment && matchesStatus && matchesUrgency && matchesModeration;
     });
-  }, [initialReports, searchTerm, selectedParish, selectedDepartment, selectedStatus, selectedUrgency]);
+  }, [initialReports, searchTerm, selectedParish, selectedDepartment, selectedStatus, selectedUrgency, selectedModeration]);
 
   // Contadores para métricas rápidas
   const counts = useMemo(() => {
@@ -123,10 +134,11 @@ export default function ReportsAdminTable({
       pendientes: filteredReports.filter((r) => r.status === 'PENDIENTE' || r.status === 'RECEIVED').length,
       enProceso: filteredReports.filter((r) => r.status === 'EN_PROCESO' || r.status === 'IN_PROGRESS' || r.status === 'EN_REVISION' || r.status === 'IN_REVIEW').length,
       resueltos: filteredReports.filter((r) => r.status === 'RESUELTO' || r.status === 'RESOLVED').length,
+      duplicados: filteredReports.filter((r) => (r.moderationStatus === 'MERGED' || r.parentReportId != null)).length,
     };
   }, [filteredReports]);
 
-  const hasActiveFilters = searchTerm !== '' || selectedParish !== '' || selectedDepartment !== '' || selectedStatus !== '' || selectedUrgency !== '';
+  const hasActiveFilters = searchTerm !== '' || selectedParish !== '' || selectedDepartment !== '' || selectedStatus !== '' || selectedUrgency !== '' || selectedModeration !== '';
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -134,6 +146,7 @@ export default function ReportsAdminTable({
     setSelectedDepartment('');
     setSelectedStatus('');
     setSelectedUrgency('');
+    setSelectedModeration('');
   };
 
   // Construir parámetros para exportación
@@ -268,7 +281,7 @@ export default function ReportsAdminTable({
           </div>
 
           {/* Fila de Controles de Filtro */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2">
             {/* Buscador de texto */}
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -340,6 +353,21 @@ export default function ReportsAdminTable({
                 <option value="ALTA">Alta</option>
                 <option value="MEDIA">Media</option>
                 <option value="BAJA">Baja</option>
+              </select>
+            </div>
+
+            {/* Filtro Moderación y Duplicados */}
+            <div>
+              <select
+                value={selectedModeration}
+                onChange={(e) => setSelectedModeration(e.target.value)}
+                className="w-full py-2 px-3 text-xs rounded-lg border border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold"
+              >
+                <option value="">Filtro Moderación</option>
+                <option value="APPROVED">Aprobados (En Mapa)</option>
+                <option value="PENDING">Pendientes Revisión</option>
+                <option value="MERGED">Duplicados Agrupados</option>
+                <option value="DISCARDED">Descartados / Spam</option>
               </select>
             </div>
           </div>
@@ -431,6 +459,31 @@ export default function ReportsAdminTable({
                           <span>•</span>
                           <span className="truncate">{report.neighborhood}</span>
                         </div>
+                        {/* Badges de Deduplicación y Agrupación */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {report.duplicateCount && report.duplicateCount > 0 ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                              <Users size={10} />
+                              +{report.duplicateCount} agrupados (+{report.supportCount || 1} vecinos)
+                            </span>
+                          ) : null}
+                          {report.moderationStatus === 'MERGED' || report.parentReportId ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/70 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                              <GitMerge size={10} />
+                              Duplicado vinculado
+                            </span>
+                          ) : null}
+                          {report.moderationStatus === 'PENDING' ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300">
+                              Por moderar
+                            </span>
+                          ) : null}
+                          {report.moderationStatus === 'DISCARDED' ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300">
+                              Descartado
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
 
                       {/* Ciudadano */}
@@ -477,15 +530,27 @@ export default function ReportsAdminTable({
                         )}
                       </td>
 
-                      {/* Acción Gestionar */}
+                      {/* Acción Gestionar y Moderar */}
                       <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <Link
-                          href={`/admin/report/${report.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-sm transition-colors"
-                        >
-                          Gestionar
-                          <ChevronRight size={14} />
-                        </Link>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setModeratingReport(report)}
+                            title="Moderar visibilidad y fusionar duplicados"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/50 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 font-semibold text-xs border border-purple-200 dark:border-purple-800 transition-colors"
+                          >
+                            <GitMerge size={13} />
+                            <span className="hidden xl:inline">Moderar</span>
+                          </button>
+
+                          <Link
+                            href={`/admin/report/${report.id}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs shadow-sm transition-colors"
+                          >
+                            Gestionar
+                            <ChevronRight size={14} />
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -495,6 +560,15 @@ export default function ReportsAdminTable({
           </table>
         </div>
       </div>
+
+      {/* Modal de Moderación y Deduplicación */}
+      {moderatingReport && (
+        <ReportModerationModal
+          report={moderatingReport}
+          onClose={() => setModeratingReport(null)}
+          onSuccess={() => window.location.reload()}
+        />
+      )}
     </div>
   );
 }

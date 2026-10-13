@@ -125,12 +125,29 @@ export default async function SingleReportPage({ params }: { params: Promise<{ i
               </div>
             </div>
 
-            <div className="prose dark:prose-invert max-w-none mb-8">
+            <div className="prose dark:prose-invert max-w-none mb-6">
               <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
                 <Info size={18} className="text-gray-400" /> Descripción de la Necesidad
               </h3>
               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{report.description}</p>
             </div>
+
+            {/* Aviso de Deduplicación y Respaldo Vecinal */}
+            {report.duplicateCount && report.duplicateCount > 0 ? (
+              <div className="mb-8 p-4 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 shrink-0">
+                  <Sparkles size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-purple-900 dark:text-purple-200">
+                    Caso Prioritario con Fusión Comunitaria
+                  </h4>
+                  <p className="text-xs text-purple-700 dark:text-purple-300 mt-0.5 leading-relaxed">
+                    Este reporte consolida <strong>{report.duplicateCount} reportes ciudadanos adicionales</strong> del mismo problema en {report.neighborhood} y cuenta con el respaldo directo de <strong>{report.supportCount || (report.duplicateCount + 1)} vecinos</strong>.
+                  </p>
+                </div>
+              </div>
+            ) : null}
 
             {originalPhotos.length > 0 && (
               <div className="mb-8">

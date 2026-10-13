@@ -99,6 +99,15 @@ model Report {
   // Análisis IA persistido
   aiAnalysis       String?  @db.LongText
 
+  // Moderación y Agrupación de Duplicados (Deduplicación & Clusters)
+  moderationStatus ModerationStatus @default(APPROVED)
+  moderationNotes  String?          @db.Text
+  parentReportId   String?
+  parentReport     Report?          @relation("ReportDuplicates", fields: [parentReportId], references: [id], onDelete: SetNull)
+  duplicates       Report[]         @relation("ReportDuplicates")
+  duplicateCount   Int              @default(0)
+  supportCount     Int              @default(1)
+
   // Relaciones
   comments         Comment[]
   votesList        ReportVote[]
@@ -108,7 +117,9 @@ model Report {
 
   @@index([tenantId, createdAt])
   @@index([tenantId, status])
+  @@index([tenantId, moderationStatus])
   @@index([tenantId, department])
+  @@index([parentReportId])
 }
 
 model Comment {
@@ -177,6 +188,13 @@ enum ReportStatus {
   IN_PROGRESS
   RESOLVED
   REJECTED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  MERGED
+  DISCARDED
 }
 
 // Configuración Global de la Plataforma
