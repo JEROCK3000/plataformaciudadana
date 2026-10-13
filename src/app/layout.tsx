@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import PwaRegister from "@/components/pwa/PwaRegister";
+import OfflineBanner from "@/components/pwa/OfflineBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,6 +48,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <PwaRegister />
+        <OfflineBanner />
         {children}
         <footer className="bg-gray-900 text-gray-500 text-xs text-center py-3 mt-auto">
           Desarrollado por{' '}

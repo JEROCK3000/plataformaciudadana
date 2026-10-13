@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MapPin, CheckCircle, Camera, X, User } from 'lucide-react';
+import { MapPin, CheckCircle, Camera, X, User, WifiOff, CloudUpload } from 'lucide-react';
 import { createReport } from '@/lib/actions/reports';
+import { saveOfflineReport } from '@/lib/offline/offlineStorage';
 
 const CATEGORIAS = [
   { id: 'INFRASTRUCTURE', label: 'Infraestructura y Vialidad' },
@@ -166,6 +167,7 @@ export default function ReportForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [savedOffline, setSavedOffline] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,27 +210,72 @@ export default function ReportForm({
     }
   };
 
+  const resetFormState = () => {
+    setFormData(prev => ({
+      ...prev,
+      title: '',
+      neighborhood: '',
+      description: '',
+      citizenName: '',
+      citizenContact: '',
+      photos: [],
+      privacyAccepted: false,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    try {
-      const response = await createReport({
-        ...formData,
-        tenantSlug,
-        category: formData.category as any,
-        urgency: formData.urgency as any
-      });
 
-      if (response.success) {
+    const reportPayload = {
+      tenantSlug,
+      title: formData.title,
+      category: formData.category as any,
+      parish: formData.parish,
+      neighborhood: formData.neighborhood,
+      description: formData.description,
+      urgency: formData.urgency as any,
+      citizenName: formData.citizenName,
+      citizenContact: formData.citizenContact,
+      privacyAccepted: formData.privacyAccepted,
+      photos: formData.photos,
+    };
+
+    // Caso A: Si el navegador no tiene conexión activa, guardar localmente sin intentar la red
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      saveOfflineReport(reportPayload);
+      setIsSubmitting(false);
+      setSavedOffline(true);
+      resetFormState();
+      setTimeout(() => setSavedOffline(false), 5000);
+      return;
+    }
+    
+    // Caso B: Si está online, intentar enviar por red
+    try {
+      const response = await createReport(reportPayload);
+
+      if (response && response.success) {
         setSubmitSuccess(true);
+        resetFormState();
         setTimeout(() => {
           setSubmitSuccess(false);
-          setFormData(prev => ({ ...prev, title: '', neighborhood: '', description: '', citizenName: '', citizenContact: '', photos: [], privacyAccepted: false }));
-        }, 3000);
+        }, 3500);
+      } else {
+        // Si el servidor devolvió error o timeout, respaldar de emergencia en local
+        console.warn("[ReportForm] Fallo de servidor, guardando copia de seguridad offline.");
+        saveOfflineReport(reportPayload);
+        setSavedOffline(true);
+        resetFormState();
+        setTimeout(() => setSavedOffline(false), 5000);
       }
     } catch (error) {
-      console.error("Error al enviar el reporte", error);
+      // Si la llamada falló por caída de conexión súbita
+      console.warn("[ReportForm] Conexión perdida durante el envío, guardando offline:", error);
+      saveOfflineReport(reportPayload);
+      setSavedOffline(true);
+      resetFormState();
+      setTimeout(() => setSavedOffline(false), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -236,12 +283,34 @@ export default function ReportForm({
 
   if (submitSuccess) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-12 text-center">
-        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-green-200 dark:border-green-800/60 p-12 text-center animate-in zoom-in-95 duration-200">
+        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle size={32} />
         </div>
         <h3 className="text-xl font-bold text-gray-800 dark:text-white">¡Reporte Enviado con Éxito!</h3>
-        <p className="text-gray-600 dark:text-gray-300 mt-2">Gracias por contribuir al desarrollo. Tu reporte ha sido registrado de forma segura.</p>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
+          Gracias por contribuir al desarrollo. Tu reporte ha sido registrado en el War Room de forma segura.
+        </p>
+      </div>
+    );
+  }
+
+  if (savedOffline) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-amber-300 dark:border-amber-700/80 p-8 sm:p-12 text-center animate-in zoom-in-95 duration-200">
+        <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4">
+          <WifiOff size={32} />
+        </div>
+        <span className="inline-block px-3 py-1 bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+          Modo Sin Conexión Protegido
+        </span>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white">¡Reporte Guardado en tu Teléfono!</h3>
+        <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm max-w-md mx-auto">
+          Detectamos señal celular baja o nula en este sector. Tu información quedó protegida localmente en este dispositivo y se subirá automáticamente en cuanto recuperes cobertura de internet.
+        </p>
+        <div className="mt-4 inline-flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 font-semibold bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-800/50">
+          <CloudUpload size={15} /> Sincronización automática activa en segundo plano
+        </div>
       </div>
     );
   }

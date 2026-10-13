@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import ImageUploadDropzone from '@/components/ui/ImageUploadDropzone';
 import { saveElectoralActa, updateDelegate, syncOfficialCneRecintos } from '@/lib/actions/electoral';
+import { saveOfflineActa } from '@/lib/offline/offlineStorage';
 
 interface ControlElectoralProps {
   data: {
@@ -152,6 +153,29 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
     e.preventDefault();
     setSubmitMessage(null);
 
+    const actaData = {
+      juntaId: selectedJuntaId,
+      candidateVotes,
+      balladaresVotes,
+      ruizVotes,
+      guerreroVotes,
+      rivalVotes: balladaresVotes,
+      otherVotes: ruizVotes + guerreroVotes,
+      blankVotes,
+      nullVotes,
+      photoUrl: actaPhotoUrl || undefined,
+    };
+
+    // Caso A: Si el dispositivo está sin conexión a internet en el recinto
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      saveOfflineActa(actaData);
+      setSubmitMessage({
+        type: 'success',
+        text: '¡Acta protegida localmente en este teléfono (Modo Sin Conexión)! Se transmitirá automáticamente al War Room apenas detecte cobertura celular o WiFi.'
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append('juntaId', selectedJuntaId);
     formData.append('candidateVotes', candidateVotes.toString());
@@ -165,16 +189,29 @@ export default function ControlElectoralClient({ data }: ControlElectoralProps) 
     if (actaPhotoUrl) formData.append('photoUrl', actaPhotoUrl);
 
     startTransition(async () => {
-      const res = await saveElectoralActa(formData);
-      if (res.success) {
+      try {
+        const res = await saveElectoralActa(formData);
+        if (res.success) {
+          setSubmitMessage({
+            type: 'success',
+            text: res.hasInconsistency
+              ? '¡Acta transmitida con éxito! Alerta: Se registró con bandera de inconsistencia numérica.'
+              : '¡Acta oficial transmitida y verificada correctamente!'
+          });
+        } else {
+          // Si el servidor falla o hay timeout en territorio
+          saveOfflineActa(actaData);
+          setSubmitMessage({
+            type: 'success',
+            text: '¡Servidor no disponible momentáneamente! El acta quedó asegurada localmente en tu teléfono y se reintentará en segundo plano.'
+          });
+        }
+      } catch (networkErr) {
+        saveOfflineActa(actaData);
         setSubmitMessage({
           type: 'success',
-          text: res.hasInconsistency
-            ? '¡Acta transmitida con éxito! Alerta: Se registró con bandera de inconsistencia numérica.'
-            : '¡Acta oficial transmitida y verificada correctamente!'
+          text: '¡Pérdida de señal durante la transmisión! El acta se guardó sin pérdida en tu teléfono y se sincronizará automáticamente.'
         });
-      } else {
-        setSubmitMessage({ type: 'error', text: res.error || 'Error al guardar el acta.' });
       }
     });
   };
