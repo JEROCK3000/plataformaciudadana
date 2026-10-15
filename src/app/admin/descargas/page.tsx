@@ -31,6 +31,19 @@ export default async function DescargasPage() {
 
   const documents = [
     {
+      id: 'manual-deduplicacion-inteligente',
+      title: 'Manual de Deduplicación, Moderación & Portal Ciudadano',
+      category: 'Ingeniería de Software & Gestión Territorial',
+      badge: 'Manual Técnico & Operativo',
+      badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+      icon: <Layers className="text-purple-600 dark:text-purple-400" size={26} />,
+      format: 'Manual Técnico',
+      size: 'Guía Completa',
+      description: 'Manual de funcionamiento paso a paso y arquitectura de software del motor inteligente de deduplicación: cómo se detectan y fusionan reportes similares (para evitar 20 pines repetidos en el mapa por la misma fuga o bache), esquema relacional reflexivo en MariaDB/MySQL y guía del nuevo Portal Ciudadano.',
+      url: '/docs/manual-tecnico-y-operativo-deduplicacion-inteligente.md',
+      directFile: 'manual-tecnico-y-operativo-deduplicacion-inteligente.md',
+    },
+    {
       id: 'capacitacion-exposicion-campana',
       title: 'Manual de Capacitación, Exposición & Soporte Día D',
       category: 'Inducción de Comando, Avanzada & 20 Delegados',
